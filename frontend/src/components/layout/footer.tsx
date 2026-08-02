@@ -36,7 +36,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-border bg-background pb-8 pt-16 text-foreground">
+    <footer className="relative overflow-hidden border-t border-border bg-background pb-24 pt-16 text-foreground md:pb-8">
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-32 w-3/4 -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
 
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,7 +135,7 @@ export function Footer() {
 
           <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
             <p>&copy; {new Date().getFullYear()} Xpert PPC. Engineered for Growth.</p>
-            <nav className="flex items-center gap-6">
+            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               {legalNav.map((l) => (
                 <Link key={l.href} href={l.href} className="transition-colors hover:text-primary">
                   {l.label}

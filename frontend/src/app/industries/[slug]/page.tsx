@@ -85,7 +85,7 @@ export default async function IndustryPage({ params }: Props) {
               <LoadItem
                 as="h1"
                 y={30}
-                className="mb-6 text-balance text-4xl font-extrabold leading-tight text-foreground md:text-5xl lg:text-6xl"
+                className="mb-6 text-balance text-3xl font-extrabold leading-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl"
               >
                 {industry.heroTitle}{' '}
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -165,7 +165,7 @@ export default async function IndustryPage({ params }: Props) {
               <RevealItem
                 key={t.name}
                 as="figure"
-                className="relative rounded-2xl border border-primary/20 bg-background p-8 transition-colors duration-300 hover:border-primary hover:shadow-[0_0_30px_rgba(0,102,204,0.15)]"
+                className="relative rounded-2xl border border-primary/20 bg-background p-5 transition-colors duration-300 hover:border-primary hover:shadow-[0_0_30px_rgba(0,102,204,0.15)] sm:p-8"
               >
                 <Quote className="mb-4 h-10 w-10 text-primary/30" />
                 <div className="mb-4 flex gap-1" aria-label={`${t.rating} out of 5 stars`}>
@@ -247,9 +247,9 @@ export default async function IndustryPage({ params }: Props) {
               <RevealItem
                 key={p.name}
                 className={cn(
-                  'relative flex flex-col rounded-2xl border p-8 transition-all duration-300',
+                  'relative flex flex-col rounded-2xl border p-5 transition-all duration-300 sm:p-8',
                   p.popular
-                    ? 'border-primary bg-background shadow-[0_0_40px_rgba(0,102,204,0.2)] lg:scale-105'
+                    ? 'z-10 border-primary bg-background shadow-[0_0_40px_rgba(0,102,204,0.2)] ring-1 ring-primary/40'
                     : 'border-primary/20 bg-background hover:border-primary/50'
                 )}
               >
@@ -278,7 +278,7 @@ export default async function IndustryPage({ params }: Props) {
                 <a
                   href="#audit-form"
                   className={cn(
-                    'btn-hover-effect inline-flex h-12 items-center justify-center rounded-md px-6 text-base font-bold transition-all duration-300',
+                    'btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-md px-6 text-base font-bold transition-all duration-300',
                     p.popular
                       ? 'hover-glow-primary bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground'
                       : 'border border-primary/30 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground'

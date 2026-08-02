@@ -108,13 +108,13 @@ export default async function CoursePage({ params }: Props) {
               href={enrollHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-hover-effect hover-glow-primary inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 text-sm font-bold text-white transition-all hover:scale-105"
+              className="btn-hover-effect hover-glow-primary inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 text-sm font-bold text-white transition-all hover:scale-105 sm:w-auto"
             >
               <MessageCircle className="h-4 w-4" /> Enroll on WhatsApp
             </a>
             <a
               href="#curriculum"
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-muted/40 px-6 text-sm font-bold text-foreground transition-all duration-300 hover:scale-105 hover:bg-muted/80 active:scale-95"
+              className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-border bg-muted/40 px-6 text-sm font-bold text-foreground transition-all duration-300 hover:scale-105 hover:bg-muted/80 active:scale-95 sm:w-auto"
             >
               View Curriculum
             </a>
@@ -134,7 +134,7 @@ export default async function CoursePage({ params }: Props) {
             </p>
           </div>
 
-          <RevealGroup className="mx-auto grid max-w-5xl grid-cols-2 gap-6 md:grid-cols-3">
+          <RevealGroup className="mx-auto grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
             {course.audience.map((a) => {
               const meta = audienceMeta[a] ?? {
                 icon: 'Users' as LucideIconName,
@@ -143,7 +143,7 @@ export default async function CoursePage({ params }: Props) {
               return (
                 <RevealItem
                   key={a}
-                  className="group rounded-2xl border border-border/50 bg-background p-6 text-center transition-colors duration-300 hover:border-primary/50"
+                  className="group rounded-2xl border border-border/50 bg-background p-5 text-center transition-colors duration-300 hover:border-primary/50 sm:p-6"
                 >
                   <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
                     <Icon name={meta.icon} className="h-7 w-7" />
@@ -184,7 +184,7 @@ export default async function CoursePage({ params }: Props) {
             <Reveal
               x={30}
               duration={0.6}
-              className="relative overflow-hidden rounded-2xl border border-border bg-card p-8"
+              className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 sm:p-8"
             >
               <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-primary/10 blur-[80px]" />
               <h3 className="relative z-10 mb-8 text-2xl font-bold text-foreground">
@@ -220,7 +220,7 @@ export default async function CoursePage({ params }: Props) {
           <RevealGroup
             as="ul"
             stagger={0.05}
-            className="mx-auto grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5"
+            className="mx-auto grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5"
           >
             {course.tools.map((t) => (
               <RevealItem
@@ -256,8 +256,10 @@ export default async function CoursePage({ params }: Props) {
                   className="rounded-xl border border-border bg-card px-5 data-[state=open]:border-primary/40"
                 >
                   <AccordionTrigger className="px-0 text-left font-semibold text-foreground hover:no-underline">
-                    <span className="mr-3 text-primary">Module {i + 1}</span>
-                    {mod.title.replace(/^Module \d+:\s*/, '')}
+                    <span className="min-w-0 flex-1 text-balance">
+                      <span className="mr-3 text-primary">Module {i + 1}</span>
+                      {mod.title.replace(/^Module \d+:\s*/, '')}
+                    </span>
                   </AccordionTrigger>
                   <AccordionContent className="px-0">
                     <ul className="space-y-2 pb-2">

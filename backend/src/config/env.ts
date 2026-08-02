@@ -22,6 +22,16 @@ export const env = {
     .map((o) => o.trim())
     .filter(Boolean),
   cookieDomain: process.env.COOKIE_DOMAIN || undefined,
+  /** Inbox that receives form submissions. */
+  leadNotifyTo: process.env.LEAD_NOTIFY_TO || 'umer@xpertppc.com',
+  smtp: {
+    host: process.env.SMTP_HOST || '',
+    port: Number(process.env.SMTP_PORT ?? 587),
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@xpertppc.com',
+  },
   get isProd() {
     return this.nodeEnv === 'production';
   },

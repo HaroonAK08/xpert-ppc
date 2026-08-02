@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader2, LogOut, RefreshCw, Trash2 } from 'lucide-react';
 
@@ -103,7 +104,13 @@ export function AdminDashboard() {
             ) : null}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/admin/courses"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-border px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+            >
+              Courses
+            </Link>
             <button
               type="button"
               onClick={() => void load(filter)}
@@ -131,14 +138,14 @@ export function AdminDashboard() {
           {statCards.map((s) => (
             <div key={s.label} className="rounded-2xl border border-border bg-card p-5">
               <dd className="text-2xl font-extrabold text-primary">{s.value}</dd>
-              <dt className="mt-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              <dt className="mt-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground sm:text-[11px] sm:tracking-widest">
                 {s.label}
               </dt>
             </div>
           ))}
         </dl>
 
-        <div className="mb-6 flex items-center gap-3">
+        <div className="mb-6 flex flex-wrap items-center gap-3">
           <label htmlFor="status-filter" className="text-sm font-semibold text-muted-foreground">
             Filter
           </label>
@@ -146,7 +153,7 @@ export function AdminDashboard() {
             id="status-filter"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="w-48"
+            className="w-full sm:w-48"
           >
             <option value="all">All statuses</option>
             {STATUSES.map((s) => (

@@ -67,17 +67,17 @@ export default function CaseStudyPage() {
               Success Story
             </div>
 
-            <h1 className="mb-6 text-balance text-4xl font-extrabold leading-tight text-foreground md:text-6xl">
+            <h1 className="mb-6 text-balance text-3xl font-extrabold leading-tight text-foreground sm:text-4xl md:text-6xl">
               {cs.title}
             </h1>
 
-            <p className="mb-8 text-xl font-medium text-muted-foreground md:text-2xl">
+            <p className="mb-8 text-lg font-medium text-muted-foreground sm:text-xl md:text-2xl">
               {cs.subtitle}
             </p>
 
             <a
               href="#overview"
-              className="inline-flex h-12 items-center justify-center rounded-md bg-[#f97316] px-8 text-base font-bold text-white shadow-[0_0_20px_rgba(249,115,22,0.3)] transition-all duration-300 hover:scale-105 hover:bg-[#ea580c] active:scale-95"
+              className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[#f97316] px-8 text-base font-bold text-white shadow-[0_0_20px_rgba(249,115,22,0.3)] transition-all duration-300 hover:scale-105 hover:bg-[#ea580c] active:scale-95 sm:w-auto"
             >
               View Full Case Study <ArrowRight className="ml-2 h-5 w-5" />
             </a>
@@ -244,7 +244,7 @@ export default function CaseStudyPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-flex h-14 items-center justify-center rounded-md bg-background px-8 text-lg font-bold text-foreground shadow-xl transition-all duration-300 hover:scale-105 hover:bg-accent hover:text-accent-foreground active:scale-95"
+            className="inline-flex h-12 w-full items-center justify-center rounded-md bg-background px-8 text-base font-bold text-foreground shadow-xl transition-all duration-300 hover:scale-105 hover:bg-accent hover:text-accent-foreground active:scale-95 sm:h-14 sm:w-auto sm:text-lg"
           >
             Start Your Case Study
           </Link>

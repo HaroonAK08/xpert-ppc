@@ -48,30 +48,30 @@ export default function AboutPage() {
     <>
       <JsonLd data={organizationSchema()} />
 
-      <section className="relative overflow-hidden bg-background pb-20 pt-20">
+      <section className="relative overflow-hidden bg-background pb-12 pt-12 sm:pb-20 sm:pt-20">
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-background via-card to-background" />
         <LoadFade
           y={20}
           duration={0.5}
-          className="container relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8"
+          className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8"
         >
           <Breadcrumbs items={[{ label: 'About Us' }]} />
-          <h1 className="mb-6 text-4xl font-extrabold leading-tight text-foreground md:text-6xl">
+          <h1 className="mb-6 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl md:text-6xl">
             Engineered for{' '}
             <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               Aggressive Growth
             </span>
           </h1>
-          <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
             We are a syndicate of elite media buyers deploying next-generation strategies across
             Google, Meta, and TikTok to scale brands past their plateaus.
           </p>
         </LoadFade>
       </section>
 
-      <section className="border-t border-primary/10 bg-card py-20">
+      <section className="border-t border-primary/10 bg-card py-12 sm:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <Reveal x={-30} duration={0.6}>
               <h2 className="mb-6 text-3xl font-bold text-primary drop-shadow-sm">
                 The Xpert Advantage
@@ -87,24 +87,24 @@ export default function AboutPage() {
               </p>
               <Link
                 href="/contact"
-                className="btn-hover-effect inline-flex h-12 items-center justify-center rounded-md border-2 border-primary bg-transparent px-8 text-base font-bold text-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
+                className="btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-md border-2 border-primary bg-transparent px-8 text-base font-bold text-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground sm:w-auto"
               >
                 Partner With Us
               </Link>
             </Reveal>
 
-            <RevealGroup className="grid grid-cols-2 gap-6">
+            <RevealGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               {stats.map((s) => (
                 <RevealItem
                   key={s.label}
                   x={30}
                   className="rounded-2xl border border-primary/20 bg-background transition-colors hover:border-primary hover-glow-primary"
                 >
-                  <div className="p-6 text-center">
-                    <s.icon className="mx-auto mb-4 h-10 w-10 text-primary" />
-                    <div className="mb-1 text-3xl font-extrabold text-foreground">
+                  <div className="p-4 text-center sm:p-6">
+                    <s.icon className="mx-auto mb-4 h-8 w-8 text-primary sm:h-10 sm:w-10" />
+                    <div className="mb-1 text-2xl font-extrabold text-foreground sm:text-3xl">
                       {s.value}
-                      {s.unit ? <span className="text-xl">{s.unit}</span> : null}
+                      {s.unit ? <span className="text-lg sm:text-xl">{s.unit}</span> : null}
                     </div>
                     <p className="mb-2 text-xs font-bold uppercase tracking-wider text-primary">
                       {s.label}

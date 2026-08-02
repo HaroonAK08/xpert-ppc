@@ -62,11 +62,11 @@ export default function UpworkPage() {
 
       <section className="border-y border-border bg-card/40 py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <RevealGroup as="dl" stagger={0.07} className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
+          <RevealGroup as="dl" stagger={0.07} className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-6">
             {u.stats.map((s) => (
               <RevealItem key={s.label} className="text-center">
                 <dd className="text-xl font-extrabold text-primary sm:text-2xl">{s.value}</dd>
-                <dt className="mt-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                <dt className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground sm:text-[11px] sm:tracking-wider">
                   {s.label}
                 </dt>
               </RevealItem>

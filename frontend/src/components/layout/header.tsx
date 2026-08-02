@@ -132,10 +132,10 @@ export function Header() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
             <Link
               href="/contact"
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90"
+              className="hidden h-10 items-center justify-center rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 sm:inline-flex sm:px-4"
             >
               Free Audit
             </Link>
@@ -153,7 +153,7 @@ export function Header() {
       </div>
 
       {mobileOpen ? (
-        <div className="border-t border-primary/20 bg-background lg:hidden">
+        <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-primary/20 bg-background lg:hidden">
           <nav className="container mx-auto flex flex-col px-4 py-4 sm:px-6" aria-label="Mobile">
             {mainNav.map((item) => (
               <div key={item.label}>
@@ -181,7 +181,7 @@ export function Header() {
             ))}
             <Link
               href="/contact"
-              className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground"
+              className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground"
             >
               Book a Call
             </Link>

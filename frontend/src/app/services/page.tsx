@@ -111,19 +111,19 @@ export default function ServicesPage() {
           <Breadcrumbs items={[{ label: 'Services' }]} />
 
           <LoadFade y={20} duration={0.5} className="mx-auto max-w-4xl text-center">
-            <h1 className="mb-6 text-4xl font-extrabold leading-tight text-foreground md:text-6xl">
+            <h1 className="mb-6 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl md:text-6xl">
               Our PPC{' '}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Services
               </span>
             </h1>
-            <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+            <p className="mx-auto mb-10 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
               Expert advertising management across all major platforms. We build sophisticated
               acquisition funnels tailored to unique algorithms.
             </p>
             <a
               href="#services-grid"
-              className="btn-hover-effect inline-flex h-14 items-center justify-center rounded-md bg-primary px-8 text-lg font-bold text-primary-foreground transition-all duration-300 hover:bg-accent hover:text-accent-foreground"
+              className="btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-md bg-primary px-8 text-base font-bold text-primary-foreground transition-all duration-300 hover:bg-accent hover:text-accent-foreground sm:h-14 sm:w-auto sm:text-lg"
             >
               Explore Our Services <ArrowRight className="ml-2 h-5 w-5" />
             </a>
@@ -139,14 +139,14 @@ export default function ServicesPage() {
               <RevealItem
                 as="article"
                 key={s.slug}
-                className="group flex h-full flex-col rounded-2xl border border-primary/20 bg-background p-8 transition-all duration-300 hover:border-primary/50"
+                className="group flex h-full flex-col rounded-2xl border border-primary/20 bg-background p-5 transition-all duration-300 hover:border-primary/50 sm:p-8"
               >
-                <div className="mb-6 flex items-center">
-                  <div className="mr-4 rounded-xl bg-primary/10 p-3 transition-colors group-hover:bg-primary/20">
-                    <Icon name={s.icon} className="h-8 w-8 text-primary" />
+                  <div className="mb-6 flex items-start sm:items-center">
+                    <div className="mr-4 shrink-0 rounded-xl bg-primary/10 p-3 transition-colors group-hover:bg-primary/20">
+                      <Icon name={s.icon} className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="text-xl font-bold text-foreground sm:text-2xl">{s.name}</h2>
                   </div>
-                  <h2 className="text-2xl font-bold text-foreground">{s.name}</h2>
-                </div>
 
                 <p className="mb-6 leading-relaxed text-muted-foreground">{s.shortDescription}</p>
 
@@ -209,7 +209,7 @@ export default function ServicesPage() {
 
                   <Link
                     href={`/services/${s.slug}`}
-                    className="btn-hover-effect inline-flex h-12 items-center justify-center rounded-md border-2 border-primary bg-transparent px-8 text-base font-bold text-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
+                    className="btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-md border-2 border-primary bg-transparent px-6 text-center text-base font-bold text-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground sm:w-auto sm:px-8"
                   >
                     Learn More About {s.name}
                   </Link>
@@ -219,7 +219,7 @@ export default function ServicesPage() {
                   x={30}
                   duration={0.6}
                   delay={0.2}
-                  className={`relative overflow-hidden rounded-2xl border border-primary/20 p-8 shadow-xl ${
+                  className={`relative overflow-hidden rounded-2xl border border-primary/20 p-5 shadow-xl sm:p-8 ${
                     even ? 'bg-card' : 'bg-background'
                   }`}
                 >
@@ -276,15 +276,15 @@ export default function ServicesPage() {
           </h2>
           <RevealGroup
             as="dl"
-            className="grid grid-cols-2 gap-8 md:grid-cols-4"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-8 md:grid-cols-4"
           >
             {stats.map((s) => (
               <RevealItem
                 key={s.label}
-                className="rounded-2xl border border-primary/10 bg-card p-6 transition-colors hover:border-primary/30"
+                className="rounded-2xl border border-primary/10 bg-card p-4 transition-colors hover:border-primary/30 sm:p-6"
               >
-                <dd className="mb-2 text-3xl font-extrabold text-primary md:text-4xl">{s.value}</dd>
-                <dt className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                <dd className="mb-2 text-2xl font-extrabold text-primary sm:text-3xl md:text-4xl">{s.value}</dd>
+                <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground sm:text-sm">
                   {s.label}
                 </dt>
               </RevealItem>
@@ -300,8 +300,9 @@ export default function ServicesPage() {
             Platform Comparison
           </h2>
 
-          <div className="overflow-x-auto rounded-xl border border-primary/20 shadow-lg">
-            <table className="min-w-full divide-y divide-primary/20 text-left">
+          <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            <div className="min-w-[36rem] overflow-hidden rounded-xl border border-primary/20 shadow-lg sm:min-w-0">
+              <table className="w-full min-w-full divide-y divide-primary/20 text-left">
               <caption className="sr-only">
                 Comparison of advertising platforms by best use case, average cost per click, and
                 ideal audience
@@ -312,7 +313,7 @@ export default function ServicesPage() {
                     <th
                       key={h}
                       scope="col"
-                      className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-foreground"
+                      className="whitespace-nowrap px-3 py-3 text-xs font-bold uppercase tracking-wider text-foreground sm:px-6 sm:py-4 sm:text-sm"
                     >
                       {h}
                     </th>
@@ -322,18 +323,28 @@ export default function ServicesPage() {
               <tbody className="divide-y divide-primary/10 bg-card">
                 {comparison.map((row) => (
                   <tr key={row.platform} className="transition-colors hover:bg-background/50">
-                    <th scope="row" className="px-6 py-4 font-bold text-primary">
+                    <th
+                      scope="row"
+                      className="sticky left-0 bg-card px-3 py-3 font-bold text-primary sm:static sm:bg-transparent sm:px-6 sm:py-4"
+                    >
                       <Link href={`/services/${row.slug}`} className="hover:underline">
                         {row.platform}
                       </Link>
                     </th>
-                    <td className="px-6 py-4 text-muted-foreground">{row.bestFor}</td>
-                    <td className="px-6 py-4 text-muted-foreground">{row.cpc}</td>
-                    <td className="px-6 py-4 text-muted-foreground">{row.audience}</td>
+                    <td className="px-3 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4 sm:text-base">
+                      {row.bestFor}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4 sm:text-base">
+                      {row.cpc}
+                    </td>
+                    <td className="px-3 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4 sm:text-base">
+                      {row.audience}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </section>

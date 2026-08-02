@@ -68,12 +68,12 @@ export default function ContactPage() {
           className="container relative z-10 mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8"
         >
           <h1
-            className="mb-6 text-4xl font-bold leading-tight text-foreground md:text-5xl"
+            className="mb-6 text-3xl font-bold leading-tight text-foreground sm:text-4xl md:text-5xl"
             style={{ letterSpacing: '-0.02em' }}
           >
             Get in touch
           </h1>
-          <p className="text-lg leading-relaxed text-muted-foreground">
+          <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
             Ready to take your digital advertising to the next level? Contact us today to discuss
             how we can help grow your business.
           </p>
@@ -139,7 +139,7 @@ export default function ContactPage() {
             <Reveal
               x={20}
               duration={0.5}
-              className="rounded-2xl bg-card p-8 shadow-lg"
+              className="rounded-2xl bg-card p-5 shadow-lg sm:p-8"
             >
               <h2 className="mb-6 text-2xl font-semibold leading-snug text-foreground md:text-3xl">
                 Send us a message

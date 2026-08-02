@@ -33,13 +33,13 @@ export default function FaqPage() {
         <div className="container relative z-10 mx-auto px-4 text-left sm:px-6 lg:px-8">
           <Breadcrumbs items={[{ label: 'FAQ' }]} />
           <LoadFade y={20} duration={0.5} className="max-w-3xl text-left">
-            <h1 className="mb-6 text-4xl font-extrabold leading-tight text-foreground md:text-5xl lg:text-6xl">
+            <h1 className="mb-6 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
               Frequently Asked{' '}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Questions
               </span>
             </h1>
-            <p className="text-lg leading-relaxed text-muted-foreground md:text-xl">
+            <p className="text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
               Everything you need to know about our data-driven approach to performance marketing.
             </p>
           </LoadFade>
@@ -58,7 +58,7 @@ export default function FaqPage() {
           </p>
           <Link
             href="/contact"
-            className="btn-hover-effect inline-flex h-14 items-center justify-center rounded-md bg-primary px-8 text-lg font-bold text-primary-foreground transition-all duration-300 hover:bg-accent hover:text-accent-foreground"
+            className="btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-md bg-primary px-8 text-base font-bold text-primary-foreground transition-all duration-300 hover:bg-accent hover:text-accent-foreground sm:h-14 sm:w-auto sm:text-lg"
           >
             Contact Us <ArrowRight className="ml-2 h-5 w-5" />
           </Link>

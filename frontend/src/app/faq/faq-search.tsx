@@ -35,7 +35,7 @@ export function FaqSearch({ faqs }: { faqs: FaqItem[] }) {
   return (
     <>
       {/* Search shares the same container left edge as the hero + FAQ list */}
-      <section className="sticky top-20 z-40 border-b border-primary/10 bg-background/95 py-8 backdrop-blur-md">
+      <section className="sticky top-20 z-40 border-b border-primary/10 bg-background/95 py-4 backdrop-blur-md sm:py-6 md:py-8">
         <div className="container mx-auto px-4 text-left sm:px-6 lg:px-8">
           <div className="relative max-w-4xl">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -43,9 +43,9 @@ export function FaqSearch({ faqs }: { faqs: FaqItem[] }) {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search questions by keyword (e.g., Budget, ACOS, Meta)..."
+              placeholder="Search questions (e.g. Budget, ACOS)..."
               aria-label="Search frequently asked questions"
-              className="h-14 w-full rounded-xl border-primary/30 bg-card pl-12 text-lg text-foreground shadow-lg focus-visible:ring-accent"
+              className="h-12 w-full rounded-xl border-primary/30 bg-card pl-12 text-base text-foreground shadow-lg focus-visible:ring-accent sm:h-14 sm:text-lg"
             />
           </div>
         </div>
@@ -92,13 +92,15 @@ export function FaqSearch({ faqs }: { faqs: FaqItem[] }) {
                           value={f.question}
                           className="rounded-xl border border-primary/20 bg-background transition-colors duration-300 hover:bg-card/50 data-[state=open]:border-primary/50 data-[state=open]:bg-card"
                         >
-                          <AccordionTrigger className="px-6 py-5 text-lg font-semibold hover:no-underline [&>svg]:hidden [&[data-state=open]_.faq-chevron]:rotate-180">
-                            <span className="pr-8 text-left">{f.question}</span>
+                          <AccordionTrigger className="px-4 py-4 text-base font-semibold hover:no-underline sm:px-6 sm:py-5 sm:text-lg [&>svg]:hidden [&[data-state=open]_.faq-chevron]:rotate-180">
+                            <span className="min-w-0 flex-1 pr-4 text-left text-balance sm:pr-8">
+                              {f.question}
+                            </span>
                             <span className="faq-chevron flex shrink-0 rounded-full bg-primary/10 p-1 transition-transform duration-300">
                               <ChevronDown className="h-5 w-5 text-primary" />
                             </span>
                           </AccordionTrigger>
-                          <AccordionContent className="px-6 pb-5 pt-0 text-base leading-relaxed text-muted-foreground">
+                          <AccordionContent className="px-4 pb-5 pt-0 text-base leading-relaxed text-muted-foreground sm:px-6">
                             {f.answer}
                           </AccordionContent>
                         </AccordionItem>

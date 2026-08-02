@@ -8,7 +8,7 @@ export function Logo({ className }: { className?: string }) {
       className={cn('inline-flex items-center transition-opacity hover:opacity-80', className)}
       aria-label="Xpert PPC — home"
     >
-      <span className="text-2xl font-extrabold tracking-tighter text-primary">
+      <span className="text-xl font-extrabold tracking-tighter text-primary sm:text-2xl">
         XPERT<span className="text-foreground">PPC</span>
       </span>
     </Link>

@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import { Lead } from '../models/Lead';
 import { requireAuth } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
+import { sendLeadNotification } from '../utils/mail';
 import { createLeadSchema, updateLeadSchema, LEAD_STATUSES } from '../validation/lead';
 
 const router = Router();
@@ -44,6 +45,13 @@ router.post(
         referer: req.get('referer') ?? '',
       },
     });
+
+    // Notify inbox — never fail the form if mail delivery has a hiccup.
+    try {
+      await sendLeadNotification({ ...data, id: String(lead._id) });
+    } catch (err) {
+      console.error('[mail] Failed to send lead notification:', err);
+    }
 
     res.status(201).json({ ok: true, id: String(lead._id) });
   })

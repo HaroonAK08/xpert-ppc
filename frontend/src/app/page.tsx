@@ -70,7 +70,7 @@ export default function HomePage() {
                 as="h1"
                 y={16}
                 duration={0.7}
-                className="mb-5 text-4xl font-extrabold leading-tight text-foreground md:text-5xl lg:text-6xl"
+                className="mb-5 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl"
               >
                 We Grow Revenue With{' '}
                 <span className="text-primary">High-Performance PPC Ads</span>
@@ -168,7 +168,7 @@ export default function HomePage() {
           <div className="mt-8 text-center">
             <Link
               href="/services"
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-border px-8 text-sm font-bold text-foreground transition-colors hover:border-primary hover:text-primary"
+              className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-border px-8 text-sm font-bold text-foreground transition-colors hover:border-primary hover:text-primary sm:w-auto"
             >
               See All Services
             </Link>
@@ -195,7 +195,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/case-study"
-              className="btn-hover-effect inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+              className="btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-8 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
             >
               Read Full Case Study <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
@@ -266,7 +266,7 @@ export default function HomePage() {
                       className="rounded-xl border border-border bg-background px-5 data-[state=open]:border-primary/40"
                     >
                       <AccordionTrigger className="px-0 text-left font-semibold text-foreground hover:no-underline">
-                        {f.question}
+                        <span className="min-w-0 flex-1 text-balance">{f.question}</span>
                       </AccordionTrigger>
                       <AccordionContent className="px-0 leading-relaxed text-muted-foreground">
                         {f.answer}
@@ -287,7 +287,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal
             scale={0.98}
-            className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-8 text-center md:p-10"
+            className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 text-center sm:p-8 md:p-10"
           >
             <h2 className="mb-4 text-3xl font-extrabold text-foreground md:text-4xl">
               Ready to scale with cleaner ad spend?

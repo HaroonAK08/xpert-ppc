@@ -23,6 +23,7 @@ export const mainNav: NavItem[] = [
       },
     ],
   },
+  { label: 'Courses', href: '/courses' },
   { label: 'Case Studies', href: '/case-study' },
   { label: 'About', href: '/about' },
   { label: 'FAQ', href: '/faq' },
@@ -33,6 +34,7 @@ export const footerNav = {
   academy: {
     title: 'Digital Academy',
     links: [
+      { label: 'Course portal', href: '/courses' },
       { label: 'SEM Course', href: '/xpert-ppc-digital-academy/sem' },
       {
         label: 'Social Media Marketing Course',

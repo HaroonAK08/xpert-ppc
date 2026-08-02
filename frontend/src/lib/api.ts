@@ -10,15 +10,22 @@ export const API_URL = (
 
 export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<ApiResult<T>> {
+async function request<T>(
+  path: string,
+  init: RequestInit = {},
+  opts?: { json?: boolean }
+): Promise<ApiResult<T>> {
+  const asJson = opts?.json !== false;
   try {
+    const headers: HeadersInit = {
+      ...(asJson ? { 'Content-Type': 'application/json' } : {}),
+      ...(init.headers ?? {}),
+    };
+
     const res = await fetch(`${API_URL}${path}`, {
       ...init,
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(init.headers ?? {}),
-      },
+      headers,
     });
 
     const data = await res.json().catch(() => null);
@@ -40,6 +47,11 @@ export const api = {
   patch: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'PATCH', body: JSON.stringify(body ?? {}) }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+  upload: async <T>(path: string, file: File) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return request<T>(path, { method: 'POST', body: fd }, { json: false });
+  },
 };
 
 /* ------------------------------- types --------------------------------- */
@@ -68,3 +80,52 @@ export type LeadsResponse = {
 };
 
 export type AdminUser = { sub: string; email: string; name: string; role: string };
+
+export type StudentUser = { id: string; email: string; name: string };
+
+export type PortalCourseSummary = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  thumbnailUrl: string;
+  level: string;
+  published: boolean;
+  enrolled?: boolean;
+  moduleCount: number;
+  lessonCount: number;
+  updatedAt: string;
+};
+
+export type PortalLesson = {
+  id: string;
+  title: string;
+  type: 'video' | 'lecture' | 'assignment' | 'task';
+  summary: string;
+  body: string;
+  videoUrl: string;
+  fileUrl: string;
+  fileName: string;
+  durationMinutes: number;
+  order: number;
+  completed?: boolean;
+  published?: boolean;
+};
+
+export type PortalModule = {
+  id: string;
+  title: string;
+  description: string;
+  order: number;
+  lessons: PortalLesson[];
+};
+
+export type PortalCourseDetail = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  thumbnailUrl: string;
+  level: string;
+  modules: PortalModule[];
+};

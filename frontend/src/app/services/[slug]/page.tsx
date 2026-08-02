@@ -155,14 +155,14 @@ export default async function ServiceDetailPage({ params }: Props) {
           <Reveal as="h2" className="mb-10 text-center text-2xl font-extrabold text-foreground sm:text-3xl">
             Our {service.name} Process
           </Reveal>
-          <RevealGroup as="ol" stagger={0.08} className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+          <RevealGroup as="ol" stagger={0.08} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {detail.process.map((step, i) => (
               <RevealItem
                 key={step}
                 as="li"
-                className="rounded-2xl border border-border bg-card p-5 text-center transition-colors hover:border-primary/40"
+                className="rounded-2xl border border-border bg-card p-4 text-center transition-colors hover:border-primary/40 sm:p-5"
               >
-                <span className="mb-3 block text-[11px] font-bold uppercase tracking-widest text-primary">
+                <span className="mb-3 block text-[11px] font-bold uppercase tracking-wider text-primary sm:tracking-widest">
                   Step {i + 1}
                 </span>
                 <span className="text-sm font-bold text-foreground">{step}</span>

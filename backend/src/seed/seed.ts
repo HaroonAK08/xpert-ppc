@@ -22,6 +22,7 @@ import { CaseStudy } from '../models/CaseStudy';
 import { TeamMember } from '../models/TeamMember';
 import { Testimonial } from '../models/Testimonial';
 import { AdminUser } from '../models/AdminUser';
+import { Student } from '../models/Student';
 import { hashPassword } from '../utils/password';
 
 const upsert = { upsert: true, setDefaultsOnInsert: true };
@@ -225,20 +226,45 @@ async function main() {
   const password = process.env.SEED_ADMIN_PASSWORD;
 
   if (email && password) {
-    const existing = await AdminUser.findOne({ email: email.toLowerCase() });
-    if (existing) {
-      console.log(`• admin user ${email} already exists — left unchanged`);
-    } else {
-      await AdminUser.create({
+    const passwordHash = await hashPassword(password);
+    await AdminUser.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      {
         email: email.toLowerCase(),
         name: process.env.SEED_ADMIN_NAME || 'Admin',
-        passwordHash: await hashPassword(password),
+        passwordHash,
         role: 'admin',
-      });
-      console.log(`✓ admin user created: ${email}`);
-    }
+        active: true,
+      },
+      { upsert: true, setDefaultsOnInsert: true }
+    );
+    console.log(`✓ admin user ready: ${email}`);
   } else {
     console.log('• skipped admin user (set SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD to create one)');
+  }
+
+  /* --------------------------- student user ---------------------------- */
+  const studentEmail = process.env.SEED_STUDENT_EMAIL;
+  const studentPassword = process.env.SEED_STUDENT_PASSWORD;
+
+  if (studentEmail && studentPassword) {
+    const passwordHash = await hashPassword(studentPassword);
+    await Student.findOneAndUpdate(
+      { email: studentEmail.toLowerCase() },
+      {
+        email: studentEmail.toLowerCase(),
+        name: process.env.SEED_STUDENT_NAME || 'Student',
+        passwordHash,
+        emailVerified: true,
+        active: true,
+      },
+      { upsert: true, setDefaultsOnInsert: true }
+    );
+    console.log(`✓ student user ready: ${studentEmail}`);
+  } else {
+    console.log(
+      '• skipped student user (set SEED_STUDENT_EMAIL and SEED_STUDENT_PASSWORD to create one)'
+    );
   }
 
   await mongoose.disconnect();
