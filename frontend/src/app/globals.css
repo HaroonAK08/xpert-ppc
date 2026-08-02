@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 223 64% 10%;
+    --foreground: 0 0% 100%;
+    --primary: 215 100% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 100% 54%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 16 100% 60%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 223 66% 13%;
+    --muted-foreground: 213 27% 84%;
+    --card: 224 58% 15%;
+    --card-foreground: 0 0% 100%;
+    --popover: 224 58% 15%;
+    --popover-foreground: 0 0% 100%;
+    --border: 217 91% 60%;
+    --input: 217 91% 60%;
+    --ring: 215 100% 54%;
+    --success: 142 70% 49%;
+    --success-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --radius: 0.875rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Native dropdown popups use OS colours unless the options are styled. */
+  select option {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  /* Borders are a saturated blue token — soften them by default so the
+     card outlines read as hairlines, matching the production site. */
+  .border,
+  .border-t,
+  .border-b,
+  .border-l,
+  .border-r {
+    border-color: hsl(var(--border) / 0.2);
+  }
+}
+
+@layer utilities {
+  .glow-primary {
+    box-shadow: 0 0 18px hsla(var(--primary), 0.45);
+  }
+
+  .hover-glow-primary:hover {
+    box-shadow: 0 0 24px hsla(var(--primary), 0.55);
+  }
+
+  .hover-glow-accent:hover {
+    box-shadow: 0 0 20px hsla(var(--accent), 0.6);
+  }
+
+  .btn-hover-effect {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.3s;
+  }
+
+  .btn-hover-effect:hover {
+    transform: scale(1.05);
+  }
+
+  .btn-hover-effect:active {
+    transform: scale(0.98);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
