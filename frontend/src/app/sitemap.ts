@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { services } from '@shared/content/services';
 import { courses } from '@shared/content/courses';
 import { industries } from '@shared/content/industries';
+import { caseStudies } from '@shared/content/case-studies';
 import { siteConfig } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -11,7 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: url('/'), changeFrequency: 'weekly', priority: 1 },
     { url: url('/services'), changeFrequency: 'weekly', priority: 0.9 },
-    { url: url('/case-study'), changeFrequency: 'monthly', priority: 0.8 },
+    { url: url('/case-study'), changeFrequency: 'weekly', priority: 0.85 },
     { url: url('/about'), changeFrequency: 'monthly', priority: 0.7 },
     { url: url('/contact'), changeFrequency: 'monthly', priority: 0.8 },
     { url: url('/faq'), changeFrequency: 'monthly', priority: 0.7 },
@@ -43,7 +44,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...serviceRoutes, ...industryRoutes, ...courseRoutes].map((r) => ({
+  const caseStudyRoutes: MetadataRoute.Sitemap = caseStudies.map((c) => ({
+    url: url(`/case-study/${c.slug}`),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
+
+  return [
+    ...staticRoutes,
+    ...serviceRoutes,
+    ...industryRoutes,
+    ...courseRoutes,
+    ...caseStudyRoutes,
+  ].map((r) => ({
     ...r,
     lastModified: now,
   }));

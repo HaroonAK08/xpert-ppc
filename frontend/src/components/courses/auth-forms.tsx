@@ -3,12 +3,50 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 import { Field, Input, Label } from '@/components/ui/input';
 import { api } from '@/lib/api';
 
 type Mode = 'signup' | 'login';
+
+function PasswordField({
+  id,
+  autoComplete,
+  minLength,
+}: {
+  id: string;
+  autoComplete: string;
+  minLength?: number;
+}) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <Field>
+      <Label htmlFor={id}>Password</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          name="password"
+          type={show ? 'text' : 'password'}
+          required
+          minLength={minLength}
+          autoComplete={autoComplete}
+          placeholder="••••••••"
+          className="pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setShow((v) => !v)}
+          className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+          aria-label={show ? 'Hide password' : 'Show password'}
+        >
+          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
+    </Field>
+  );
+}
 
 export function CourseAuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
@@ -62,24 +100,35 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
         email: result.data.email,
         purpose: result.data.purpose,
       });
-      // Full page load avoids App Router soft-nav crashes after signup.
       window.location.assign(`/courses/verify?${params.toString()}`);
       return;
     }
 
+    // Students first; if that fails, try admin (test / umer) → /admin.
     const result = await api.post<{ user: { id: string } }>('/api/student/auth/login', {
       email,
       password,
     });
 
-    setBusy(false);
-
-    if (!result.ok) {
-      setError(result.error);
+    if (result.ok) {
+      setBusy(false);
+      router.replace('/courses/dashboard');
       return;
     }
 
-    router.replace('/courses/dashboard');
+    const adminResult = await api.post<{ user: { id: string; role?: string } }>(
+      '/api/auth/login',
+      { email, password }
+    );
+
+    setBusy(false);
+
+    if (adminResult.ok) {
+      window.location.assign('/admin');
+      return;
+    }
+
+    setError(result.error || adminResult.error || 'Invalid email or password.');
   }
 
   return (
@@ -103,18 +152,11 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
         />
       </Field>
 
-      <Field>
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          required
-          minLength={6}
-          autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-          placeholder="••••••••"
-        />
-      </Field>
+      <PasswordField
+        id="password"
+        autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+        minLength={6}
+      />
 
       {error ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
@@ -271,3 +313,4 @@ export function useStudentSession() {
 
   return { user, loading, setUser };
 }
+

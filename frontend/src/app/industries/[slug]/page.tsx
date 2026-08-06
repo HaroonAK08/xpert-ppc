@@ -1,15 +1,23 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import { ArrowRight, CheckCircle2, Quote, Star, Stethoscope } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Quote, Star } from 'lucide-react';
 
 import { Icon } from '@/components/icon';
 import { LeadForm } from '@/components/forms/lead-form';
 import { JsonLd } from '@/components/seo/json-ld';
 import { LoadFade, LoadGroup, LoadItem, Reveal, RevealGroup, RevealItem } from '@/components/motion';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { getIndustry, industries } from '@shared/content/industries';
-import { absoluteUrl, buildMetadata, serviceSchema } from '@/lib/seo';
+import { getCaseStudy } from '@shared/content/case-studies';
+import { absoluteUrl, buildMetadata, faqSchema, serviceSchema } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 
 type Props = { params: Promise<{ slug: string }> };
@@ -35,6 +43,10 @@ export default async function IndustryPage({ params }: Props) {
   const { slug } = await params;
   const industry = getIndustry(slug);
   if (!industry) notFound();
+
+  const relatedStudies = industry.relatedCaseStudies
+    .map((s) => getCaseStudy(s))
+    .filter((cs): cs is NonNullable<typeof cs> => Boolean(cs));
 
   return (
     <>
@@ -62,10 +74,10 @@ export default async function IndustryPage({ params }: Props) {
               },
             })),
           },
+          faqSchema(industry.faqs),
         ]}
       />
 
-      {/* Hero — pillars sit under bullets; form is sticky */}
       <section id="top" className="relative overflow-hidden bg-background pb-20 pt-12 md:pt-16">
         <div className="pointer-events-none absolute inset-0 z-0">
           <div className="absolute left-1/2 top-[-6rem] h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-primary/20 blur-[130px]" />
@@ -78,7 +90,7 @@ export default async function IndustryPage({ params }: Props) {
                 y={30}
                 className="mb-6 inline-flex items-center rounded-full border border-primary bg-primary/10 px-4 py-1.5 text-sm font-bold text-primary shadow-[0_0_15px_rgba(0,102,204,0.25)]"
               >
-                <Stethoscope className="mr-2 h-4 w-4" />
+                <Icon name={industry.icon} className="mr-2 h-4 w-4" />
                 {industry.eyebrow}
               </LoadItem>
 
@@ -112,10 +124,7 @@ export default async function IndustryPage({ params }: Props) {
 
               <LoadItem className="grid grid-cols-1 gap-4 border-t border-primary/20 pt-6 sm:grid-cols-3">
                 {industry.pillars.map((p) => (
-                  <div
-                    key={p.title}
-                    className="rounded-xl border border-primary/20 bg-card p-4"
-                  >
+                  <div key={p.title} className="rounded-xl border border-primary/20 bg-card p-4">
                     <Icon name={p.icon} className="glow-primary mb-3 h-7 w-7 text-primary" />
                     <h2 className="mb-1 font-bold text-foreground">{p.title}</h2>
                     <p className="text-sm text-muted-foreground">{p.description}</p>
@@ -127,19 +136,15 @@ export default async function IndustryPage({ params }: Props) {
             <LoadFade
               scale={0.95}
               delay={0.3}
-              className="w-full max-w-md mx-auto lg:col-span-5 lg:mx-0 lg:max-w-none lg:sticky lg:top-28"
+              className="mx-auto w-full max-w-md lg:col-span-5 lg:mx-0 lg:sticky lg:top-28 lg:max-w-none"
             >
               <div
                 id="audit-form"
                 className="rounded-3xl border border-primary/30 bg-card p-6 shadow-[0_0_40px_rgba(0,102,204,0.12)] md:p-8"
               >
                 <h2 className="mb-1 text-xl font-bold text-foreground">Book a Free Growth Audit</h2>
-                <p className="mb-6 text-sm text-muted-foreground">
-                  Tell us about your clinic and we will map your patient-acquisition strategy.
-                </p>
-                <Suspense
-                  fallback={<div className="h-96 animate-pulse rounded-xl bg-muted/40" />}
-                >
+                <p className="mb-6 text-sm text-muted-foreground">{industry.formIntro}</p>
+                <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-muted/40" />}>
                   <LeadForm source="industry" />
                 </Suspense>
               </div>
@@ -148,24 +153,128 @@ export default async function IndustryPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="border-y border-primary/10 bg-card py-24">
+      <section className="border-y border-primary/10 bg-card py-20 md:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto mb-14 max-w-3xl text-center">
+            <h2 className="mb-4 text-3xl font-extrabold text-foreground md:text-5xl">
+              {industry.challengesHeading}
+            </h2>
+            <p className="text-lg text-muted-foreground">{industry.challengesIntro}</p>
+          </div>
+
+          <RevealGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {industry.challenges.map((c) => (
+              <RevealItem
+                key={c.title}
+                className="rounded-2xl border border-primary/20 bg-background p-6 sm:p-8"
+              >
+                <h3 className="mb-3 text-xl font-bold text-foreground">{c.title}</h3>
+                <p className="leading-relaxed text-muted-foreground">{c.description}</p>
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </div>
+      </section>
+
+      <section className="bg-background py-20 md:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto mb-14 max-w-3xl text-center">
+            <h2 className="mb-4 text-3xl font-extrabold text-foreground md:text-5xl">
+              {industry.processHeading}
+            </h2>
+            <p className="text-lg text-muted-foreground">{industry.processIntro}</p>
+          </div>
+
+          <RevealGroup
+            as="ol"
+            stagger={0.1}
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {industry.process.map((step, i) => (
+              <RevealItem
+                key={step.title}
+                as="li"
+                className="relative rounded-2xl border border-primary/20 bg-card p-5"
+              >
+                <span className="text-xs font-bold text-primary">STEP {i + 1}</span>
+                <div className="my-4 w-fit rounded-xl bg-primary/10 p-2.5">
+                  <Icon name={step.icon} className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-foreground">{step.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{step.description}</p>
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </div>
+      </section>
+
+      {relatedStudies.length > 0 ? (
+        <section className="border-y border-primary/10 bg-card py-20 md:py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto mb-14 max-w-3xl text-center">
+              <h2 className="mb-4 text-3xl font-extrabold text-foreground md:text-5xl">
+                {industry.name} <span className="text-primary">Results</span>
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Real campaigns we have run for brands in this space.
+              </p>
+            </div>
+
+            <RevealGroup className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {relatedStudies.map((cs) => (
+                <RevealItem key={cs.slug} className="h-full">
+                  <Link
+                    href={`/case-study/${cs.slug}`}
+                    className="group flex h-full flex-col overflow-hidden rounded-2xl border border-primary/20 bg-background transition-all hover:border-primary/50 hover:shadow-[0_0_30px_rgba(0,102,204,0.12)]"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <Image
+                        src={`/case-studies/covers/${cs.slug}.jpg`}
+                        alt={cs.client}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                    </div>
+                    <div className="flex flex-1 flex-col p-5 sm:p-6">
+                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        {cs.industry}
+                      </p>
+                      <h3 className="mt-2 text-xl font-bold text-foreground group-hover:text-primary">
+                        {cs.client}
+                      </h3>
+                      <p className="mt-1 text-sm font-medium text-primary">{cs.subtitle}</p>
+                      <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+                        {cs.excerpt}
+                      </p>
+                      <span className="mt-5 inline-flex items-center text-sm font-bold text-primary">
+                        View case study <ArrowRight className="ml-2 h-4 w-4" />
+                      </span>
+                    </div>
+                  </Link>
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="border-y border-primary/10 bg-background py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-6 text-3xl font-extrabold text-foreground md:text-5xl">
-              Trusted by <span className="text-primary">Leading Clinics</span>
+              {industry.testimonialsHeading}
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Dermatologists across the world rely on Xpert PPC to grow their practice profitably.
-            </p>
+            <p className="text-lg text-muted-foreground">{industry.testimonialsSubheading}</p>
           </div>
 
           <RevealGroup className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {industry.testimonials.map((t) => (
               <RevealItem
-                key={t.name}
+                key={t.name + t.role}
                 as="figure"
-                className="relative rounded-2xl border border-primary/20 bg-background p-5 transition-colors duration-300 hover:border-primary hover:shadow-[0_0_30px_rgba(0,102,204,0.15)] sm:p-8"
+                className="relative rounded-2xl border border-primary/20 bg-card p-5 transition-colors duration-300 hover:border-primary hover:shadow-[0_0_30px_rgba(0,102,204,0.15)] sm:p-8"
               >
                 <Quote className="mb-4 h-10 w-10 text-primary/30" />
                 <div className="mb-4 flex gap-1" aria-label={`${t.rating} out of 5 stars`}>
@@ -186,15 +295,15 @@ export default async function IndustryPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Portfolio — text overlays on images */}
-      <section className="border-b border-primary/10 bg-background py-24">
+      <section className="border-b border-primary/10 bg-card py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-6 text-3xl font-extrabold text-foreground md:text-5xl">
               Our <span className="text-primary">Designs &amp; Work</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              Websites, ad creative, and performance campaigns crafted for dermatology brands.
+              Websites, ad creative, and performance campaigns crafted for{' '}
+              {industry.name.toLowerCase()}.
             </p>
           </div>
 
@@ -203,12 +312,12 @@ export default async function IndustryPage({ params }: Props) {
               <RevealItem
                 as="figure"
                 key={p.title}
-                className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-card"
+                className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-background"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <Image
                     src={p.image}
-                    alt={`${p.title} — ${p.category} work by Xpert PPC for dermatology clinics`}
+                    alt={`${p.title} — ${p.category} work by Xpert PPC for ${industry.name}`}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -227,16 +336,13 @@ export default async function IndustryPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Packages */}
-      <section className="border-b border-primary/10 bg-card py-24">
+      <section className="border-b border-primary/10 bg-background py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-6 text-3xl font-extrabold text-foreground md:text-5xl">
               Our <span className="text-primary">Packages</span>
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Transparent plans designed to scale with your clinic.
-            </p>
+            <p className="text-lg text-muted-foreground">{industry.packagesIntro}</p>
           </div>
 
           <RevealGroup
@@ -249,8 +355,8 @@ export default async function IndustryPage({ params }: Props) {
                 className={cn(
                   'relative flex flex-col rounded-2xl border p-5 transition-all duration-300 sm:p-8',
                   p.popular
-                    ? 'z-10 border-primary bg-background shadow-[0_0_40px_rgba(0,102,204,0.2)] ring-1 ring-primary/40'
-                    : 'border-primary/20 bg-background hover:border-primary/50'
+                    ? 'z-10 border-primary bg-card shadow-[0_0_40px_rgba(0,102,204,0.2)] ring-1 ring-primary/40'
+                    : 'border-primary/20 bg-card hover:border-primary/50'
                 )}
               >
                 {p.popular ? (
@@ -289,6 +395,37 @@ export default async function IndustryPage({ params }: Props) {
               </RevealItem>
             ))}
           </RevealGroup>
+        </div>
+      </section>
+
+      <section className="border-b border-primary/10 bg-card py-20 md:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl">
+            <Reveal
+              as="h2"
+              y={14}
+              className="mb-8 text-center text-3xl font-extrabold text-foreground md:text-4xl"
+            >
+              {industry.name} Marketing FAQ
+            </Reveal>
+
+            <Accordion type="single" collapsible className="space-y-3">
+              {industry.faqs.map((f, i) => (
+                <AccordionItem
+                  key={f.question}
+                  value={`faq-${i}`}
+                  className="rounded-xl border border-primary/20 bg-background px-5"
+                >
+                  <AccordionTrigger className="px-0 text-left font-semibold text-foreground hover:no-underline">
+                    {f.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 leading-relaxed text-muted-foreground">
+                    {f.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
         </div>
       </section>
     </>

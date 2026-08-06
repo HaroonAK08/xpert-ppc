@@ -21,6 +21,31 @@ export const mainNav: NavItem[] = [
         href: '/industries/dermatologists',
         description: 'Patient acquisition for skin & aesthetic clinics',
       },
+      {
+        label: 'Law Firms',
+        href: '/industries/law-firms',
+        description: 'Qualified case inquiries for competitive legal niches',
+      },
+      {
+        label: 'eCommerce',
+        href: '/industries/ecommerce',
+        description: 'ROAS-focused Google, Shopping & Meta growth',
+      },
+      {
+        label: 'Local Services',
+        href: '/industries/local-services',
+        description: 'High-intent leads for home & local businesses',
+      },
+      {
+        label: 'Healthcare Clinics',
+        href: '/industries/healthcare-clinics',
+        description: 'Appointment leads for dental, physio & clinics',
+      },
+      {
+        label: 'Food & Beverage',
+        href: '/industries/food-beverage',
+        description: 'Growth for specialty food, CPG & beverage brands',
+      },
     ],
   },
   { label: 'Courses', href: '/courses' },

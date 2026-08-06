@@ -83,8 +83,8 @@ export function Header() {
                   </button>
 
                   {openDropdown === item.label ? (
-                    <div className="absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-4">
-                      <div className="overflow-hidden rounded-2xl border border-primary/20 bg-card shadow-2xl">
+                    <div className="absolute left-1/2 top-full z-50 w-80 -translate-x-1/2 pt-4">
+                      <div className="max-h-[70vh] overflow-y-auto overflow-hidden rounded-2xl border border-primary/20 bg-card shadow-2xl">
                         {item.children.map((child) => (
                           <Link
                             key={child.href}

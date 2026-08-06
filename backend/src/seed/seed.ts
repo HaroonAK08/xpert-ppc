@@ -11,7 +11,7 @@ import { services as serviceContent } from '../../../shared/content/services';
 import { faqs as faqContent } from '../../../shared/content/faqs';
 import { courses as courseContent } from '../../../shared/content/courses';
 import { industries as industryContent } from '../../../shared/content/industries';
-import { desertFarms } from '../../../shared/content/case-studies';
+import { caseStudies } from '../../../shared/content/case-studies';
 import { umerKhan } from '../../../shared/content/team';
 
 import { Service } from '../models/Service';
@@ -116,7 +116,7 @@ async function main() {
         name: ind.name,
         tagline: ind.eyebrow,
         description: ind.heroDescription,
-        icon: 'Stethoscope',
+        icon: ind.icon || 'Briefcase',
         order: i,
         published: true,
         hero: {
@@ -124,6 +124,10 @@ async function main() {
           title: `${ind.heroTitle} ${ind.heroHighlight}`,
           subtitle: ind.heroDescription,
         },
+        challenges: ind.challenges.map((c) => ({
+          title: c.title,
+          description: c.description,
+        })),
         solutions: ind.pillars.map((p) => ({
           title: p.title,
           description: p.description,
@@ -136,6 +140,10 @@ async function main() {
           description: p.description,
           features: p.features,
           popular: Boolean(p.popular),
+        })),
+        faqs: ind.faqs.map((f) => ({
+          question: f.question,
+          answer: f.answer,
         })),
         seo: {
           title: ind.seo.title,
@@ -165,36 +173,41 @@ async function main() {
   console.log(`✓ industries: ${industryContent.length}`);
 
   /* ----------------------------- case studies -------------------------- */
-  await CaseStudy.findOneAndUpdate(
-    { slug: desertFarms.slug },
-    {
-      slug: desertFarms.slug,
-      client: desertFarms.client,
-      title: desertFarms.title,
-      excerpt: desertFarms.excerpt,
-      industry: desertFarms.industry,
-      duration: desertFarms.duration,
-      channels: desertFarms.channels,
-      featured: true,
-      published: true,
-      metrics: desertFarms.metrics.map((m) => ({
-        label: m.label,
-        value: m.value,
-        description: '',
-      })),
-      challenge: desertFarms.intro,
-      solution: desertFarms.approach.join('\n\n'),
-      results: desertFarms.takeaways.map((t) => `${t.title}: ${t.description}`).join('\n\n'),
-      sections: desertFarms.takeaways.map((t) => ({ title: t.title, body: t.description })),
-      seo: {
-        title: desertFarms.seo.title,
-        description: desertFarms.seo.description,
-        keywords: desertFarms.seo.keywords,
+  let csOrder = 0;
+  for (const cs of caseStudies) {
+    await CaseStudy.findOneAndUpdate(
+      { slug: cs.slug },
+      {
+        slug: cs.slug,
+        client: cs.client,
+        title: cs.title,
+        excerpt: cs.excerpt,
+        industry: cs.industry,
+        duration: cs.duration,
+        channels: cs.channels,
+        heroImage: cs.heroImage,
+        featured: Boolean(cs.featured),
+        published: true,
+        order: csOrder++,
+        metrics: cs.metrics.map((m) => ({
+          label: m.label,
+          value: m.value,
+          description: '',
+        })),
+        challenge: cs.intro,
+        solution: cs.approach.join('\n\n'),
+        results: cs.takeaways.map((t) => `${t.title}: ${t.description}`).join('\n\n'),
+        sections: cs.takeaways.map((t) => ({ title: t.title, body: t.description })),
+        seo: {
+          title: cs.seo.title,
+          description: cs.seo.description,
+          keywords: cs.seo.keywords,
+        },
       },
-    },
-    upsert
-  );
-  console.log('✓ case studies: 1');
+      upsert
+    );
+  }
+  console.log(`✓ case studies: ${caseStudies.length}`);
 
   /* ------------------------------- team -------------------------------- */
   await TeamMember.findOneAndUpdate(
@@ -221,24 +234,38 @@ async function main() {
   );
   console.log('✓ team: 1');
 
-  /* ---------------------------- admin user ----------------------------- */
-  const email = process.env.SEED_ADMIN_EMAIL;
-  const password = process.env.SEED_ADMIN_PASSWORD;
+  /* ---------------------------- admin users ---------------------------- */
+  const admins = [
+    {
+      email: process.env.SEED_ADMIN_EMAIL,
+      password: process.env.SEED_ADMIN_PASSWORD,
+      name: process.env.SEED_ADMIN_NAME || 'Admin',
+    },
+    {
+      email: process.env.SEED_ADMIN_EMAIL_2,
+      password: process.env.SEED_ADMIN_PASSWORD_2,
+      name: process.env.SEED_ADMIN_NAME_2 || 'Admin',
+    },
+  ].filter((a): a is { email: string; password: string; name: string } =>
+    Boolean(a.email && a.password)
+  );
 
-  if (email && password) {
-    const passwordHash = await hashPassword(password);
-    await AdminUser.findOneAndUpdate(
-      { email: email.toLowerCase() },
-      {
-        email: email.toLowerCase(),
-        name: process.env.SEED_ADMIN_NAME || 'Admin',
-        passwordHash,
-        role: 'admin',
-        active: true,
-      },
-      { upsert: true, setDefaultsOnInsert: true }
-    );
-    console.log(`✓ admin user ready: ${email}`);
+  if (admins.length) {
+    for (const admin of admins) {
+      const passwordHash = await hashPassword(admin.password);
+      await AdminUser.findOneAndUpdate(
+        { email: admin.email.toLowerCase() },
+        {
+          email: admin.email.toLowerCase(),
+          name: admin.name,
+          passwordHash,
+          role: 'admin',
+          active: true,
+        },
+        { upsert: true, setDefaultsOnInsert: true }
+      );
+      console.log(`✓ admin user ready: ${admin.email}`);
+    }
   } else {
     console.log('• skipped admin user (set SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD to create one)');
   }

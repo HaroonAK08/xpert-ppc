@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/accordion';
 import { services } from '@shared/content/services';
 import { heroBullets, heroTrustLine, homeFaqs, processSteps } from '@shared/content/home';
+import { getFeaturedCaseStudies } from '@shared/content/case-studies';
 import { buildMetadata, faqSchema, professionalServiceSchema } from '@/lib/seo';
 import { siteConfig } from '@/lib/site';
 
@@ -177,29 +178,61 @@ export default function HomePage() {
       </section>
 
       {/* ---------------------------------------------------------------- */}
-      {/* Featured case study                                               */}
+      {/* Featured case studies                                              */}
       {/* ---------------------------------------------------------------- */}
       <section className="border-y border-border bg-card py-12 md:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal y={24} duration={0.65} className="mx-auto max-w-2xl text-center">
+          <Reveal y={24} duration={0.65} className="mx-auto mb-10 max-w-2xl text-center">
             <p className="mb-3 text-sm font-bold uppercase tracking-wider text-primary">
-              Featured Case Study
+              Case Studies
             </p>
             <h2 className="mb-4 text-3xl font-extrabold text-foreground md:text-4xl">
-              Desert Farms, 12+ Years of Compounding Growth
+              Proven results across industries
             </h2>
-            <p className="mb-8 leading-relaxed text-muted-foreground">
-              For over a decade, Xpert PPC helped Desert Farms scale camel milk eCommerce through
-              SEO, Google Ads, and Meta Ads, building a durable acquisition engine, not short-term
-              spikes.
+            <p className="leading-relaxed text-muted-foreground">
+              From camel-milk eCommerce to law firms and local services — real accounts, real
+              metrics.
             </p>
+          </Reveal>
+
+          <RevealGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {getFeaturedCaseStudies(3).map((cs) => (
+              <RevealItem key={cs.slug} className="h-full">
+                <Link
+                  href={`/case-study/${cs.slug}`}
+                  className="flex h-full flex-col rounded-2xl border border-border bg-background p-6 transition-all hover:border-primary/40 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <p className="text-xs font-bold uppercase tracking-wider text-primary">
+                    {cs.channels[0]}
+                  </p>
+                  <h3 className="mt-2 text-xl font-bold text-foreground">{cs.client}</h3>
+                  <p className="mt-2 flex-1 text-sm text-muted-foreground line-clamp-3">
+                    {cs.excerpt}
+                  </p>
+                  <div className="mt-4 flex gap-4">
+                    {cs.metrics.slice(0, 2).map((m) => (
+                      <div key={m.label}>
+                        <div className="text-lg font-extrabold text-foreground">{m.value}</div>
+                        <div className="text-[11px] uppercase text-muted-foreground">{m.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <span className="mt-5 inline-flex items-center text-sm font-bold text-primary">
+                    Read case study <ArrowRight className="ml-1.5 h-4 w-4" />
+                  </span>
+                </Link>
+              </RevealItem>
+            ))}
+          </RevealGroup>
+
+          <div className="mt-10 text-center">
             <Link
               href="/case-study"
-              className="btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-8 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
+              className="btn-hover-effect inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
             >
-              Read Full Case Study <ArrowRight className="ml-2 h-4 w-4" />
+              View All Case Studies <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
-          </Reveal>
+          </div>
         </div>
       </section>
 
