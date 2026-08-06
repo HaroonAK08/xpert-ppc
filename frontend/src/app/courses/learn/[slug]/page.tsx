@@ -157,6 +157,11 @@ export default function CourseLearnPage() {
                     {mod.title}
                   </h2>
                   <ul className="space-y-1">
+                    {!mod.lessons.length ? (
+                      <li className="rounded-lg px-3 py-2 text-sm text-muted-foreground">
+                        No lessons yet
+                      </li>
+                    ) : null}
                     {mod.lessons.map((lesson) => (
                       <li key={lesson.id}>
                         <button
@@ -196,7 +201,7 @@ export default function CourseLearnPage() {
                   <p className="mb-6 text-muted-foreground">{activeLesson.summary}</p>
                 ) : null}
 
-                {activeLesson.type === 'video' ? (
+                {activeLesson.videoUrl || activeLesson.type === 'video' ? (
                   <div className="mb-6 overflow-hidden rounded-xl border border-border bg-background">
                     {yt ? (
                       <iframe

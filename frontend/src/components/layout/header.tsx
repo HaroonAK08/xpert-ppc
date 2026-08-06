@@ -14,7 +14,7 @@ function isActive(pathname: string, href: string) {
 }
 
 export function Header() {
-  const pathname = usePathname();
+  const pathname = usePathname() || '';
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);

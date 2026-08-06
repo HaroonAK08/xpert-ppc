@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { Check, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { Field, Input, Label, Textarea } from '@/components/ui/input';
 import { api, type PortalCourseSummary } from '@/lib/api';
@@ -75,6 +75,20 @@ export default function AdminCoursesPage() {
       return;
     }
     setItems((prev) => prev.filter((c) => c.id !== id));
+  }
+
+  async function togglePublish(id: string, published: boolean) {
+    const res = await api.patch<{ course: { published: boolean } }>(
+      `/api/admin/portal/courses/${id}`,
+      { published }
+    );
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setItems((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, published: res.data.course.published } : c))
+    );
   }
 
   if (loading) {
@@ -161,20 +175,36 @@ export default function AdminCoursesPage() {
                   /{c.slug} · {c.moduleCount} modules · {c.lessonCount} lessons
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/admin/courses/${c.id}`}
-                  className="inline-flex h-10 items-center rounded-xl border border-border px-4 text-sm font-semibold hover:text-primary"
+                  className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-border px-4 text-sm font-semibold hover:text-primary"
                 >
-                  Edit content
+                  <Pencil className="h-3.5 w-3.5" /> Edit
                 </Link>
+                {c.published ? (
+                  <button
+                    type="button"
+                    onClick={() => void togglePublish(c.id, false)}
+                    className="inline-flex h-10 items-center rounded-xl border border-border px-4 text-sm font-semibold"
+                  >
+                    Unpublish
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => void togglePublish(c.id, true)}
+                    className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground"
+                  >
+                    <Check className="h-3.5 w-3.5" /> Publish
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => void removeCourse(c.id)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-destructive"
-                  aria-label="Delete course"
+                  className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-destructive/40 px-4 text-sm font-semibold text-destructive hover:bg-destructive/10"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" /> Delete
                 </button>
               </div>
             </div>

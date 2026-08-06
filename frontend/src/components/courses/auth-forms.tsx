@@ -62,8 +62,8 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
         email: result.data.email,
         purpose: result.data.purpose,
       });
-      if (name) params.set('name', name);
-      router.push(`/courses/verify?${params.toString()}`);
+      // Full page load avoids App Router soft-nav crashes after signup.
+      window.location.assign(`/courses/verify?${params.toString()}`);
       return;
     }
 
