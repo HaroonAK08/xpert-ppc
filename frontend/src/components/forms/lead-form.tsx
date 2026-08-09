@@ -4,6 +4,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { Field, Input, Label, Select, Textarea } from '@/components/ui/input';
+import { trackLeadConversion } from '@/lib/analytics';
 import { api } from '@/lib/api';
 import { PLATFORMS, type LEAD_SOURCES } from '@/lib/validation';
 import { cn } from '@/lib/utils';
@@ -70,6 +71,11 @@ export function LeadForm({
       setStatus('error');
       return;
     }
+
+    trackLeadConversion({
+      source,
+      platform: payload.platform,
+    });
 
     form.reset();
     setStatus('done');
