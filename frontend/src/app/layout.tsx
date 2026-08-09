@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google';
 import { Suspense } from 'react';
 import './globals.css';
 
+import { GoogleTags } from '@/components/analytics/google-tags';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { WhatsAppFab } from '@/components/layout/whatsapp-fab';
@@ -10,6 +11,8 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { MotionProvider } from '@/components/motion';
 import { organizationSchema, websiteSchema } from '@/lib/seo';
 import { siteConfig } from '@/lib/site';
+
+const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -77,6 +80,9 @@ export const metadata: Metadata = {
     apple: '/favicon-192.png',
   },
   formatDetection: { telephone: true, email: true, address: false },
+  ...(googleSiteVerification
+    ? { verification: { google: googleSiteVerification } }
+    : {}),
 };
 
 export const viewport: Viewport = {
@@ -99,6 +105,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground">
+        <GoogleTags />
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
 
         <a
