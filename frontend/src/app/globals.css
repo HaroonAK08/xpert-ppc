@@ -90,6 +90,23 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .trust-marquee-track {
+    animation: trust-marquee 38s linear infinite;
+  }
+
+  .trust-marquee-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes trust-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* Respect users who prefer less motion */

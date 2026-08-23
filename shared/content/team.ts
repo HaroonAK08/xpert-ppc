@@ -17,8 +17,7 @@ export const umerKhan: TeamMemberContent = {
   name: 'Umer Khan',
   role: 'Senior PPC Specialist / Account Manager',
   bio: 'With over 20+ years of rigorous experience in data-driven performance marketing, Umer engineers high-velocity ad campaigns for brands demanding aggressive growth. He specializes in bridging the gap between deep analytics and compelling creative to exploit platform algorithms across Google, Meta, and TikTok.',
-  photo:
-    'https://horizons-cdn.hostinger.com/63fcbc2b-b25a-4691-84cb-d8d88c4d6854/4fb1db486c2b087c186ea7f7fecf5c7b.png',
+  photo: '/team/umer-khan.png',
   expertise: [
     'Google Ads (Search, Display, PMax)',
     'Meta Ads (Facebook & Instagram)',

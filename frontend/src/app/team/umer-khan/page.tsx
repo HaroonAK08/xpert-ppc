@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, ExternalLink, Linkedin, Mail, MessageCircle, Phone } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ExternalLink, Linkedin, Mail } from 'lucide-react';
 
 import { Breadcrumbs } from '@/components/layout/breadcrumbs';
+import { WhatsAppNumberButton } from '@/components/layout/whatsapp-number-button';
 import { JsonLd } from '@/components/seo/json-ld';
 import { LoadFade, Reveal, RevealGroup, RevealItem } from '@/components/motion';
 import { umerKhan as m } from '@shared/content/team';
@@ -40,13 +41,13 @@ export default function TeamMemberPage() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
             <LoadFade className="lg:col-span-1" scale={0.95}>
               <div className="rounded-2xl border border-border bg-card p-6">
-                <div className="relative mx-auto mb-6 aspect-square w-40 overflow-hidden rounded-2xl border border-primary/20">
+                <div className="relative mx-auto mb-6 aspect-square w-40 overflow-hidden rounded-full border border-primary/20 bg-card">
                   <Image
                     src={m.photo}
                     alt={`${m.name}, ${m.role} at Xpert PPC`}
                     fill
                     sizes="160px"
-                    className="object-cover"
+                    className="object-contain"
                     priority
                   />
                 </div>
@@ -61,20 +62,7 @@ export default function TeamMemberPage() {
                   >
                     <Mail className="h-4 w-4 shrink-0" /> {siteConfig.contact.email}
                   </a>
-                  <a
-                    href={`tel:${siteConfig.contact.phonePrimaryRaw}`}
-                    className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    <Phone className="h-4 w-4 shrink-0" /> {siteConfig.contact.phonePrimary}
-                  </a>
-                  <a
-                    href={siteConfig.contact.whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    <MessageCircle className="h-4 w-4 shrink-0" /> WhatsApp Chat
-                  </a>
+                  <WhatsAppNumberButton size="sm" />
                   <a
                     href={m.socials.linkedin}
                     target="_blank"

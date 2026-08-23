@@ -7,6 +7,7 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 import { mainNav } from '@/lib/site';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
+import { WhatsAppNumberButton } from './whatsapp-number-button';
 
 function isActive(pathname: string, href: string) {
   if (href === '/') return pathname === '/';
@@ -39,6 +40,34 @@ export function Header() {
       document.body.style.overflow = '';
     };
   }, [mobileOpen]);
+
+  const isLanding = pathname.startsWith('/ads');
+
+  if (isLanding) {
+    return (
+      <header
+        className={cn(
+          'fixed top-0 z-50 w-full border-b bg-background transition-all duration-300',
+          scrolled ? 'border-primary/20 shadow-lg shadow-background/50' : 'border-transparent'
+        )}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-20 items-center justify-between">
+            <Logo />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <WhatsAppNumberButton size="sm" />
+              <a
+                href="#audit-form"
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 sm:px-6 sm:text-sm"
+              >
+                Book a strategy session
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header
@@ -123,7 +152,8 @@ export function Header() {
             )}
           </nav>
 
-          <div className="hidden items-center lg:flex">
+          <div className="hidden items-center gap-3 lg:flex">
+            <WhatsAppNumberButton size="sm" />
             <Link
               href="/contact"
               className="btn-hover-effect inline-flex h-10 items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90"
@@ -133,6 +163,7 @@ export function Header() {
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
+            <WhatsAppNumberButton size="sm" className="max-[380px]:px-2.5" />
             <Link
               href="/contact"
               className="hidden h-10 items-center justify-center rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 sm:inline-flex sm:px-4"
@@ -179,9 +210,10 @@ export function Header() {
                 ))}
               </div>
             ))}
+            <WhatsAppNumberButton className="mt-4 w-full" />
             <Link
               href="/contact"
-              className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground"
+              className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground"
             >
               Book a Call
             </Link>

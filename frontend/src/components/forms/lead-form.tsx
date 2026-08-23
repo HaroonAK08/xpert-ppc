@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { Field, Input, Label, Select, Textarea } from '@/components/ui/input';
 import { api } from '@/lib/api';
+import { siteConfig } from '@/lib/site';
 import { PLATFORMS, type LEAD_SOURCES } from '@/lib/validation';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +17,10 @@ type Props = {
   /** Preselects the platform dropdown, e.g. on a service page. */
   defaultPlatform?: string;
   submitLabel?: string;
+  /** Adds a WhatsApp submit path using the same fields. */
+  whatsAppSubmit?: boolean;
+  /** Name, email, phone only — for ad landing pages. */
+  compact?: boolean;
   className?: string;
 };
 
@@ -26,6 +31,8 @@ export function LeadForm({
   source,
   defaultPlatform,
   submitLabel,
+  whatsAppSubmit = false,
+  compact = false,
   className,
 }: Props) {
   const uid = useId();
@@ -102,73 +109,119 @@ export function LeadForm({
         <input id={`cw-${uid}`} name="companyWebsite" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
-      <Field>
-        <Label htmlFor={`name-${uid}`}>{isAudit ? 'Full Name *' : 'Name *'}</Label>
-        <Input
-          id={`name-${uid}`}
-          name="name"
-          required
-          autoComplete="name"
-          placeholder={isAudit ? 'Jane Doe' : 'Your name'}
-        />
-      </Field>
+      {compact ? (
+        <div className="space-y-4">
+          <input type="hidden" name="platform" value="Other" />
+          <Field>
+            <Label htmlFor={`name-${uid}`}>Name *</Label>
+            <Input
+              id={`name-${uid}`}
+              name="name"
+              required
+              autoComplete="name"
+              placeholder="Dr. Sara Ahmed"
+            />
+          </Field>
+          <Field>
+            <Label htmlFor={`email-${uid}`}>Work email *</Label>
+            <Input
+              id={`email-${uid}`}
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="clinic@email.com"
+            />
+          </Field>
+          <Field>
+            <Label htmlFor={`phone-${uid}`}>WhatsApp *</Label>
+            <Input
+              id={`phone-${uid}`}
+              name="phone"
+              type="tel"
+              required
+              autoComplete="tel"
+              placeholder="+1 555 000 0000"
+            />
+          </Field>
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <Label htmlFor={`name-${uid}`}>{isAudit ? 'Full name *' : 'Name *'}</Label>
+              <Input
+                id={`name-${uid}`}
+                name="name"
+                required
+                autoComplete="name"
+                placeholder={isAudit ? 'Dr. Sara Ahmed' : 'Your name'}
+              />
+            </Field>
 
-      <Field>
-        <Label htmlFor={`email-${uid}`}>{isAudit ? 'Work Email *' : 'Email *'}</Label>
-        <Input
-          id={`email-${uid}`}
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          placeholder={isAudit ? 'jane@company.com' : 'you@company.com'}
-        />
-      </Field>
+            <Field>
+              <Label htmlFor={`email-${uid}`}>{isAudit ? 'Work email *' : 'Email *'}</Label>
+              <Input
+                id={`email-${uid}`}
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder={isAudit ? 'clinic@email.com' : 'you@company.com'}
+              />
+            </Field>
 
-      <Field>
-        <Label htmlFor={`phone-${uid}`}>{isAudit ? 'Phone (optional)' : 'Phone *'}</Label>
-        <Input
-          id={`phone-${uid}`}
-          name="phone"
-          type="tel"
-          required={!isAudit}
-          autoComplete="tel"
-          placeholder="+971 5X XXX XXXX"
-        />
-      </Field>
+            <Field>
+              <Label htmlFor={`phone-${uid}`}>{isAudit ? 'WhatsApp / phone' : 'Phone *'}</Label>
+              <Input
+                id={`phone-${uid}`}
+                name="phone"
+                type="tel"
+                required={!isAudit}
+                autoComplete="tel"
+                placeholder="+1 555 000 0000"
+              />
+            </Field>
 
-      <Field>
-        <Label htmlFor={`platform-${uid}`}>
-          {isAudit ? 'Platform Focus *' : 'Service interest *'}
-        </Label>
-        <Select
-          id={`platform-${uid}`}
-          name="platform"
-          required
-          defaultValue={defaultPlatform ?? ''}
-        >
-          <option value="" disabled>
-            {isAudit ? 'Select a platform' : 'Select a service'}
-          </option>
-          {platformOptions.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </Select>
-      </Field>
+            <Field>
+              <Label htmlFor={`platform-${uid}`}>
+                {isAudit ? 'Where should we audit? *' : 'Service interest *'}
+              </Label>
+              <Select
+                id={`platform-${uid}`}
+                name="platform"
+                required
+                defaultValue={defaultPlatform ?? ''}
+              >
+                <option value="" disabled>
+                  {isAudit ? 'Select a platform' : 'Select a service'}
+                </option>
+                {platformOptions.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
 
-      <Field>
-        <Label htmlFor={`message-${uid}`}>
-          {isAudit ? 'Goals / brief (optional)' : 'Message *'}
-        </Label>
-        <Textarea
-          id={`message-${uid}`}
-          name="message"
-          required={!isAudit}
-          placeholder={isAudit ? 'What are you trying to improve?' : 'Tell us about your goals'}
-        />
-      </Field>
+          <Field>
+            <Label htmlFor={`message-${uid}`}>
+              {isAudit ? 'Clinic / city (optional)' : 'Message *'}
+            </Label>
+            <Textarea
+              id={`message-${uid}`}
+              name="message"
+              required={!isAudit}
+              placeholder={
+                isAudit
+                  ? 'e.g. Acne & laser clinic in London, ~$5k/month ads'
+                  : 'Tell us about your goals'
+              }
+            />
+          </Field>
+        </>
+      )}
 
       {error ? (
         <p className="text-sm font-medium text-destructive" role="alert">
@@ -179,7 +232,7 @@ export function LeadForm({
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="btn-hover-effect inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 disabled:opacity-60"
+        className="btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 disabled:opacity-60"
       >
         {status === 'sending' ? (
           <>
@@ -190,6 +243,37 @@ export function LeadForm({
           submitLabel ?? (isAudit ? 'Get My Free Audit' : 'Send Message')
         )}
       </button>
+      {whatsAppSubmit ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            const form = e.currentTarget.form;
+            if (!form) return;
+            const fd = new FormData(form);
+            const name = String(fd.get('name') || '').trim();
+            const email = String(fd.get('email') || '').trim();
+            const phone = String(fd.get('phone') || '').trim();
+            const platform = String(fd.get('platform') || '').trim();
+            const message = String(fd.get('message') || '').trim();
+            const lines = [
+              'Hi Xpert PPC — I want a free dermatology clinic audit.',
+              name ? `Name: ${name}` : '',
+              email ? `Email: ${email}` : '',
+              phone ? `Phone: ${phone}` : '',
+              platform ? `Platform: ${platform}` : '',
+              message ? `Notes: ${message}` : '',
+            ].filter(Boolean);
+            window.open(
+              `${siteConfig.contact.whatsapp}?text=${encodeURIComponent(lines.join('\n'))}`,
+              '_blank',
+              'noopener,noreferrer'
+            );
+          }}
+          className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#25D366] px-6 text-sm font-bold text-white transition-colors hover:bg-[#20bd5a]"
+        >
+          Submit on WhatsApp
+        </button>
+      ) : null}
     </form>
   );
 }

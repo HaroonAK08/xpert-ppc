@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Mail, Phone } from 'lucide-react';
 
 import { LeadForm } from '@/components/forms/lead-form';
+import { WhatsAppNumberButton } from '@/components/layout/whatsapp-number-button';
 import { JsonLd } from '@/components/seo/json-ld';
 import { LoadFade, Reveal } from '@/components/motion';
 import { buildMetadata, professionalServiceSchema } from '@/lib/seo';
@@ -102,13 +103,12 @@ export default function ContactPage() {
                       <h3 className="mb-2 font-semibold text-foreground">{block.title}</h3>
                       {block.details.map((detail) =>
                         block.type === 'phone' ? (
-                          <p key={detail} className="text-muted-foreground">
-                            <a
-                              href={`tel:${detail.replace(/\s/g, '')}`}
-                              className="transition-colors hover:text-primary"
-                            >
-                              {detail}
-                            </a>
+                          <p key={detail} className="mb-2 last:mb-0">
+                            <WhatsAppNumberButton
+                              size="sm"
+                              phone={detail}
+                              phoneRaw={detail.replace(/\s/g, '')}
+                            />
                           </p>
                         ) : (
                           <p key={detail} className="text-muted-foreground">

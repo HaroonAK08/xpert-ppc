@@ -1,10 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 import { siteConfig } from '@/lib/site';
 
 export function WhatsAppFab() {
+  const pathname = usePathname() || '';
+  if (pathname.startsWith('/ads')) return null;
+
   const href = `${siteConfig.contact.whatsapp}?text=${encodeURIComponent(
     "Hi Xpert PPC, I'd like a free PPC audit."
   )}`;

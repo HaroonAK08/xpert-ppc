@@ -28,6 +28,8 @@ const nextConfig = {
     return [
       // Legacy / alternate paths -> canonical
       { source: '/industries', destination: '/industries/dermatologists', permanent: false },
+      { source: '/lp/dermatologists', destination: '/ads/dermatologists', permanent: true },
+      { source: '/lp/:slug*', destination: '/ads/:slug*', permanent: true },
       { source: '/xpert-ppc-digital-academy', destination: '/xpert-ppc-digital-academy/sem', permanent: false },
     ];
   },

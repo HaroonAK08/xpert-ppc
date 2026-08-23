@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   ExternalLink,
   Facebook,
@@ -6,13 +9,13 @@ import {
   Globe,
   Linkedin,
   Mail,
-  Phone,
   Youtube,
   Briefcase,
   Users,
 } from 'lucide-react';
 import { footerNav, legalNav, siteConfig } from '@/lib/site';
 import { Logo } from './logo';
+import { WhatsAppNumberButton } from './whatsapp-number-button';
 
 const socialLinks = [
   { href: siteConfig.socials.linkedin, label: 'LinkedIn', Icon: Linkedin },
@@ -35,6 +38,28 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 }
 
 export function Footer() {
+  const pathname = usePathname() || '';
+
+  if (pathname.startsWith('/ads')) {
+    return (
+      <footer className="border-t border-border bg-background pb-24 pt-8 text-foreground md:pb-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
+            <WhatsAppNumberButton size="sm" />
+            <p>&copy; {new Date().getFullYear()} Xpert PPC. Engineered for Growth.</p>
+            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              {legalNav.map((l) => (
+                <Link key={l.href} href={l.href} className="transition-colors hover:text-primary">
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="relative overflow-hidden border-t border-border bg-background pb-24 pt-16 text-foreground md:pb-8">
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-32 w-3/4 -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
@@ -82,17 +107,14 @@ export function Footer() {
           <div>
             <span className="mb-6 block text-lg font-bold text-primary">Contact</span>
             <div className="flex flex-col space-y-4">
-              <a
-                href={`tel:${siteConfig.contact.phonePrimaryRaw}`}
-                className="flex items-center space-x-3 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary"
-              >
-                <Phone className="h-4 w-4 shrink-0" />
-                <span>
-                  {siteConfig.contact.phonePrimary}
-                  <br />
-                  {siteConfig.contact.phoneSecondary}
-                </span>
-              </a>
+              <div className="flex flex-col items-start gap-2">
+                <WhatsAppNumberButton size="sm" />
+                <WhatsAppNumberButton
+                  size="sm"
+                  phone={siteConfig.contact.phoneSecondary}
+                  phoneRaw={siteConfig.contact.phoneSecondaryRaw}
+                />
+              </div>
               <a
                 href={`mailto:${siteConfig.contact.email}`}
                 className="flex items-center space-x-3 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary"
