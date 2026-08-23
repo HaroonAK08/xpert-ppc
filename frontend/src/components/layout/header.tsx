@@ -51,16 +51,17 @@ export function Header() {
           scrolled ? 'border-primary/20 shadow-lg shadow-background/50' : 'border-transparent'
         )}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-20 items-center justify-between">
-            <Logo />
-            <div className="flex items-center gap-2 sm:gap-3">
-              <WhatsAppNumberButton size="sm" />
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between gap-2 sm:h-20">
+            <Logo className="shrink-0" />
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+              <WhatsAppNumberButton size="sm" hideNumberOnMobile />
               <a
                 href="#audit-form"
-                className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 sm:px-6 sm:text-sm"
+                className="inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 sm:px-6 sm:text-sm"
               >
-                Book a strategy session
+                <span className="sm:hidden">Free audit</span>
+                <span className="hidden sm:inline">Book a strategy session</span>
               </a>
             </div>
           </div>

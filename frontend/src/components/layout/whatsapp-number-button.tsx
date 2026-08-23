@@ -14,6 +14,8 @@ type Props = {
   phone?: string;
   phoneRaw?: string;
   size?: 'sm' | 'md';
+  /** Hide the number on small screens; keep the green icon button. */
+  hideNumberOnMobile?: boolean;
   className?: string;
 };
 
@@ -21,6 +23,7 @@ export function WhatsAppNumberButton({
   phone = siteConfig.contact.phonePrimary,
   phoneRaw = siteConfig.contact.phonePrimaryRaw,
   size = 'md',
+  hideNumberOnMobile = false,
   className,
 }: Props) {
   const href = `https://wa.me/${phoneRaw.replace(/\D/g, '')}`;
@@ -32,13 +35,14 @@ export function WhatsAppNumberButton({
       rel="noopener noreferrer"
       aria-label={`WhatsApp ${phone}`}
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] font-bold text-white shadow-md shadow-[#25D366]/30 transition-transform hover:scale-[1.03] hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        size === 'sm' ? 'h-10 px-3.5 text-xs sm:text-sm' : 'h-12 px-5 text-sm',
+        'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#25D366] font-bold text-white shadow-md shadow-[#25D366]/30 transition-transform hover:scale-[1.03] hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        size === 'sm' ? 'h-10 text-xs sm:text-sm' : 'h-12 text-sm',
+        hideNumberOnMobile ? 'w-10 px-0 sm:w-auto sm:px-3.5' : size === 'sm' ? 'px-3.5' : 'px-5',
         className
       )}
     >
-      <WhatsAppIcon className={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} />
-      {phone}
+      <WhatsAppIcon className={size === 'sm' ? 'h-5 w-5' : 'h-5 w-5'} />
+      <span className={cn(hideNumberOnMobile && 'hidden sm:inline')}>{phone}</span>
     </a>
   );
 }
