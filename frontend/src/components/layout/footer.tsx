@@ -13,6 +13,7 @@ import {
   Briefcase,
   Users,
 } from 'lucide-react';
+import { useSiteHref } from '@/hooks/use-site-href';
 import { footerNav, legalNav, siteConfig } from '@/lib/site';
 import { Logo } from './logo';
 import { WhatsAppNumberButton } from './whatsapp-number-button';
@@ -26,9 +27,10 @@ const socialLinks = [
 ];
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const to = useSiteHref();
   return (
     <Link
-      href={href}
+      href={to(href)}
       className="group flex items-start text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-accent"
     >
       <ExternalLink className="mr-2 mt-0.5 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
@@ -39,6 +41,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 
 export function Footer() {
   const pathname = usePathname() || '';
+  const to = useSiteHref();
 
   if (pathname.startsWith('/ads')) {
     return (
@@ -49,7 +52,7 @@ export function Footer() {
             <p>&copy; {new Date().getFullYear()} Xpert PPC. Engineered for Growth.</p>
             <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               {legalNav.map((l) => (
-                <Link key={l.href} href={l.href} className="transition-colors hover:text-primary">
+                <Link key={l.href} href={to(l.href)} className="transition-colors hover:text-primary">
                   {l.label}
                 </Link>
               ))}
@@ -159,7 +162,7 @@ export function Footer() {
             <p>&copy; {new Date().getFullYear()} Xpert PPC. Engineered for Growth.</p>
             <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               {legalNav.map((l) => (
-                <Link key={l.href} href={l.href} className="transition-colors hover:text-primary">
+                <Link key={l.href} href={to(l.href)} className="transition-colors hover:text-primary">
                   {l.label}
                 </Link>
               ))}

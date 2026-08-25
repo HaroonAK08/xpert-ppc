@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
+import { useSiteHref } from '@/hooks/use-site-href';
 import { mainNav } from '@/lib/site';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
@@ -16,6 +17,7 @@ function isActive(pathname: string, href: string) {
 
 export function Header() {
   const pathname = usePathname() || '';
+  const to = useSiteHref();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export function Header() {
                         {item.children.map((child) => (
                           <Link
                             key={child.href}
-                            href={child.href}
+                            href={to(child.href)}
                             className="block px-5 py-4 transition-colors hover:bg-primary/10"
                           >
                             <span className="block text-sm font-semibold text-foreground">
@@ -138,7 +140,7 @@ export function Header() {
               ) : (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={to(item.href)}
                   aria-current={isActive(pathname, item.href) ? 'page' : undefined}
                   className={cn(
                     'border-b-2 pb-1 text-sm font-semibold transition-colors duration-300',
@@ -156,7 +158,7 @@ export function Header() {
           <div className="hidden items-center gap-3 lg:flex">
             <WhatsAppNumberButton size="sm" />
             <Link
-              href="/contact"
+              href={to('/contact')}
               className="btn-hover-effect inline-flex h-10 items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90"
             >
               Book a Call
@@ -166,7 +168,7 @@ export function Header() {
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
             <WhatsAppNumberButton size="sm" className="max-[380px]:px-2.5" />
             <Link
-              href="/contact"
+              href={to('/contact')}
               className="hidden h-10 items-center justify-center rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 sm:inline-flex sm:px-4"
             >
               Free Audit
@@ -190,7 +192,7 @@ export function Header() {
             {mainNav.map((item) => (
               <div key={item.label}>
                 <Link
-                  href={item.href}
+                  href={to(item.href)}
                   className={cn(
                     'block border-b border-primary/10 py-3 text-sm font-semibold transition-colors',
                     isActive(pathname, item.href)
@@ -203,7 +205,7 @@ export function Header() {
                 {item.children?.map((child) => (
                   <Link
                     key={child.href}
-                    href={child.href}
+                    href={to(child.href)}
                     className="block border-b border-primary/10 py-2.5 pl-4 text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
                     {child.label}
@@ -213,7 +215,7 @@ export function Header() {
             ))}
             <WhatsAppNumberButton className="mt-4 w-full" />
             <Link
-              href="/contact"
+              href={to('/contact')}
               className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground"
             >
               Book a Call

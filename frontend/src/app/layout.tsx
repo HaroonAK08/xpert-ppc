@@ -74,10 +74,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/favicon-32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon-192.png', type: 'image/png', sizes: '192x192' },
     ],
-    apple: '/favicon-192.png',
+    apple: '/apple-touch-icon.png',
   },
   formatDetection: { telephone: true, email: true, address: false },
   ...(googleSiteVerification
