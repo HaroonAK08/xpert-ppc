@@ -135,11 +135,104 @@ export async function sendOtpEmail(opts: {
 
   const transporter = createTransport();
   await transporter.sendMail({
-    from: env.smtp.from,
+    from: env.smtp.otpFrom,
     to: opts.to,
     subject,
     text,
     html,
   });
   return { sent: true };
+}
+
+function btn(href: string, label: string, color: string): string {
+  return `<a href="${escapeHtml(href)}" style="display:inline-block;background:${color};color:#fff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:10px;margin-right:8px">${escapeHtml(label)}</a>`;
+}
+
+export async function sendCourseApplicationEmail(opts: {
+  name: string;
+  email: string;
+  interest: string;
+  acceptUrl: string;
+  rejectUrl: string;
+}): Promise<void> {
+  if (!isMailConfigured()) {
+    console.warn(
+      `[mail] SMTP not configured — course application from ${opts.email} saved but not emailed.`
+    );
+    return;
+  }
+
+  const subject = `Course application: ${opts.name}`;
+  const text = [
+    'New course application',
+    '',
+    `Name: ${opts.name}`,
+    `Email: ${opts.email}`,
+    '',
+    'What they want to learn:',
+    opts.interest,
+    '',
+    `Accept: ${opts.acceptUrl}`,
+    `Reject: ${opts.rejectUrl}`,
+  ].join('\n');
+
+  const html = `
+    <div style="font-family:Inter,Segoe UI,Arial,sans-serif;max-width:640px;margin:0 auto">
+      <h2 style="margin:0 0 16px;color:#0f172a">New course application</h2>
+      <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:12px;overflow:hidden">
+        ${row('Name', opts.name)}
+        ${row('Email', opts.email)}
+        ${row('Wants to learn', opts.interest)}
+      </table>
+      <p style="margin:24px 0 8px;color:#475569">Accept this person so they can sign in with the password they chose.</p>
+      <p>${btn(opts.acceptUrl, 'Accept', '#16a34a')}${btn(opts.rejectUrl, 'Reject', '#dc2626')}</p>
+    </div>
+  `;
+
+  const transporter = createTransport();
+  await transporter.sendMail({
+    from: env.smtp.from,
+    to: env.leadNotifyTo,
+    replyTo: opts.email,
+    subject,
+    text,
+    html,
+  });
+}
+
+export async function sendApplicationDecisionEmail(opts: {
+  to: string;
+  name: string;
+  decision: 'approved' | 'rejected';
+  loginUrl: string;
+}): Promise<void> {
+  if (!isMailConfigured()) return;
+
+  const accepted = opts.decision === 'approved';
+  const subject = accepted
+    ? 'You’re in — sign in to Xpert PPC Courses'
+    : 'Update on your Xpert PPC Courses application';
+  const text = accepted
+    ? `Hi ${opts.name},\n\nYour application was accepted. Sign in with the password you chose:\n${opts.loginUrl}\n\n— Xpert PPC`
+    : `Hi ${opts.name},\n\nThanks for applying to Xpert PPC Courses. We can’t offer a place right now.\n\n— Xpert PPC`;
+
+  const html = accepted
+    ? `<div style="font-family:Inter,Segoe UI,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px">
+        <h2 style="margin:0 0 12px;color:#0f172a">You’re approved</h2>
+        <p style="color:#475569">Hi ${escapeHtml(opts.name)}, you can now sign in with the password you set on the application form.</p>
+        <p>${btn(opts.loginUrl, 'Sign in', '#0066cc')}</p>
+      </div>`
+    : `<div style="font-family:Inter,Segoe UI,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px">
+        <h2 style="margin:0 0 12px;color:#0f172a">Application update</h2>
+        <p style="color:#475569">Hi ${escapeHtml(opts.name)}, thanks for applying. We can’t offer a place on Xpert PPC Courses right now.</p>
+      </div>`;
+
+  const transporter = createTransport();
+  await transporter.sendMail({
+    from: env.smtp.from,
+    to: opts.to,
+    subject,
+    text,
+    html,
+  });
 }

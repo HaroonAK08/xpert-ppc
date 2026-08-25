@@ -10,7 +10,9 @@ import {
   portalCourseSchema,
   portalLessonSchema,
   portalModuleSchema,
+  studentDecisionSchema,
 } from '../validation/portal';
+import { applyStudentDecision } from '../utils/studentApplication';
 
 const router = Router();
 
@@ -19,17 +21,34 @@ router.use(requireAuth);
 router.get(
   '/students',
   asyncHandler(async (_req, res) => {
-    const students = await Student.find({ emailVerified: true })
-      .sort({ createdAt: -1 })
-      .limit(200);
+    const students = await Student.find().sort({ createdAt: -1 }).limit(200);
     res.json({
       items: students.map((s) => ({
         id: String(s._id),
         name: s.name,
         email: s.email,
+        interest: s.interest || '',
+        status: s.status || (s.emailVerified ? 'approved' : 'pending'),
         lastLoginAt: s.lastLoginAt,
         createdAt: s.createdAt,
       })),
+    });
+  })
+);
+
+router.patch(
+  '/students/:id',
+  asyncHandler(async (req, res) => {
+    const parsed = studentDecisionSchema.safeParse(req.body);
+    if (!parsed.success) throw new ApiError(400, 'Send status approved or rejected.');
+
+    const result = await applyStudentDecision(req.params.id, parsed.data.status);
+    if (!result.ok) throw new ApiError(404, result.error);
+
+    res.json({
+      ok: true,
+      already: result.already,
+      status: parsed.data.status,
     });
   })
 );

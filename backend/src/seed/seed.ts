@@ -283,6 +283,7 @@ async function main() {
         name: process.env.SEED_STUDENT_NAME || 'Student',
         passwordHash,
         emailVerified: true,
+        status: 'approved',
         active: true,
       },
       { upsert: true, setDefaultsOnInsert: true }

@@ -22,15 +22,23 @@ export const env = {
     .map((o) => o.trim())
     .filter(Boolean),
   cookieDomain: process.env.COOKIE_DOMAIN || undefined,
-  /** Inbox that receives form submissions. */
+  /** Inbox that receives form submissions and course applications. */
   leadNotifyTo: process.env.LEAD_NOTIFY_TO || 'umer@xpertppc.com',
+  /** Public site origin, used in accept/reject email links. */
+  siteUrl: (process.env.PUBLIC_SITE_URL || 'https://xpertppc.com').replace(/\/$/, ''),
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT ?? 587),
     secure: process.env.SMTP_SECURE === 'true',
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
-    from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@xpertppc.com',
+    /** From address for lead alerts (and fallback for other mail). */
+    from: process.env.SMTP_FROM || 'Xpert PPC <team@xpertppc.com>',
+    /** From address for course signup/login codes. */
+    otpFrom:
+      process.env.SMTP_OTP_FROM ||
+      process.env.SMTP_FROM ||
+      'Xpert PPC <team@xpertppc.com>',
   },
   get isProd() {
     return this.nodeEnv === 'production';

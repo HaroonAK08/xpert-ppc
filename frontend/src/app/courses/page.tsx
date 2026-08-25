@@ -1,21 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, CheckCircle2, Mail } from 'lucide-react';
+import { BookOpen, CheckCircle2 } from 'lucide-react';
 
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Courses | Xpert PPC Digital Academy',
   description:
-    'Sign up with email OTP to access Xpert PPC courses — videos, lectures, assignments, and tasks.',
+    'Apply for Xpert PPC courses. After we accept you, sign in and learn with videos, lectures, and assignments.',
   path: '/courses',
   keywords: ['PPC courses', 'digital academy', 'SEM training', 'SEO course'],
 });
 
 const steps = [
-  'Create an account with your name and email',
-  'Verify the 6-digit OTP sent to your Gmail',
-  'Enroll and learn with videos, lectures, and assignments',
+  'Apply with your name, email, password, and what you want to learn',
+  'We review your application and email you if you’re accepted',
+  'Sign in with your password and start the lessons',
 ];
 
 export default function CoursesLandingPage() {
@@ -31,8 +31,8 @@ export default function CoursesLandingPage() {
             Xpert PPC <span className="text-primary">Courses</span>
           </h1>
           <p className="mb-10 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Access training content built by our media buying team. Sign up with your email, verify
-            via OTP, then unlock videos, lectures, assignments, and tasks.
+            Access training from our media buying team. Apply first — if we accept you, you can
+            sign in and unlock videos, lectures, assignments, and tasks.
           </p>
 
           <div className="mb-12 flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -40,7 +40,7 @@ export default function CoursesLandingPage() {
               href="/courses/signup"
               className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-8 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
             >
-              Sign up free
+              Apply
             </Link>
             <Link
               href="/courses/login"
@@ -63,10 +63,6 @@ export default function CoursesLandingPage() {
               </li>
             ))}
           </ul>
-
-          <p className="mt-10 inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <Mail className="h-4 w-4" /> OTP codes are sent to your email (Gmail supported)
-          </p>
         </div>
       </div>
     </section>

@@ -62,3 +62,32 @@ export function cookieOptions() {
     ...(env.cookieDomain ? { domain: env.cookieDomain } : {}),
   };
 }
+
+export type ApplicationDecision = 'approved' | 'rejected';
+
+type ApplicationTokenPayload = {
+  typ: 'student-app';
+  sid: string;
+  decision: ApplicationDecision;
+};
+
+export function signApplicationToken(studentId: string, decision: ApplicationDecision): string {
+  return jwt.sign(
+    { typ: 'student-app', sid: studentId, decision } satisfies ApplicationTokenPayload,
+    env.jwtSecret,
+    { expiresIn: '14d' }
+  );
+}
+
+export function verifyApplicationToken(
+  token: string
+): { sid: string; decision: ApplicationDecision } | null {
+  try {
+    const payload = jwt.verify(token, env.jwtSecret) as ApplicationTokenPayload;
+    if (payload.typ !== 'student-app' || !payload.sid) return null;
+    if (payload.decision !== 'approved' && payload.decision !== 'rejected') return null;
+    return { sid: payload.sid, decision: payload.decision };
+  } catch {
+    return null;
+  }
+}

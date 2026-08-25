@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
-import { Field, Input, Label } from '@/components/ui/input';
+import { Field, Input, Label, Textarea } from '@/components/ui/input';
 import { api } from '@/lib/api';
 
 type Mode = 'signup' | 'login';
@@ -62,19 +62,13 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
     const email = String(fd.get('email') || '').trim();
     const name = String(fd.get('name') || '').trim();
     const password = String(fd.get('password') || '');
+    const interest = String(fd.get('interest') || '').trim();
 
     if (mode === 'signup') {
-      const result = await api.post<{
-        email: string;
-        purpose: string;
-        emailed?: boolean;
-        previewCode?: string;
-        message?: string;
-      }>('/api/student/auth/signup', {
-        name,
-        email,
-        password,
-      });
+      const result = await api.post<{ pending?: boolean; email: string; message?: string }>(
+        '/api/student/auth/signup',
+        { name, email, password, interest }
+      );
 
       setBusy(false);
 
@@ -83,28 +77,10 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
         return;
       }
 
-      if (result.data.previewCode) {
-        sessionStorage.setItem(
-          'xppc_otp_preview',
-          JSON.stringify({
-            email: result.data.email,
-            code: result.data.previewCode,
-            message: result.data.message,
-          })
-        );
-      } else {
-        sessionStorage.removeItem('xppc_otp_preview');
-      }
-
-      const params = new URLSearchParams({
-        email: result.data.email,
-        purpose: result.data.purpose,
-      });
-      window.location.assign(`/courses/verify?${params.toString()}`);
+      window.location.assign('/courses/applied');
       return;
     }
 
-    // Students first; if that fails, try admin (test / umer) → /admin.
     const result = await api.post<{ user: { id: string } }>('/api/student/auth/login', {
       email,
       password,
@@ -158,6 +134,20 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
         minLength={6}
       />
 
+      {mode === 'signup' ? (
+        <Field>
+          <Label htmlFor="interest">What do you want to learn?</Label>
+          <Textarea
+            id="interest"
+            name="interest"
+            required
+            minLength={8}
+            maxLength={500}
+            placeholder="Google Ads, Meta Ads, landing pages…"
+          />
+        </Field>
+      ) : null}
+
       {error ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
           {error}
@@ -170,13 +160,13 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
         className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
       >
         {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        {mode === 'signup' ? 'Create account' : 'Sign in'}
+        {mode === 'signup' ? 'Apply for access' : 'Sign in'}
       </button>
 
       <p className="text-center text-sm text-muted-foreground">
         {mode === 'signup' ? (
           <>
-            Already have an account?{' '}
+            Already accepted?{' '}
             <Link href="/courses/login" className="font-semibold text-primary hover:underline">
               Sign in
             </Link>
@@ -185,111 +175,11 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
           <>
             New here?{' '}
             <Link href="/courses/signup" className="font-semibold text-primary hover:underline">
-              Sign up
+              Apply
             </Link>
           </>
         )}
       </p>
-    </form>
-  );
-}
-
-export function CourseOtpForm({
-  email,
-  purpose,
-}: {
-  email: string;
-  purpose: 'signup' | 'login';
-}) {
-  const router = useRouter();
-  const [code, setCode] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [preview, setPreview] = useState<{ code: string; message?: string } | null>(null);
-
-  useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem('xppc_otp_preview');
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as { email?: string; code?: string; message?: string };
-      if (parsed.email === email && parsed.code) {
-        setPreview({ code: parsed.code, message: parsed.message });
-      }
-    } catch {
-      // ignore
-    }
-  }, [email]);
-
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setBusy(true);
-    setError('');
-
-    const result = await api.post('/api/student/auth/verify-otp', {
-      email,
-      code,
-      purpose,
-    });
-
-    setBusy(false);
-
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-
-    sessionStorage.removeItem('xppc_otp_preview');
-    router.replace('/courses/dashboard');
-  }
-
-  return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      {preview ? (
-        <div className="rounded-xl border border-accent/40 bg-accent/10 p-3 text-sm text-foreground">
-          <p className="mb-1 font-semibold text-accent">Email not configured (dev mode)</p>
-          <p className="text-muted-foreground">
-            {preview.message || 'Use this preview code to continue:'}
-          </p>
-          <p className="mt-2 text-2xl font-extrabold tracking-[0.35em] text-primary">{preview.code}</p>
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          We sent a 6-digit code to <span className="font-semibold text-foreground">{email}</span>.
-          Check your inbox (and spam folder).
-        </p>
-      )}
-
-      <Field>
-        <Label htmlFor="code">Verification code</Label>
-        <Input
-          id="code"
-          name="code"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          required
-          maxLength={6}
-          pattern="\d{6}"
-          placeholder="123456"
-          value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-          className="tracking-[0.4em]"
-        />
-      </Field>
-
-      {error ? (
-        <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
-
-      <button
-        type="submit"
-        disabled={busy || code.length !== 6}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-      >
-        {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        Verify & continue
-      </button>
     </form>
   );
 }
@@ -313,4 +203,3 @@ export function useStudentSession() {
 
   return { user, loading, setUser };
 }
-

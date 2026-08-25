@@ -6,6 +6,12 @@ const StudentSchema = new Schema(
     name: { type: String, required: true, trim: true },
     passwordHash: { type: String, required: true, select: false },
     emailVerified: { type: Boolean, default: false },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
+    interest: { type: String, default: '', trim: true },
     lastLoginAt: { type: Date, default: null },
     active: { type: Boolean, default: true },
   },

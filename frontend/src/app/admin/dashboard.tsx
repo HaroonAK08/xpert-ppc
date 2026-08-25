@@ -106,6 +106,12 @@ export function AdminDashboard() {
 
           <div className="flex flex-wrap items-center gap-3">
             <Link
+              href="/admin/students"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-border px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+            >
+              Applications
+            </Link>
+            <Link
               href="/admin/courses"
               className="inline-flex h-10 items-center justify-center rounded-xl border border-border px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
             >

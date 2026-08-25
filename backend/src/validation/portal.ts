@@ -4,6 +4,11 @@ export const studentSignupSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(160),
   password: z.string().min(6).max(100),
+  interest: z.string().trim().min(8).max(500),
+});
+
+export const studentDecisionSchema = z.object({
+  status: z.enum(['approved', 'rejected']),
 });
 
 export const studentLoginSchema = z.object({
