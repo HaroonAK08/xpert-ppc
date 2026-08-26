@@ -47,13 +47,14 @@ router.post(
     if (!parsed.success) {
       throw new ApiError(
         400,
-        'Enter your name, email, password (min 6 characters), and what you want to learn.'
+        'Enter your name, email, country, password (min 6 characters), and what you want to learn.'
       );
     }
 
     const email = parsed.data.email.toLowerCase();
     const name = parsed.data.name.trim();
     const interest = parsed.data.interest.trim();
+    const country = parsed.data.country.trim();
     const passwordHash = await hashPassword(parsed.data.password);
 
     let student = await Student.findOne({ email }).select('+passwordHash');
@@ -67,6 +68,7 @@ router.post(
         name,
         passwordHash,
         interest,
+        country,
         status: 'pending',
         emailVerified: false,
       });
@@ -74,6 +76,7 @@ router.post(
       student.name = name;
       student.passwordHash = passwordHash;
       student.interest = interest;
+      student.country = country;
       student.status = 'pending';
       student.emailVerified = false;
       await student.save();
@@ -86,6 +89,7 @@ router.post(
       await sendCourseApplicationEmail({
         name: student.name,
         email: student.email,
+        country,
         interest,
         acceptUrl,
         rejectUrl,

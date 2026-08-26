@@ -151,6 +151,7 @@ function btn(href: string, label: string, color: string): string {
 export async function sendCourseApplicationEmail(opts: {
   name: string;
   email: string;
+  country: string;
   interest: string;
   acceptUrl: string;
   rejectUrl: string;
@@ -168,6 +169,7 @@ export async function sendCourseApplicationEmail(opts: {
     '',
     `Name: ${opts.name}`,
     `Email: ${opts.email}`,
+    `Country: ${opts.country}`,
     '',
     'What they want to learn:',
     opts.interest,
@@ -182,6 +184,7 @@ export async function sendCourseApplicationEmail(opts: {
       <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:12px;overflow:hidden">
         ${row('Name', opts.name)}
         ${row('Email', opts.email)}
+        ${row('Country', opts.country)}
         ${row('Wants to learn', opts.interest)}
       </table>
       <p style="margin:24px 0 8px;color:#475569">Accept this person so they can sign in with the password they chose.</p>

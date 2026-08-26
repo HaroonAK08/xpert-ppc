@@ -28,6 +28,7 @@ router.get(
         name: s.name,
         email: s.email,
         interest: s.interest || '',
+        country: s.country || '',
         status: s.status || (s.emailVerified ? 'approved' : 'pending'),
         lastLoginAt: s.lastLoginAt,
         createdAt: s.createdAt,

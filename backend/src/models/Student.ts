@@ -12,6 +12,7 @@ const StudentSchema = new Schema(
       default: 'pending',
     },
     interest: { type: String, default: '', trim: true },
+    country: { type: String, default: '', trim: true },
     lastLoginAt: { type: Date, default: null },
     active: { type: Boolean, default: true },
   },

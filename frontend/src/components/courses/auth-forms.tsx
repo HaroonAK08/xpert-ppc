@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
-import { Field, Input, Label, Textarea } from '@/components/ui/input';
+import { Field, Input, Label, Select, Textarea } from '@/components/ui/input';
 import { api } from '@/lib/api';
+import { COUNTRIES } from '@/lib/countries';
 
 type Mode = 'signup' | 'login';
 
@@ -63,11 +64,12 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
     const name = String(fd.get('name') || '').trim();
     const password = String(fd.get('password') || '');
     const interest = String(fd.get('interest') || '').trim();
+    const country = String(fd.get('country') || '').trim();
 
     if (mode === 'signup') {
       const result = await api.post<{ pending?: boolean; email: string; message?: string }>(
         '/api/student/auth/signup',
-        { name, email, password, interest }
+        { name, email, password, country, interest }
       );
 
       setBusy(false);
@@ -133,6 +135,22 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
         autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
         minLength={6}
       />
+
+      {mode === 'signup' ? (
+        <Field>
+          <Label htmlFor="country">Country</Label>
+          <Select id="country" name="country" required defaultValue="" autoComplete="country-name">
+            <option value="" disabled>
+              Select your country
+            </option>
+            {COUNTRIES.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      ) : null}
 
       {mode === 'signup' ? (
         <Field>

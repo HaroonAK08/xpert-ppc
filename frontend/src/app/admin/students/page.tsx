@@ -11,6 +11,7 @@ type Applicant = {
   id: string;
   name: string;
   email: string;
+  country: string;
   interest: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
@@ -93,7 +94,10 @@ export default function AdminStudentsPage() {
             pending.map((s) => (
               <article key={s.id} className="rounded-2xl border border-border bg-card p-5">
                 <p className="font-bold">{s.name}</p>
-                <p className="text-sm text-muted-foreground">{s.email}</p>
+                <p className="text-sm text-muted-foreground">
+                  {s.email}
+                  {s.country ? ` · ${s.country}` : ''}
+                </p>
                 {s.interest ? (
                   <p className="mt-2 text-sm text-foreground/90">{s.interest}</p>
                 ) : null}
@@ -129,7 +133,10 @@ export default function AdminStudentsPage() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <p className="font-bold">{s.name}</p>
-                  <p className="text-sm text-muted-foreground">{s.email}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {s.email}
+                    {s.country ? ` · ${s.country}` : ''}
+                  </p>
                 </div>
                 <span className="text-xs font-bold uppercase text-muted-foreground">
                   {s.status}
