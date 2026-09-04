@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { useSiteHref } from '@/hooks/use-site-href';
-import { mainNav } from '@/lib/site';
+import { mainNav, siteConfig } from '@/lib/site';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
 import { WhatsAppNumberButton } from './whatsapp-number-button';
@@ -43,9 +43,105 @@ export function Header() {
     };
   }, [mobileOpen]);
 
-  const isLanding = pathname.startsWith('/ads');
+  const isAdsLanding = pathname.startsWith('/ads');
+  const isLpLanding = pathname.startsWith('/lp');
 
-  if (isLanding) {
+  if (isLpLanding) {
+    const site = 'https://xpertppc.com';
+    const nav = [
+      { label: 'Home', href: `${site}/` },
+      { label: 'Services', href: `${site}/services` },
+      { label: 'Results', href: `${site}/case-study` },
+      { label: 'About', href: `${site}/about` },
+      { label: 'FAQs', href: `${site}/faq` },
+    ];
+
+    return (
+      <header
+        className={cn(
+          'fixed top-0 z-50 w-full border-b transition-all duration-300',
+          scrolled
+            ? 'border-slate-200/80 bg-white/95 shadow-sm backdrop-blur'
+            : 'border-transparent bg-white'
+        )}
+      >
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:h-20 sm:px-6 lg:px-8">
+          <a href={site} className="inline-flex shrink-0 items-center gap-2.5" aria-label="Xpert PPC">
+            <img
+              src="/favicon-192.png"
+              alt=""
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-full object-cover"
+            />
+            <span className="leading-tight">
+              <span className="block text-lg font-extrabold tracking-tight text-[#0b1f4d] sm:text-xl">
+                Xpert <span className="text-[#1d6ff2]">PPC</span>
+              </span>
+              <span className="hidden text-[10px] font-semibold tracking-wide text-slate-500 sm:block">
+                Grow. Scale. Get Patients.
+              </span>
+            </span>
+          </a>
+
+          <nav className="hidden items-center gap-6 lg:flex">
+            {nav.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="text-sm font-semibold text-slate-600 transition-colors hover:text-[#1d6ff2]"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <a
+              href={siteConfig.contact.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden h-10 items-center justify-center rounded-full border border-[#1d6ff2] px-4 text-sm font-bold text-[#1d6ff2] transition-colors hover:bg-[#1d6ff2]/10 sm:inline-flex"
+            >
+              Book a Strategy Call
+            </a>
+            <a
+              href="#audit-form"
+              className="inline-flex h-10 items-center justify-center rounded-full bg-[#1d6ff2] px-4 text-xs font-bold text-white transition-colors hover:bg-[#1558c7] sm:text-sm"
+            >
+              Get a Free Audit
+            </a>
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 lg:hidden"
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              onClick={() => setMobileOpen((v) => !v)}
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        {mobileOpen ? (
+          <div className="border-t border-slate-200 bg-white px-4 py-4 lg:hidden">
+            <nav className="flex flex-col gap-3">
+              {nav.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        ) : null}
+      </header>
+    );
+  }
+
+  if (isAdsLanding) {
     return (
       <header
         className={cn(

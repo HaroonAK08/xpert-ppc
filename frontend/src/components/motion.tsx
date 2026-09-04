@@ -235,3 +235,40 @@ export function LoadFade({
     </motion.div>
   );
 }
+
+/** Soft looping float — hero cards / badges. Honours reduced motion. */
+export function Float({
+  children,
+  className,
+  amplitude = 8,
+  duration = 4.2,
+  delay = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  amplitude?: number;
+  duration?: number;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{
+        opacity: 1,
+        y: [0, -amplitude, 0],
+      }}
+      transition={{
+        opacity: { duration: 0.6, ease: EASE, delay },
+        y: {
+          duration,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          delay: delay + 0.6,
+        },
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}

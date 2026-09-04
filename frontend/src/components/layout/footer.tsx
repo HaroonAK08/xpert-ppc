@@ -43,6 +43,25 @@ export function Footer() {
   const pathname = usePathname() || '';
   const to = useSiteHref();
 
+  if (pathname.startsWith('/lp')) {
+    return (
+      <footer className="border-t border-slate-200 bg-[#0b1f4d] py-10 text-white">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 text-sm text-white/70 sm:px-6 md:flex-row lg:px-8">
+          <a href="https://xpertppc.com" className="font-bold text-white hover:text-white">
+            Xpert PPC
+          </a>
+          <p>&copy; {new Date().getFullYear()} Xpert PPC. Digital marketing for clinics.</p>
+          <a
+            href="https://xpertppc.com/contact"
+            className="transition-colors hover:text-white"
+          >
+            Contact
+          </a>
+        </div>
+      </footer>
+    );
+  }
+
   if (pathname.startsWith('/ads')) {
     return (
       <footer className="border-t border-border bg-background pb-24 pt-8 text-foreground md:pb-8">

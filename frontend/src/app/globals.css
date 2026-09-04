@@ -61,6 +61,34 @@
 }
 
 @layer utilities {
+  .lp-light {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 40%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 64% 36%;
+    --success-foreground: 0 0% 100%;
+    color: hsl(var(--foreground));
+    background: #fff;
+  }
+
+  @keyframes lp-bar-grow {
+    from {
+      transform: scaleY(0);
+      opacity: 0.4;
+    }
+    to {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+  }
+
   .glow-primary {
     box-shadow: 0 0 18px hsla(var(--primary), 0.45);
   }
