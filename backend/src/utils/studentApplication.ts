@@ -33,7 +33,7 @@ export async function applyStudentDecision(
         to: student.email,
         name: student.name,
         decision,
-        loginUrl: `${env.siteUrl}/courses/login`,
+        loginUrl: `${env.coursesSiteUrl}/courses/login`,
       });
     } catch (err) {
       console.error('[mail] Failed to email student about application:', err);

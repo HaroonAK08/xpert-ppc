@@ -1,14 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { publicHref } from '@/lib/site-href';
+import { isNetHost, publicHref } from '@/lib/site-href';
 
 export function useSiteHref() {
-  const [host, setHost] = useState('');
+  const [host, setHost] = useState(() =>
+    typeof window !== 'undefined' ? window.location.host : ''
+  );
 
   useEffect(() => {
     setHost(window.location.host);
   }, []);
 
-  return (href: string) => publicHref(href, host);
+  return {
+    to: (href: string) => publicHref(href, host),
+    isNet: isNetHost(host),
+    host,
+  };
 }

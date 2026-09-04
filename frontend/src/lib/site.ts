@@ -48,11 +48,23 @@ export const mainNav: NavItem[] = [
       },
     ],
   },
-  { label: 'Courses', href: '/courses' },
   { label: 'Case Studies', href: '/case-study' },
   { label: 'About', href: '/about' },
   { label: 'FAQ', href: '/faq' },
   { label: 'Contact', href: '/contact' },
+];
+
+/** Nav for xpertppc.net (Digital Academy / courses site). */
+export const coursesNav: NavItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'SEM Course', href: '/xpert-ppc-digital-academy/sem' },
+  {
+    label: 'Social Media',
+    href: '/xpert-ppc-digital-academy/social-media-marketing',
+  },
+  { label: 'SEO Course', href: '/xpert-ppc-digital-academy/seo' },
+  { label: 'Apply', href: '/courses/signup' },
+  { label: 'Sign in', href: '/courses/login' },
 ];
 
 export const footerNav = {

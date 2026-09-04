@@ -5,19 +5,20 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { useSiteHref } from '@/hooks/use-site-href';
-import { mainNav, siteConfig } from '@/lib/site';
+import { coursesNav, mainNav, siteConfig } from '@/lib/site';
+import { COM_ORIGIN } from '@/lib/site-href';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
 import { WhatsAppNumberButton } from './whatsapp-number-button';
 
 function isActive(pathname: string, href: string) {
-  if (href === '/') return pathname === '/';
+  if (href === '/') return pathname === '/' || pathname === '/courses';
   return pathname === href || pathname.startsWith(href + '/');
 }
 
 export function Header() {
   const pathname = usePathname() || '';
-  const to = useSiteHref();
+  const { to, isNet } = useSiteHref();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -164,6 +165,97 @@ export function Header() {
             </div>
           </div>
         </div>
+      </header>
+    );
+  }
+
+  if (isNet) {
+    return (
+      <header
+        className={cn(
+          'fixed top-0 z-50 w-full border-b bg-background transition-all duration-300',
+          scrolled ? 'border-primary/20 shadow-lg shadow-background/50' : 'border-transparent'
+        )}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-20 items-center justify-between">
+            <Logo />
+            <nav className="hidden items-center space-x-6 lg:flex" aria-label="Courses">
+              {coursesNav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={to(item.href)}
+                  aria-current={isActive(pathname, item.href) ? 'page' : undefined}
+                  className={cn(
+                    'border-b-2 pb-1 text-sm font-semibold transition-colors duration-300',
+                    isActive(pathname, item.href)
+                      ? 'border-primary text-foreground'
+                      : 'border-transparent text-foreground hover:text-primary'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="hidden items-center gap-3 lg:flex">
+              <a
+                href={COM_ORIGIN}
+                className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+              >
+                Agency site
+              </a>
+              <Link
+                href={to('/courses/signup')}
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90"
+              >
+                Apply
+              </Link>
+            </div>
+            <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
+              <Link
+                href={to('/courses/signup')}
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground"
+              >
+                Apply
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMobileOpen((v) => !v)}
+                className="p-2 text-foreground transition-colors hover:text-primary"
+                aria-label="Toggle navigation menu"
+                aria-expanded={mobileOpen}
+              >
+                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+        {mobileOpen ? (
+          <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-primary/20 bg-background lg:hidden">
+            <nav className="container mx-auto flex flex-col px-4 py-4" aria-label="Courses mobile">
+              {coursesNav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={to(item.href)}
+                  className={cn(
+                    'block border-b border-primary/10 py-3 text-sm font-semibold transition-colors',
+                    isActive(pathname, item.href)
+                      ? 'text-primary'
+                      : 'text-foreground hover:text-primary'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <a
+                href={COM_ORIGIN}
+                className="mt-4 block py-3 text-sm font-semibold text-muted-foreground hover:text-primary"
+              >
+                Agency site → xpertppc.com
+              </a>
+            </nav>
+          </div>
+        ) : null}
       </header>
     );
   }

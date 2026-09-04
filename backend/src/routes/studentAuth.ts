@@ -82,8 +82,8 @@ router.post(
       await student.save();
     }
 
-    const acceptUrl = `${env.siteUrl}/courses/application?token=${signApplicationToken(String(student._id), 'approved')}`;
-    const rejectUrl = `${env.siteUrl}/courses/application?token=${signApplicationToken(String(student._id), 'rejected')}`;
+    const acceptUrl = `${env.coursesSiteUrl}/courses/application?token=${signApplicationToken(String(student._id), 'approved')}`;
+    const rejectUrl = `${env.coursesSiteUrl}/courses/application?token=${signApplicationToken(String(student._id), 'rejected')}`;
 
     try {
       await sendCourseApplicationEmail({

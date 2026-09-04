@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useSiteHref } from '@/hooks/use-site-href';
 import { footerNav, legalNav, siteConfig } from '@/lib/site';
+import { COM_ORIGIN } from '@/lib/site-href';
 import { Logo } from './logo';
 import { WhatsAppNumberButton } from './whatsapp-number-button';
 
@@ -28,7 +29,7 @@ const socialLinks = [
 ];
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
-  const to = useSiteHref();
+  const { to } = useSiteHref();
   return (
     <Link
       href={to(href)}
@@ -42,7 +43,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 
 export function Footer() {
   const pathname = usePathname() || '';
-  const to = useSiteHref();
+  const { to, isNet } = useSiteHref();
 
   if (pathname.startsWith('/lp')) {
     return (
@@ -110,12 +111,83 @@ export function Footer() {
     );
   }
 
+  if (isNet) {
+    return (
+      <footer className="relative overflow-hidden border-t border-border bg-background pb-24 pt-16 text-foreground md:pb-8">
+        <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <Logo className="mb-6" />
+              <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground">
+                Digital Academy
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                PPC, SEO, and social media courses from the Xpert PPC media buying team.
+              </p>
+            </div>
+
+            <div>
+              <span className="mb-6 flex items-center gap-2 text-lg font-bold text-primary">
+                <GraduationCap className="h-5 w-5" />
+                {footerNav.academy.title}
+              </span>
+              <nav className="flex flex-col space-y-4">
+                {footerNav.academy.links.map((l) => (
+                  <FooterLink key={l.href} href={l.href}>
+                    {l.label}
+                  </FooterLink>
+                ))}
+              </nav>
+            </div>
+
+            <div>
+              <span className="mb-6 block text-lg font-bold text-primary">Contact</span>
+              <div className="flex flex-col space-y-4">
+                <WhatsAppNumberButton size="sm" />
+                <a
+                  href={`mailto:${siteConfig.contact.email}`}
+                  className="flex items-center space-x-3 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary"
+                >
+                  <Mail className="h-4 w-4 shrink-0" />
+                  <span>{siteConfig.contact.email}</span>
+                </a>
+                <a
+                  href={COM_ORIGIN}
+                  className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                >
+                  Agency site → xpertppc.com
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-8">
+            <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
+              <p>&copy; {new Date().getFullYear()} Xpert PPC Digital Academy.</p>
+              <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+                {legalNav.map((l) => (
+                  <a
+                    key={l.href}
+                    href={`${COM_ORIGIN}${l.href}`}
+                    className="transition-colors hover:text-primary"
+                  >
+                    {l.label}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="relative overflow-hidden border-t border-border bg-background pb-24 pt-16 text-foreground md:pb-8">
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-32 w-3/4 -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
 
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-12 grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <Logo className="mb-6" />
             <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground">
@@ -125,20 +197,6 @@ export function Footer() {
               We scale brands with precision targeting and accountable optimization across major ad
               platforms.
             </p>
-          </div>
-
-          <div>
-            <span className="mb-6 flex items-center gap-2 text-lg font-bold text-primary">
-              <GraduationCap className="h-5 w-5" />
-              {footerNav.academy.title}
-            </span>
-            <nav className="flex flex-col space-y-4">
-              {footerNav.academy.links.map((l) => (
-                <FooterLink key={l.href} href={l.href}>
-                  {l.label}
-                </FooterLink>
-              ))}
-            </nav>
           </div>
 
           <div>

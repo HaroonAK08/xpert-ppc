@@ -24,8 +24,10 @@ export const env = {
   cookieDomain: process.env.COOKIE_DOMAIN || undefined,
   /** Inbox that receives form submissions and course applications. */
   leadNotifyTo: process.env.LEAD_NOTIFY_TO || 'umer@xpertppc.com',
-  /** Public site origin, used in accept/reject email links. */
+  /** Public agency site origin (admin / marketing links). */
   siteUrl: (process.env.PUBLIC_SITE_URL || 'https://xpertppc.com').replace(/\/$/, ''),
+  /** Courses / Digital Academy origin (student + application links). */
+  coursesSiteUrl: (process.env.COURSES_SITE_URL || 'https://xpertppc.net').replace(/\/$/, ''),
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT ?? 587),
