@@ -27,7 +27,6 @@ import {
   RevealItem,
 } from '@/components/motion';
 import { buildMetadata } from '@/lib/seo';
-import { siteConfig } from '@/lib/site';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Marketing for Dermatologists & Aesthetic Clinics | Xpert PPC',
@@ -46,7 +45,9 @@ export const metadata: Metadata = buildMetadata({
 });
 
 const SITE = 'https://xpertppc.com';
-const WHATSAPP = siteConfig.contact.whatsapp;
+const WHATSAPP =
+  'https://wa.me/923004021417?text=' +
+  encodeURIComponent("Hi Xpert PPC, I'd like a free clinic marketing audit.");
 
 const challenges = [
   {

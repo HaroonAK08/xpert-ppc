@@ -9,8 +9,14 @@ export function WhatsAppFab() {
   const pathname = usePathname() || '';
   if (pathname.startsWith('/ads')) return null;
 
-  const href = `${siteConfig.contact.whatsapp}?text=${encodeURIComponent(
-    "Hi Xpert PPC, I'd like a free PPC audit."
+  const isDermLp = pathname.startsWith('/lp/dermatologist');
+  const base = isDermLp
+    ? 'https://wa.me/923004021417'
+    : siteConfig.contact.whatsapp;
+  const href = `${base}?text=${encodeURIComponent(
+    isDermLp
+      ? "Hi Xpert PPC, I'd like a free clinic marketing audit."
+      : "Hi Xpert PPC, I'd like a free PPC audit."
   )}`;
 
   return (
