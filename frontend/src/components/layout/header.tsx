@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { useSiteHref } from '@/hooks/use-site-href';
-import { coursesNav, mainNav } from '@/lib/site';
+import { coursesNav, mainNav, siteConfig } from '@/lib/site';
 import { COM_ORIGIN } from '@/lib/site-href';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
@@ -99,7 +99,7 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <a
-              href="https://wa.me/923004021417?text=Hi%20Xpert%20PPC%2C%20I%27d%20like%20a%20free%20clinic%20marketing%20audit."
+              href={siteConfig.contact.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden h-10 items-center justify-center rounded-full border border-[#1d6ff2] px-4 text-sm font-bold text-[#1d6ff2] transition-colors hover:bg-[#1d6ff2]/10 sm:inline-flex"

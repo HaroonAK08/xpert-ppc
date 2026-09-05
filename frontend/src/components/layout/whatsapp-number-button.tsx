@@ -12,6 +12,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 
 type Props = {
   phone?: string;
+  /** Ignored for href — all WhatsApp buttons use siteConfig.contact.whatsapp. */
   phoneRaw?: string;
   size?: 'sm' | 'md';
   /** Hide the number on small screens; keep the green icon button. */
@@ -20,17 +21,14 @@ type Props = {
 };
 
 export function WhatsAppNumberButton({
-  phone = siteConfig.contact.phonePrimary,
-  phoneRaw = siteConfig.contact.phonePrimaryRaw,
+  phone = siteConfig.contact.whatsappDisplay,
   size = 'md',
   hideNumberOnMobile = false,
   className,
 }: Props) {
-  const href = `https://wa.me/${phoneRaw.replace(/\D/g, '')}`;
-
   return (
     <a
-      href={href}
+      href={siteConfig.contact.whatsapp}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`WhatsApp ${phone}`}

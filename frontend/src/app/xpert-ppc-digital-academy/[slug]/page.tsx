@@ -71,9 +71,7 @@ export default async function CoursePage({ params }: Props) {
   const course = getCourse(slug);
   if (!course) notFound();
 
-  const enrollHref = `${siteConfig.contact.whatsapp}?text=${encodeURIComponent(
-    `Hi Xpert PPC, I'd like to enroll in the ${course.shortName}.`
-  )}`;
+  const enrollHref = siteConfig.contact.whatsapp;
 
   return (
     <>

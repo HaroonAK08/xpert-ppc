@@ -9,24 +9,13 @@ export function WhatsAppFab() {
   const pathname = usePathname() || '';
   if (pathname.startsWith('/ads')) return null;
 
-  const isDermLp = pathname.startsWith('/lp/dermatologist');
-  const base = isDermLp
-    ? 'https://wa.me/923004021417'
-    : siteConfig.contact.whatsapp;
-  const href = `${base}?text=${encodeURIComponent(
-    isDermLp
-      ? "Hi Xpert PPC, I'd like a free clinic marketing audit."
-      : "Hi Xpert PPC, I'd like a free PPC audit."
-  )}`;
-
   return (
     <motion.a
-      href={href}
+      href={siteConfig.contact.whatsapp}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
       title="Chat on WhatsApp"
-      // Pops in a second after load so it doesn't compete with the hero.
       initial={{ opacity: 0, scale: 0.5, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 1 }}

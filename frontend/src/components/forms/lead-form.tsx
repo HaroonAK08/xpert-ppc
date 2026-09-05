@@ -246,28 +246,8 @@ export function LeadForm({
       {whatsAppSubmit ? (
         <button
           type="button"
-          onClick={(e) => {
-            const form = e.currentTarget.form;
-            if (!form) return;
-            const fd = new FormData(form);
-            const name = String(fd.get('name') || '').trim();
-            const email = String(fd.get('email') || '').trim();
-            const phone = String(fd.get('phone') || '').trim();
-            const platform = String(fd.get('platform') || '').trim();
-            const message = String(fd.get('message') || '').trim();
-            const lines = [
-              'Hi Xpert PPC — I want a free dermatology clinic audit.',
-              name ? `Name: ${name}` : '',
-              email ? `Email: ${email}` : '',
-              phone ? `Phone: ${phone}` : '',
-              platform ? `Platform: ${platform}` : '',
-              message ? `Notes: ${message}` : '',
-            ].filter(Boolean);
-            window.open(
-              `${siteConfig.contact.whatsapp}?text=${encodeURIComponent(lines.join('\n'))}`,
-              '_blank',
-              'noopener,noreferrer'
-            );
+          onClick={() => {
+            window.open(siteConfig.contact.whatsapp, '_blank', 'noopener,noreferrer');
           }}
           className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#25D366] px-6 text-sm font-bold text-white transition-colors hover:bg-[#20bd5a]"
         >

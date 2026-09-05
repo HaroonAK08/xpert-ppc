@@ -21,7 +21,9 @@ export const siteConfig = {
     phoneSecondaryRaw: '+923006834017',
     email: 'umer@xpertppc.com',
     location: 'Global Remote Team',
-    whatsapp: 'https://wa.me/971586740167',
+    /** Click-to-chat link (0300 4021417 / +92 300 402 1417). */
+    whatsapp: 'https://api.whatsapp.com/message/SLXP4R7SEDWWG1?autoload=1&app_absent=0',
+    whatsappDisplay: '+92 300 402 1417',
   },
   socials: {
     linkedin: 'https://www.linkedin.com/in/umerkhan381/',
