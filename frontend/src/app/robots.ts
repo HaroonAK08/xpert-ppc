@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
 import { siteConfig } from '@/lib/site';
-import { NET_ORIGIN, isNetHost } from '@/lib/site-href';
+import { COM_ORIGIN, NET_ORIGIN, isNetHost } from '@/lib/site-href';
 
 /** Private paths only — public marketing pages must stay crawlable for indexing. */
 const PRIVATE_DISALLOW = [
@@ -16,9 +16,21 @@ const PRIVATE_DISALLOW = [
   '/courses/application/',
 ];
 
+function canonicalOrigin(hostHeader: string): { origin: string; host: string } {
+  const host = (hostHeader || '').toLowerCase().split(':')[0];
+  if (isNetHost(host)) {
+    return { origin: NET_ORIGIN, host: 'xpertppc.net' };
+  }
+  // .com, www, localhost, preview — agency canonical
+  return {
+    origin: siteConfig.url || COM_ORIGIN,
+    host: 'xpertppc.com',
+  };
+}
+
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const host = (await headers()).get('host') || '';
-  const origin = isNetHost(host) ? NET_ORIGIN : siteConfig.url;
+  const headerHost = (await headers()).get('host') || '';
+  const { origin, host } = canonicalOrigin(headerHost);
 
   return {
     rules: [
@@ -28,7 +40,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         disallow: PRIVATE_DISALLOW,
       },
     ],
-    sitemap: new URL('/sitemap.xml', origin).toString(),
-    host: origin.replace(/^https?:\/\//, ''),
+    sitemap: `${origin}/sitemap.xml`,
+    host,
   };
 }

@@ -3,6 +3,8 @@ import { COM_ORIGIN, NET_ORIGIN, isCoursePath, isNetHost } from '@/lib/site-href
 
 function isStaticOrAsset(pathname: string): boolean {
   return (
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
     pathname.startsWith('/apple-touch-icon') ||
