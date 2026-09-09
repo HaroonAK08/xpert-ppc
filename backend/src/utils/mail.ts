@@ -195,7 +195,7 @@ export async function sendCourseApplicationEmail(opts: {
   const transporter = createTransport();
   await transporter.sendMail({
     from: env.smtp.from,
-    to: env.leadNotifyTo,
+    to: env.coursesNotifyTo,
     replyTo: opts.email,
     subject,
     text,

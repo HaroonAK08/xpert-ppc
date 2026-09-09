@@ -22,8 +22,13 @@ export const env = {
     .map((o) => o.trim())
     .filter(Boolean),
   cookieDomain: process.env.COOKIE_DOMAIN || undefined,
-  /** Inbox that receives form submissions and course applications. */
+  /** Inbox for website lead / audit form submissions. */
   leadNotifyTo: process.env.LEAD_NOTIFY_TO || 'umer@xpertppc.com',
+  /** Inbox for Digital Academy course applications (Accept/Reject links). */
+  coursesNotifyTo:
+    process.env.COURSES_NOTIFY_TO ||
+    process.env.LEAD_NOTIFY_TO ||
+    'umer@xpertppc.com',
   /** Public agency site origin (admin / marketing links). */
   siteUrl: (process.env.PUBLIC_SITE_URL || 'https://xpertppc.com').replace(/\/$/, ''),
   /** Courses / Digital Academy origin (student + application links). */
