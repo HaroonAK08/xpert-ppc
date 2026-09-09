@@ -3,32 +3,32 @@ import { headers } from 'next/headers';
 import { siteConfig } from '@/lib/site';
 import { NET_ORIGIN, isNetHost } from '@/lib/site-href';
 
+/** Private paths only — public marketing pages must stay crawlable for indexing. */
+const PRIVATE_DISALLOW = [
+  '/admin',
+  '/admin/',
+  '/api/',
+  '/courses/dashboard',
+  '/courses/dashboard/',
+  '/courses/learn',
+  '/courses/learn/',
+  '/courses/application',
+  '/courses/application/',
+];
+
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const host = (await headers()).get('host') || '';
-
-  if (isNetHost(host)) {
-    return {
-      rules: [
-        {
-          userAgent: '*',
-          allow: '/',
-          disallow: ['/admin', '/admin/', '/api/', '/courses/dashboard', '/courses/learn'],
-        },
-      ],
-      sitemap: new URL('/sitemap.xml', NET_ORIGIN).toString(),
-      host: NET_ORIGIN,
-    };
-  }
+  const origin = isNetHost(host) ? NET_ORIGIN : siteConfig.url;
 
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin', '/admin/', '/api/', '/ads', '/ads/', '/lp', '/lp/', '/courses', '/courses/', '/xpert-ppc-digital-academy'],
+        disallow: PRIVATE_DISALLOW,
       },
     ],
-    sitemap: new URL('/sitemap.xml', siteConfig.url).toString(),
-    host: siteConfig.url,
+    sitemap: new URL('/sitemap.xml', origin).toString(),
+    host: origin.replace(/^https?:\/\//, ''),
   };
 }
