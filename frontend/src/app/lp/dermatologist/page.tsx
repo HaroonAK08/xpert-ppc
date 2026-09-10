@@ -42,7 +42,6 @@ export const metadata: Metadata = buildMetadata({
     'skin clinic ads',
     'aesthetic clinic marketing',
   ],
-  noIndex: true,
 });
 
 const SITE = 'https://xpertppc.com';

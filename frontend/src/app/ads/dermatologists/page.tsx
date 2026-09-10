@@ -43,7 +43,6 @@ export const metadata: Metadata = buildMetadata({
     'skin clinic website',
     'dermatology patient acquisition',
   ],
-  noIndex: true,
 });
 
 const trustHero = [

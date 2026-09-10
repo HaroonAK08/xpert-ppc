@@ -36,7 +36,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        allow: ['/', '/lp/', '/ads/', '/industries/', '/services/', '/case-study/'],
         disallow: PRIVATE_DISALLOW,
       },
     ],
