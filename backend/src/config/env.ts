@@ -32,7 +32,7 @@ export const env = {
   /** Public agency site origin (admin / marketing links). */
   siteUrl: (process.env.PUBLIC_SITE_URL || 'https://xpertppc.com').replace(/\/$/, ''),
   /** Courses / Digital Academy origin (student + application links). */
-  coursesSiteUrl: (process.env.COURSES_SITE_URL || 'https://xpertppc.net').replace(/\/$/, ''),
+  coursesSiteUrl: (process.env.COURSES_SITE_URL || 'https://xpertppc.ai').replace(/\/$/, ''),
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT ?? 587),

@@ -1,5 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { COM_ORIGIN, NET_ORIGIN, isCoursePath, isNetHost } from '@/lib/site-href';
+import {
+  COM_ORIGIN,
+  COURSES_ORIGIN,
+  isCoursePath,
+  isCoursesHost,
+  isLegacyCoursesHost,
+} from '@/lib/site-href';
 
 function isStaticOrAsset(pathname: string): boolean {
   return (
@@ -19,15 +25,21 @@ export function middleware(req: NextRequest) {
   const host = req.headers.get('host') || '';
   const { pathname, search } = req.nextUrl;
 
-  // Agency site: send course / academy URLs to .net
-  if (!isNetHost(host)) {
+  // Old courses domain → new .ai host
+  if (isLegacyCoursesHost(host)) {
+    const destPath = pathname === '/' ? '/courses' : pathname;
+    return NextResponse.redirect(`${COURSES_ORIGIN}${destPath}${search}`, 308);
+  }
+
+  // Agency / other hosts: send course URLs to .ai
+  if (!isCoursesHost(host)) {
     if (isCoursePath(pathname)) {
-      return NextResponse.redirect(`${NET_ORIGIN}${pathname}${search}`, 308);
+      return NextResponse.redirect(`${COURSES_ORIGIN}${pathname}${search}`, 308);
     }
     return NextResponse.next();
   }
 
-  // Courses site (.net)
+  // Courses site (xpertppc.ai)
   if (pathname === '/') {
     const url = req.nextUrl.clone();
     url.pathname = '/courses';

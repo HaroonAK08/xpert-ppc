@@ -1,9 +1,23 @@
 export const COM_ORIGIN = 'https://xpertppc.com';
-export const NET_ORIGIN = 'https://xpertppc.net';
+/** Digital Academy / courses site. */
+export const COURSES_ORIGIN = 'https://xpertppc.ai';
+/** Legacy courses host — redirects to .ai. */
+export const LEGACY_COURSES_ORIGIN = 'https://xpertppc.net';
 
-export function isNetHost(host: string | null | undefined): boolean {
-  return (host || '').toLowerCase().includes('xpertppc.net');
+export function isCoursesHost(host: string | null | undefined): boolean {
+  const h = (host || '').toLowerCase();
+  return h.includes('xpertppc.ai');
 }
+
+export function isLegacyCoursesHost(host: string | null | undefined): boolean {
+  const h = (host || '').toLowerCase();
+  return h.includes('xpertppc.net');
+}
+
+/** @deprecated Use isCoursesHost */
+export const isNetHost = isCoursesHost;
+/** @deprecated Use COURSES_ORIGIN */
+export const NET_ORIGIN = COURSES_ORIGIN;
 
 export function isCoursePath(pathname: string): boolean {
   return (
@@ -16,8 +30,8 @@ export function isCoursePath(pathname: string): boolean {
 
 /**
  * Cross-host link helper.
- * - On xpertppc.net: keep home + course paths local; send agency paths to .com
- * - On xpertppc.com: send leftover course paths to .net; keep agency paths local
+ * - On xpertppc.ai: keep home + course paths local; send agency paths to .com
+ * - Elsewhere: send course paths to xpertppc.ai
  */
 export function publicHref(href: string, host?: string | null): string {
   if (!href.startsWith('/')) return href;
@@ -25,12 +39,12 @@ export function publicHref(href: string, host?: string | null): string {
   const pathOnly = href.split(/[?#]/)[0] || '/';
   const suffix = href.slice(pathOnly.length);
 
-  if (isNetHost(host)) {
+  if (isCoursesHost(host)) {
     if (pathOnly === '/' || pathOnly.startsWith('/#')) return href;
     if (isCoursePath(pathOnly)) return href;
     return `${COM_ORIGIN}${pathOnly}${suffix}`;
   }
 
-  if (isCoursePath(pathOnly)) return `${NET_ORIGIN}${pathOnly}${suffix}`;
+  if (isCoursePath(pathOnly)) return `${COURSES_ORIGIN}${pathOnly}${suffix}`;
   return href;
 }

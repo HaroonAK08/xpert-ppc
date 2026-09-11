@@ -5,14 +5,14 @@ import { courses } from '@shared/content/courses';
 import { industries } from '@shared/content/industries';
 import { caseStudies } from '@shared/content/case-studies';
 import { siteConfig } from '@/lib/site';
-import { NET_ORIGIN, isNetHost } from '@/lib/site-href';
+import { COURSES_ORIGIN, isCoursesHost } from '@/lib/site-href';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const host = (await headers()).get('host') || '';
 
-  if (isNetHost(host)) {
-    const url = (path: string) => new URL(path, NET_ORIGIN).toString();
+  if (isCoursesHost(host)) {
+    const url = (path: string) => new URL(path, COURSES_ORIGIN).toString();
     return [
       { url: url('/'), changeFrequency: 'weekly', priority: 1, lastModified: now },
       { url: url('/courses'), changeFrequency: 'weekly', priority: 1, lastModified: now },

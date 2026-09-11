@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { isNetHost, publicHref } from '@/lib/site-href';
+import { isCoursesHost, publicHref } from '@/lib/site-href';
 
 export function useSiteHref() {
   const [host, setHost] = useState(() =>
@@ -12,9 +12,13 @@ export function useSiteHref() {
     setHost(window.location.host);
   }, []);
 
+  const isCourses = isCoursesHost(host);
+
   return {
     to: (href: string) => publicHref(href, host),
-    isNet: isNetHost(host),
+    isCourses,
+    /** @deprecated Use isCourses — courses site is xpertppc.ai */
+    isNet: isCourses,
     host,
   };
 }
