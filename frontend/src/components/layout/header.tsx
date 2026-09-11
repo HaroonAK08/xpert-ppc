@@ -174,24 +174,42 @@ export function Header() {
     return (
       <header
         className={cn(
-          'fixed top-0 z-50 w-full border-b bg-background transition-all duration-300',
-          scrolled ? 'border-primary/20 shadow-lg shadow-background/50' : 'border-transparent'
+          'fixed top-0 z-50 w-full border-b transition-all duration-300',
+          scrolled
+            ? 'border-white/10 bg-[#070d18]/90 shadow-lg shadow-black/20 backdrop-blur-xl'
+            : 'border-transparent bg-[#070d18]/70 backdrop-blur-md'
         )}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-20 items-center justify-between">
-            <Logo />
-            <nav className="hidden items-center space-x-6 lg:flex" aria-label="Courses">
+          <div className="flex h-[4.5rem] items-center justify-between gap-4 sm:h-20">
+            <Link href={to('/')} className="group inline-flex shrink-0 items-center gap-2.5">
+              <img
+                src="/favicon-192.png"
+                alt=""
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-full object-cover ring-1 ring-sky-400/40"
+              />
+              <span className="leading-tight">
+                <span className="block text-lg font-extrabold tracking-tight text-white sm:text-xl">
+                  XPERT<span className="text-sky-300">PPC</span>
+                </span>
+                <span className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:block">
+                  Digital Academy
+                </span>
+              </span>
+            </Link>
+            <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Courses">
               {coursesNav.map((item) => (
                 <Link
                   key={item.href}
                   href={to(item.href)}
                   aria-current={isActive(pathname, item.href) ? 'page' : undefined}
                   className={cn(
-                    'border-b-2 pb-1 text-sm font-semibold transition-colors duration-300',
+                    'rounded-lg px-3 py-2 text-[13px] font-semibold transition-colors',
                     isActive(pathname, item.href)
-                      ? 'border-primary text-foreground'
-                      : 'border-transparent text-foreground hover:text-primary'
+                      ? 'bg-white/10 text-white'
+                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
                   )}
                 >
                   {item.label}
@@ -201,28 +219,28 @@ export function Header() {
             <div className="hidden items-center gap-3 lg:flex">
               <a
                 href={COM_ORIGIN}
-                className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                className="text-xs font-semibold text-slate-500 transition-colors hover:text-sky-300"
               >
-                Agency site
+                Agency
               </a>
               <Link
                 href={to('/courses/signup')}
-                className="academy-cta inline-flex h-10 items-center justify-center rounded-full px-6 text-sm font-extrabold transition-all duration-300 hover:opacity-95"
+                className="academy-cta inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-extrabold transition"
               >
-                Apply Now
+                Apply
               </Link>
             </div>
             <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
               <Link
                 href={to('/courses/signup')}
-                className="academy-cta inline-flex h-10 items-center justify-center rounded-full px-3 text-xs font-extrabold"
+                className="academy-cta inline-flex h-9 items-center justify-center rounded-full px-3.5 text-xs font-extrabold"
               >
                 Apply
               </Link>
               <button
                 type="button"
                 onClick={() => setMobileOpen((v) => !v)}
-                className="p-2 text-foreground transition-colors hover:text-primary"
+                className="rounded-lg p-2 text-slate-200 transition-colors hover:bg-white/5 hover:text-white"
                 aria-label="Toggle navigation menu"
                 aria-expanded={mobileOpen}
               >
@@ -232,17 +250,17 @@ export function Header() {
           </div>
         </div>
         {mobileOpen ? (
-          <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-primary/20 bg-background lg:hidden">
-            <nav className="container mx-auto flex flex-col px-4 py-4" aria-label="Courses mobile">
+          <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-white/10 bg-[#070d18]/98 backdrop-blur-xl lg:hidden">
+            <nav className="container mx-auto flex flex-col px-4 py-3" aria-label="Courses mobile">
               {coursesNav.map((item) => (
                 <Link
                   key={item.href}
                   href={to(item.href)}
                   className={cn(
-                    'block border-b border-primary/10 py-3 text-sm font-semibold transition-colors',
+                    'rounded-lg px-3 py-3 text-sm font-semibold transition-colors',
                     isActive(pathname, item.href)
-                      ? 'text-primary'
-                      : 'text-foreground hover:text-primary'
+                      ? 'bg-white/10 text-white'
+                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
                   )}
                 >
                   {item.label}
@@ -250,7 +268,7 @@ export function Header() {
               ))}
               <a
                 href={COM_ORIGIN}
-                className="mt-4 block py-3 text-sm font-semibold text-muted-foreground hover:text-primary"
+                className="mt-2 rounded-lg px-3 py-3 text-sm font-semibold text-slate-500 hover:text-sky-300"
               >
                 Agency site → xpertppc.com
               </a>

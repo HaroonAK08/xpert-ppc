@@ -1,61 +1,67 @@
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { courses } from '@shared/content/courses';
 import { coursesLanding } from '@shared/content/courses-landing';
 import { Icon } from '@/components/icon';
 import { Reveal, RevealGroup, RevealItem } from '@/components/motion';
 import { ApplyCta } from './apply-cta';
+import { AcademyPanel, SectionEyebrow, SectionHeading } from './section';
 
 export function LandingCourseGrid() {
   return (
-    <section id="courses" className="scroll-mt-28 border-b border-border bg-card/30 py-16 sm:py-20">
+    <section id="courses" className="scroll-mt-28 border-b border-white/[0.06] py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">
-            All included in one membership
-          </p>
-          <h2 id="courses-heading" className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
-            3 skills that actually pay you back
-          </h2>
-          <p className="text-sm text-muted-foreground sm:text-base">
-            Every track below is yours with a single academy application — from first lesson to first
-            client-ready campaign.
-          </p>
+        <Reveal className="text-center">
+          <SectionEyebrow>Curriculum</SectionEyebrow>
+          <SectionHeading
+            id="courses-heading"
+            title="Three tracks. One academy."
+            subtitle="Every track below is included when you are accepted — explore the curriculum, then apply once."
+          />
         </Reveal>
 
-        <RevealGroup stagger={0.1} className="mb-10 grid gap-6 md:grid-cols-3">
+        <RevealGroup stagger={0.1} className="mb-12 grid gap-5 md:grid-cols-3">
           {courses.map((course) => (
-            <RevealItem
-              key={course.slug}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-background transition hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10"
-            >
-              <div className="flex flex-1 flex-col p-6">
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Icon name={course.icon} className="h-5 w-5" />
+            <RevealItem key={course.slug}>
+              <AcademyPanel className="group flex h-full flex-col overflow-hidden">
+                <div className="relative border-b border-white/[0.06] bg-gradient-to-br from-sky-400/10 via-transparent to-primary/10 px-6 pb-5 pt-6">
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0b1220] text-sky-300 ring-1 ring-white/10">
+                      <Icon name={course.icon} className="h-5 w-5" />
+                    </div>
+                    <span className="rounded-md border border-sky-400/20 bg-sky-400/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-sky-200">
+                      Included
+                    </span>
                   </div>
-                  <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-300">
-                    Included
-                  </span>
+                  <h3 className="text-xl font-extrabold tracking-tight text-white">{course.shortName}</h3>
                 </div>
-                <h3 className="mb-2 text-lg font-extrabold text-foreground">{course.shortName}</h3>
-                <p className="mb-6 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {course.tagline}
-                </p>
-                <Link
-                  href={`/xpert-ppc-digital-academy/${course.slug}`}
-                  className="inline-flex items-center gap-2 text-sm font-bold text-primary transition group-hover:gap-3"
-                >
-                  Explore course <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <p className="mb-5 flex-1 text-sm leading-relaxed text-slate-400">{course.tagline}</p>
+                  <ul className="mb-6 flex flex-wrap gap-1.5">
+                    {course.skills.slice(0, 4).map((skill) => (
+                      <li
+                        key={skill}
+                        className="rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[10px] font-medium text-slate-400"
+                      >
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/xpert-ppc-digital-academy/${course.slug}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-bold text-sky-300 transition group-hover:gap-2.5 group-hover:text-sky-200"
+                  >
+                    View curriculum <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </AcademyPanel>
             </RevealItem>
           ))}
         </RevealGroup>
 
         <div className="text-center">
-          <p className="mb-4 text-sm text-muted-foreground">
-            Why buy one track when you can apply for all of them at the cohort price?
+          <p className="mb-4 text-sm text-slate-500">
+            Apply once for all tracks at the current cohort price.
           </p>
           <ApplyCta variant="warm">
             Get all tracks — {coursesLanding.offer.offerPrice}

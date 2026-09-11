@@ -21,7 +21,7 @@ export function ApplyCta({
           'bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90',
         variant === 'warm' && 'academy-cta',
         variant === 'outline' &&
-          'border border-border bg-card/40 text-foreground hover:border-primary hover:text-primary',
+          'border border-white/15 bg-white/[0.03] text-slate-200 hover:border-sky-400/40 hover:text-white',
         className
       )}
     >

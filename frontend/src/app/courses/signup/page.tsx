@@ -13,34 +13,39 @@ export default function CourseSignupPage() {
   const { offer } = coursesLanding;
 
   return (
-    <section className="relative overflow-hidden bg-background py-12 sm:py-16">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_hsla(var(--primary),0.16),_transparent_55%)]" />
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-xl shadow-primary/10">
-          <div className="border-b border-border bg-gradient-to-r from-primary/20 via-sky-500/10 to-transparent px-5 py-4 sm:px-8">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-sky-300">
-              {offer.badge}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              <span className="line-through opacity-60">{offer.strikePrice}</span>{' '}
-              <span className="font-extrabold text-primary">{offer.offerPrice}</span> cohort
-            </p>
-          </div>
-          <div className="p-5 sm:p-8">
-            <h1 className="mb-2 text-2xl font-extrabold text-foreground">Apply for the academy</h1>
-            <p className="mb-8 text-sm text-muted-foreground">
-              Tell us your name, email, and what you want to learn. If we accept you, sign in with
-              the password you set here.
-            </p>
-            <CourseAuthForm mode="signup" />
-            <p className="mt-6 text-center text-xs text-muted-foreground">
-              <Link href="/courses" className="font-semibold hover:text-primary">
-                ← Back to academy home
-              </Link>
-            </p>
+    <div className="academy-shell">
+      <section className="relative overflow-hidden py-12 sm:py-16">
+        <div className="academy-mesh pointer-events-none absolute inset-0" />
+        <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-md overflow-hidden rounded-[1.75rem] border border-white/10 bg-[linear-gradient(165deg,hsl(222_40%_14%),hsl(223_55%_9%))] shadow-2xl shadow-black/40">
+            <div className="border-b border-white/[0.06] bg-gradient-to-r from-sky-400/15 via-transparent to-transparent px-5 py-5 sm:px-8">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-300">
+                {offer.badge}
+              </p>
+              <p className="mt-1.5 text-sm text-slate-400">
+                <span className="line-through opacity-60">{offer.strikePrice}</span>{' '}
+                <span className="font-extrabold text-white">{offer.offerPrice}</span>
+                <span className="text-slate-500"> · current cohort</span>
+              </p>
+            </div>
+            <div className="p-5 sm:p-8">
+              <h1 className="mb-2 text-2xl font-extrabold tracking-tight text-white">
+                Apply for the academy
+              </h1>
+              <p className="mb-8 text-sm leading-relaxed text-slate-400">
+                Share your details. If we accept you, sign in with the password you set here and open
+                the portal.
+              </p>
+              <CourseAuthForm mode="signup" />
+              <p className="mt-6 text-center text-xs text-slate-500">
+                <Link href="/courses" className="font-semibold text-sky-300/80 hover:text-sky-200">
+                  ← Back to academy home
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

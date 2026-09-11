@@ -113,26 +113,27 @@ export function Footer() {
 
   if (isNet) {
     return (
-      <footer className="relative overflow-hidden border-t border-border bg-background pb-24 pt-16 text-foreground md:pb-8">
+      <footer className="relative overflow-hidden border-t border-white/[0.06] bg-[#060b14] pb-24 pt-16 text-foreground md:pb-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/30 to-transparent" />
         <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12 grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
             <div>
-              <Logo className="mb-6" />
-              <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground">
+              <Logo className="mb-5" />
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-sky-300/80">
                 Digital Academy
               </p>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                SEM, SEO, and social media courses from the Xpert PPC media buying team — apply once,
-                learn after acceptance.
+              <p className="max-w-xs text-sm leading-relaxed text-slate-400">
+                SEM, SEO, and social media training from the Xpert PPC media buying team — apply
+                once, learn after acceptance.
               </p>
             </div>
 
             <div>
-              <span className="mb-6 flex items-center gap-2 text-lg font-bold text-primary">
-                <GraduationCap className="h-5 w-5" />
+              <span className="mb-5 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-200">
+                <GraduationCap className="h-4 w-4 text-sky-300" />
                 {footerNav.academy.title}
               </span>
-              <nav className="flex flex-col space-y-4">
+              <nav className="flex flex-col space-y-3">
                 {footerNav.academy.links.map((l) => (
                   <FooterLink key={l.href} href={l.href}>
                     {l.label}
@@ -142,19 +143,21 @@ export function Footer() {
             </div>
 
             <div>
-              <span className="mb-6 block text-lg font-bold text-primary">Contact</span>
+              <span className="mb-5 block text-sm font-bold uppercase tracking-wide text-slate-200">
+                Contact
+              </span>
               <div className="flex flex-col space-y-4">
                 <WhatsAppNumberButton size="sm" />
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
-                  className="flex items-center space-x-3 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary"
+                  className="flex items-center space-x-3 text-sm text-slate-400 transition-colors duration-300 hover:text-sky-300"
                 >
                   <Mail className="h-4 w-4 shrink-0" />
                   <span>{siteConfig.contact.email}</span>
                 </a>
                 <a
                   href={COM_ORIGIN}
-                  className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                  className="text-sm font-semibold text-slate-500 transition-colors hover:text-sky-300"
                 >
                   Agency site → xpertppc.com
                 </a>
@@ -162,15 +165,15 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="border-t border-border pt-8">
-            <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
+          <div className="border-t border-white/[0.06] pt-8">
+            <div className="flex flex-col items-center justify-between gap-4 text-sm text-slate-500 md:flex-row">
               <p>&copy; {new Date().getFullYear()} Xpert PPC Digital Academy.</p>
               <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                 {legalNav.map((l) => (
                   <a
                     key={l.href}
                     href={`${COM_ORIGIN}${l.href}`}
-                    className="transition-colors hover:text-primary"
+                    className="transition-colors hover:text-sky-300"
                   >
                     {l.label}
                   </a>

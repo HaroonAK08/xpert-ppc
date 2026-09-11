@@ -34,7 +34,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default function CoursesLandingPage() {
   return (
-    <>
+    <div className="academy-shell">
       <OfferMarquee />
       <OfferModal />
       <LandingHero />
@@ -48,6 +48,6 @@ export default function CoursesLandingPage() {
       <LandingPricing />
       <LandingFaq />
       <LandingFinalCta />
-    </>
+    </div>
   );
 }

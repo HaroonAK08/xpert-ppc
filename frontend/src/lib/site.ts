@@ -59,10 +59,8 @@ export const coursesNav: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Courses', href: '/courses#courses' },
   { label: 'Pricing', href: '/courses#pricing' },
-  { label: 'Success Stories', href: '/courses#success-stories' },
-  { label: 'How It Works', href: '/courses#how-it-works' },
+  { label: 'How it works', href: '/courses#how-it-works' },
   { label: 'FAQ', href: '/courses#faq' },
-  { label: 'Apply', href: '/courses/signup' },
   { label: 'Sign in', href: '/courses/login' },
 ];
 
