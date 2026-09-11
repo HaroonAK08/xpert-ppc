@@ -175,10 +175,10 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
       <button
         type="submit"
         disabled={busy}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+        className="inline-flex h-12 w-full items-center justify-center rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 text-sm font-extrabold text-white shadow-md shadow-orange-500/30 transition hover:opacity-95 disabled:opacity-60"
       >
         {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        {mode === 'signup' ? 'Apply for access' : 'Sign in'}
+        {mode === 'signup' ? 'Submit application' : 'Sign in to portal'}
       </button>
 
       <p className="text-center text-sm text-muted-foreground">

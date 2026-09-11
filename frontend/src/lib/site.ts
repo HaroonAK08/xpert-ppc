@@ -57,12 +57,11 @@ export const mainNav: NavItem[] = [
 /** Nav for xpertppc.net (Digital Academy / courses site). */
 export const coursesNav: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'SEM Course', href: '/xpert-ppc-digital-academy/sem' },
-  {
-    label: 'Social Media',
-    href: '/xpert-ppc-digital-academy/social-media-marketing',
-  },
-  { label: 'SEO Course', href: '/xpert-ppc-digital-academy/seo' },
+  { label: 'Courses', href: '/courses#courses' },
+  { label: 'Pricing', href: '/courses#pricing' },
+  { label: 'Success Stories', href: '/courses#success-stories' },
+  { label: 'How It Works', href: '/courses#how-it-works' },
+  { label: 'FAQ', href: '/courses#faq' },
   { label: 'Apply', href: '/courses/signup' },
   { label: 'Sign in', href: '/courses/login' },
 ];
@@ -71,13 +70,17 @@ export const footerNav = {
   academy: {
     title: 'Digital Academy',
     links: [
-      { label: 'Course portal', href: '/courses' },
+      { label: 'Academy home', href: '/courses' },
+      { label: 'All courses', href: '/courses#courses' },
+      { label: 'Pricing', href: '/courses#pricing' },
       { label: 'SEM Course', href: '/xpert-ppc-digital-academy/sem' },
       {
         label: 'Social Media Marketing Course',
         href: '/xpert-ppc-digital-academy/social-media-marketing',
       },
       { label: 'Complete SEO Course', href: '/xpert-ppc-digital-academy/seo' },
+      { label: 'Apply', href: '/courses/signup' },
+      { label: 'Sign in', href: '/courses/login' },
     ],
   },
   company: {

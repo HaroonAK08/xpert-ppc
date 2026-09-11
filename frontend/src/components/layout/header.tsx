@@ -12,7 +12,8 @@ import { Logo } from './logo';
 import { WhatsAppNumberButton } from './whatsapp-number-button';
 
 function isActive(pathname: string, href: string) {
-  if (href === '/') return pathname === '/' || pathname === '/courses';
+  if (href.includes('#')) return false;
+  if (href === '/' || href === '/courses') return pathname === '/' || pathname === '/courses';
   return pathname === href || pathname.startsWith(href + '/');
 }
 
@@ -206,15 +207,15 @@ export function Header() {
               </a>
               <Link
                 href={to('/courses/signup')}
-                className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90"
+                className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 px-6 text-sm font-extrabold text-white shadow-md shadow-orange-500/30 transition-all duration-300 hover:opacity-95"
               >
-                Apply
+                Apply Now
               </Link>
             </div>
             <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
               <Link
                 href={to('/courses/signup')}
-                className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground"
+                className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 px-3 text-xs font-extrabold text-white"
               >
                 Apply
               </Link>

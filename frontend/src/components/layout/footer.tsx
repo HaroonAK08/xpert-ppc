@@ -122,7 +122,8 @@ export function Footer() {
                 Digital Academy
               </p>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                PPC, SEO, and social media courses from the Xpert PPC media buying team.
+                SEM, SEO, and social media courses from the Xpert PPC media buying team — apply once,
+                learn after acceptance.
               </p>
             </div>
 

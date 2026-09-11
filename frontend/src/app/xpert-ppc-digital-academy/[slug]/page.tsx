@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { CheckCircle2, MessageCircle } from 'lucide-react';
 
 import { Icon, type LucideIconName } from '@/components/icon';
@@ -71,7 +72,7 @@ export default async function CoursePage({ params }: Props) {
   const course = getCourse(slug);
   if (!course) notFound();
 
-  const enrollHref = siteConfig.contact.whatsapp;
+  const whatsappHref = siteConfig.contact.whatsapp;
 
   return (
     <>
@@ -87,7 +88,10 @@ export default async function CoursePage({ params }: Props) {
         <div className="absolute inset-0 z-0 bg-gradient-to-b from-card via-background to-background" />
         <LoadFade y={20} duration={0.5} className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumbs
-            items={[{ label: 'Digital Academy' }, { label: course.shortName }]}
+            items={[
+              { label: 'Digital Academy', href: '/courses' },
+              { label: course.shortName },
+            ]}
           />
 
           <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -102,19 +106,25 @@ export default async function CoursePage({ params }: Props) {
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a
-              href={enrollHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-hover-effect hover-glow-primary inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 text-sm font-bold text-white transition-all hover:scale-105 sm:w-auto"
+            <Link
+              href="/courses/signup"
+              className="btn-hover-effect inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 px-6 text-sm font-extrabold text-white shadow-md shadow-orange-500/30 transition-all hover:opacity-95 sm:w-auto"
             >
-              <MessageCircle className="h-4 w-4" /> Enroll on WhatsApp
-            </a>
+              Apply for academy access
+            </Link>
             <a
               href="#curriculum"
               className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-border bg-muted/40 px-6 text-sm font-bold text-foreground transition-all duration-300 hover:scale-105 hover:bg-muted/80 active:scale-95 sm:w-auto"
             >
               View Curriculum
+            </a>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#25D366]/40 px-6 text-sm font-bold text-[#25D366] transition-all hover:bg-[#25D366]/10 sm:w-auto"
+            >
+              <MessageCircle className="h-4 w-4" /> WhatsApp
             </a>
           </div>
         </LoadFade>
@@ -304,16 +314,25 @@ export default async function CoursePage({ params }: Props) {
             Ready to start learning?
           </h2>
           <p className="mx-auto mb-8 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            Seats are limited so every student gets hands-on feedback. Message us to reserve yours.
+            Seats are limited so every student gets hands-on feedback. Apply for academy access, then
+            sign in after acceptance.
           </p>
-          <a
-            href={enrollHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-hover-effect hover-glow-accent inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 text-sm font-bold text-white transition-all hover:scale-105"
-          >
-            <MessageCircle className="h-4 w-4" /> Enroll on WhatsApp
-          </a>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/courses/signup"
+              className="btn-hover-effect inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 px-6 text-sm font-extrabold text-white shadow-md shadow-orange-500/30 transition-all hover:opacity-95"
+            >
+              Apply now
+            </Link>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#25D366]/40 px-6 text-sm font-bold text-[#25D366] transition-all hover:bg-[#25D366]/10"
+            >
+              <MessageCircle className="h-4 w-4" /> Ask on WhatsApp
+            </a>
+          </div>
         </Reveal>
       </section>
     </>
