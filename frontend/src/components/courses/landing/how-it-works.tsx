@@ -7,7 +7,7 @@ export function LandingHowItWorks() {
     <section id="how-it-works" className="scroll-mt-28 border-b border-border bg-card/30 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">Your journey</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">Your journey</p>
           <h2 className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
             From this page to your first lesson
           </h2>
@@ -23,7 +23,7 @@ export function LandingHowItWorks() {
               className="relative rounded-2xl border border-border bg-background p-6"
             >
               <div className="mb-4 flex items-center justify-between">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-accent to-red-500 text-sm font-black text-white">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-primary text-sm font-black text-white">
                   {s.step}
                 </span>
                 <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">

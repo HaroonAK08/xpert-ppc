@@ -207,7 +207,7 @@ export function Header() {
               </a>
               <Link
                 href={to('/courses/signup')}
-                className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 px-6 text-sm font-extrabold text-white shadow-md shadow-orange-500/30 transition-all duration-300 hover:opacity-95"
+                className="academy-cta inline-flex h-10 items-center justify-center rounded-full px-6 text-sm font-extrabold transition-all duration-300 hover:opacity-95"
               >
                 Apply Now
               </Link>
@@ -215,7 +215,7 @@ export function Header() {
             <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
               <Link
                 href={to('/courses/signup')}
-                className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 px-3 text-xs font-extrabold text-white"
+                className="academy-cta inline-flex h-10 items-center justify-center rounded-full px-3 text-xs font-extrabold"
               >
                 Apply
               </Link>

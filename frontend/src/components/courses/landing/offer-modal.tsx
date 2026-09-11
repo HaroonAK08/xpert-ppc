@@ -74,8 +74,8 @@ export function OfferModal() {
             exit={{ scale: 0.92, y: 24, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 260, damping: 22 }}
           >
-            <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-accent/30 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+            <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-sky-400/25 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-primary/25 blur-3xl" />
 
             <button
               type="button"
@@ -87,16 +87,13 @@ export function OfferModal() {
             </button>
 
             <div className="relative z-10 p-7 pt-8 text-center">
-              <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-red-400/40 bg-red-500/20 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-red-200">
-                <Flame className="h-3.5 w-3.5 text-yellow-400" />
+              <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/15 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-sky-300">
+                <Flame className="h-3.5 w-3.5 text-sky-300" />
                 {offer.badge}
               </div>
 
               <h2 id="offer-modal-title" className="text-2xl font-extrabold leading-tight md:text-3xl">
-                Unlock{' '}
-                <span className="bg-gradient-to-r from-yellow-300 via-orange-400 to-red-400 bg-clip-text text-transparent">
-                  3 money-making skills
-                </span>
+                Unlock <span className="academy-text-gradient">3 money-making skills</span>
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">{offer.headline}</p>
 
@@ -104,12 +101,12 @@ export function OfferModal() {
                 <span className="text-lg text-muted-foreground line-through opacity-70">
                   {offer.strikePrice}
                 </span>
-                <span className="text-3xl font-black text-accent md:text-4xl">{offer.offerPrice}</span>
+                <span className="text-3xl font-black text-primary md:text-4xl">{offer.offerPrice}</span>
               </div>
               <p className="mb-4 text-xs text-muted-foreground">{offer.priceNote}</p>
 
               <div className="mb-5 flex items-center justify-center gap-2 rounded-xl border border-border bg-background/50 px-4 py-2.5 text-[13px] text-muted-foreground">
-                <Timer className="h-4 w-4 shrink-0 text-accent" />
+                <Timer className="h-4 w-4 shrink-0 text-primary" />
                 <span>
                   {offer.urgencyPrefix}{' '}
                   <strong className="text-foreground">{offer.strikePrice}</strong> on{' '}
@@ -120,7 +117,7 @@ export function OfferModal() {
               <button
                 type="button"
                 onClick={claim}
-                className="w-full rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 py-3.5 text-lg font-extrabold text-white shadow-lg shadow-orange-500/40 transition hover:opacity-95"
+                className="academy-cta w-full rounded-full py-3.5 text-lg font-extrabold transition hover:opacity-95"
               >
                 {offer.cta}
               </button>

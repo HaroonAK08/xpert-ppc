@@ -9,14 +9,14 @@ export function LandingPricing() {
   return (
     <section id="pricing" className="scroll-mt-28 border-b border-border bg-background py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="mx-auto max-w-xl rounded-3xl border border-accent/40 bg-gradient-to-b from-card to-background p-8 text-center shadow-xl shadow-accent/10 sm:p-10">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
+        <Reveal className="mx-auto max-w-xl rounded-3xl border border-primary/40 bg-gradient-to-b from-card to-background p-8 text-center shadow-xl shadow-primary/10 sm:p-10">
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">
             {pricing.eyebrow}
           </p>
           <h2 className="mb-4 text-3xl font-extrabold text-foreground sm:text-4xl">{pricing.title}</h2>
           <div className="mb-2 flex items-center justify-center gap-3">
             <span className="text-lg text-muted-foreground line-through">{pricing.strikePrice}</span>
-            <span className="text-4xl font-black text-accent sm:text-5xl">{pricing.offerPrice}</span>
+            <span className="text-4xl font-black text-primary sm:text-5xl">{pricing.offerPrice}</span>
           </div>
           <p className="mb-8 text-sm text-muted-foreground">{offer.priceNote}</p>
 

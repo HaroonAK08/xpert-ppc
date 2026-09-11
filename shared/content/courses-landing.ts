@@ -4,15 +4,15 @@ export const coursesLanding = {
     liveLabel: 'Live Offer',
     badge: 'Flash Deal — Limited Cohort',
     headline: 'Unlock all 3 money-making PPC skills',
-    strikePrice: 'Rs. 150,000',
-    offerPrice: 'Rs. 49,000',
+    strikePrice: 'Rs. 99,000',
+    offerPrice: 'Rs. 35,000',
     priceNote: 'one-time access to SEM, Social Media & SEO tracks',
     urgencyPrefix: 'Cohort pricing goes back to',
     cta: 'Claim my spot',
     dismiss: 'Maybe later',
   },
   marquee: [
-    'Flash Deal: Rs. 150,000 → Rs. 49,000 — all 3 academy tracks',
+    'Flash Deal: Rs. 99,000 → Rs. 35,000 — all 3 academy tracks',
     'Taught by media buyers who manage real ad spend',
     'Apply once — get accepted — start learning',
     'SEM · Meta Ads · SEO in one academy',
@@ -126,7 +126,7 @@ export const coursesLanding = {
   ],
   comparison: {
     badTitle: 'Buying skills separately',
-    badPrice: 'Rs. 150,000+ and rising',
+    badPrice: 'Rs. 99,000+ and rising',
     badPoints: [
       'Pay full price for every single course',
       'Random YouTube tips with no feedback',
@@ -135,7 +135,7 @@ export const coursesLanding = {
       'Hard to package skills for clients',
     ],
     goodTitle: 'Xpert PPC Digital Academy',
-    goodPrice: 'Rs. 49,000 — current cohort',
+    goodPrice: 'Rs. 35,000 — current cohort',
     goodPoints: [
       'One apply unlocks SEM + Social + SEO',
       'Curriculum from active media buyers',
@@ -173,8 +173,8 @@ export const coursesLanding = {
   pricing: {
     eyebrow: 'Everything in one membership',
     title: 'All 3 academy tracks — current cohort price',
-    strikePrice: 'Rs. 150,000',
-    offerPrice: 'Rs. 49,000',
+    strikePrice: 'Rs. 99,000',
+    offerPrice: 'Rs. 35,000',
     bullets: [
       'Complete SEM (Google & Microsoft Ads)',
       'Social Media Marketing track',
@@ -182,7 +182,7 @@ export const coursesLanding = {
       'Student portal with videos & assignments',
       'Apply once — learn after acceptance',
     ],
-    cta: 'Apply now — Rs. 49,000 cohort',
+    cta: 'Apply now — Rs. 35,000 cohort',
     finePrint: 'Price shown for the current cohort. Acceptance required before portal access.',
   },
   faq: [

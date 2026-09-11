@@ -14,16 +14,16 @@ export default function CourseSignupPage() {
 
   return (
     <section className="relative overflow-hidden bg-background py-12 sm:py-16">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_hsla(var(--accent),0.16),_transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_hsla(var(--primary),0.16),_transparent_55%)]" />
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-accent/30 bg-card shadow-xl shadow-accent/10">
-          <div className="border-b border-border bg-gradient-to-r from-accent/20 via-orange-500/10 to-transparent px-5 py-4 sm:px-8">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-accent">
+        <div className="mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-xl shadow-primary/10">
+          <div className="border-b border-border bg-gradient-to-r from-primary/20 via-sky-500/10 to-transparent px-5 py-4 sm:px-8">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-sky-300">
               {offer.badge}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               <span className="line-through opacity-60">{offer.strikePrice}</span>{' '}
-              <span className="font-extrabold text-accent">{offer.offerPrice}</span> cohort
+              <span className="font-extrabold text-primary">{offer.offerPrice}</span> cohort
             </p>
           </div>
           <div className="p-5 sm:p-8">

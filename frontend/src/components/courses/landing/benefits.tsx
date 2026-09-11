@@ -21,7 +21,7 @@ export function LandingBenefits() {
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
           <h2 className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
             Everything you need — {offer.strikePrice}{' '}
-            <span className="text-accent">just {offer.offerPrice}</span>
+            <span className="text-primary">just {offer.offerPrice}</span>
           </h2>
           <p className="text-sm text-muted-foreground sm:text-base">
             One application. Three elite tracks. Skills that pay you back.

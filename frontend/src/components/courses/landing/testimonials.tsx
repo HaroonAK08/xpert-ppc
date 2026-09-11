@@ -8,7 +8,7 @@ export function LandingTestimonials() {
     <section id="success-stories" className="scroll-mt-28 border-b border-border bg-card/40 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">Real students</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">Real students</p>
           <h2 className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
             Don&apos;t just take our word — hear it from learners
           </h2>

@@ -10,7 +10,7 @@ export function LandingOutcomes() {
     <section className="border-b border-border bg-background py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">Your future</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">Your future</p>
           <h2 className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
             Imagine your life 6 months from now
           </h2>
@@ -27,7 +27,7 @@ export function LandingOutcomes() {
                 key={o.title}
                 className="rounded-2xl border border-border bg-card/50 p-6 text-center"
               >
-                <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-primary/20 text-accent">
+                <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-sky-400/20 text-primary">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="mb-2 text-xl font-extrabold text-foreground">{o.title}</h3>

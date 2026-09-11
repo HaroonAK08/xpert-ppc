@@ -11,7 +11,7 @@ export function LandingCourseGrid() {
     <section id="courses" className="scroll-mt-28 border-b border-border bg-card/30 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">
             All included in one membership
           </p>
           <h2 id="courses-heading" className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
@@ -34,7 +34,7 @@ export function LandingCourseGrid() {
                   <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <Icon name={course.icon} className="h-5 w-5" />
                   </div>
-                  <span className="rounded-full border border-accent/40 bg-accent/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-accent">
+                  <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-300">
                     Included
                   </span>
                 </div>

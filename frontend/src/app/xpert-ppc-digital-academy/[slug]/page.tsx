@@ -108,7 +108,7 @@ export default async function CoursePage({ params }: Props) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
               href="/courses/signup"
-              className="btn-hover-effect inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 px-6 text-sm font-extrabold text-white shadow-md shadow-orange-500/30 transition-all hover:opacity-95 sm:w-auto"
+              className="btn-hover-effect academy-cta inline-flex h-11 w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-extrabold transition-all hover:opacity-95 sm:w-auto"
             >
               Apply for academy access
             </Link>
@@ -320,7 +320,7 @@ export default async function CoursePage({ params }: Props) {
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/courses/signup"
-              className="btn-hover-effect inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-accent via-orange-500 to-red-500 px-6 text-sm font-extrabold text-white shadow-md shadow-orange-500/30 transition-all hover:opacity-95"
+              className="btn-hover-effect academy-cta inline-flex h-11 items-center justify-center rounded-full px-6 text-sm font-extrabold transition-all hover:opacity-95"
             >
               Apply now
             </Link>

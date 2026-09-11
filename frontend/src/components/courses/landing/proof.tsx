@@ -6,7 +6,7 @@ export function LandingProof() {
     <section className="border-b border-border bg-card/40 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">Proof</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">Proof</p>
           <h2 className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
             We teach from work we&apos;ve actually done
           </h2>
@@ -21,9 +21,7 @@ export function LandingProof() {
               key={p.title}
               className="rounded-2xl border border-border bg-background p-6 text-center"
             >
-              <p className="mb-2 bg-gradient-to-r from-yellow-300 via-orange-400 to-red-400 bg-clip-text text-3xl font-black text-transparent">
-                {p.value}
-              </p>
+              <p className="academy-text-gradient mb-2 text-3xl font-black">{p.value}</p>
               <h3 className="mb-2 text-base font-bold text-foreground">{p.title}</h3>
               <p className="text-xs leading-relaxed text-muted-foreground">{p.description}</p>
             </RevealItem>

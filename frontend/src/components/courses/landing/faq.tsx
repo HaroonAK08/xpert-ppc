@@ -13,7 +13,7 @@ export function LandingFaq() {
     <section id="faq" className="scroll-mt-28 border-b border-border bg-card/30 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">FAQ</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">FAQ</p>
           <h2 className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
             Got questions? We&apos;ve got answers
           </h2>

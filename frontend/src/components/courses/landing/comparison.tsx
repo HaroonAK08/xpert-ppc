@@ -10,7 +10,7 @@ export function LandingComparison() {
     <section className="border-b border-border bg-background py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">Do the math</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-sky-300">Do the math</p>
           <h2 className="mb-3 text-3xl font-extrabold text-foreground sm:text-4xl">
             The smart way vs the expensive way
           </h2>
@@ -32,13 +32,13 @@ export function LandingComparison() {
 
           <Reveal
             delay={0.1}
-            className="relative rounded-2xl border border-accent/50 bg-gradient-to-b from-accent/10 to-card p-6 shadow-lg shadow-accent/10 sm:p-8"
+            className="relative rounded-2xl border border-primary/50 bg-gradient-to-b from-primary/10 to-card p-6 shadow-lg shadow-primary/10 sm:p-8"
           >
-            <span className="absolute -top-3 left-6 rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-accent-foreground">
+            <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
               Best value
             </span>
             <h3 className="mb-1 text-lg font-bold text-foreground">{comparison.goodTitle}</h3>
-            <p className="mb-6 text-2xl font-extrabold text-accent">{comparison.goodPrice}</p>
+            <p className="mb-6 text-2xl font-extrabold text-primary">{comparison.goodPrice}</p>
             <ul className="mb-8 space-y-3">
               {comparison.goodPoints.map((p) => (
                 <li key={p} className="flex items-start gap-2 text-sm text-foreground/90">
