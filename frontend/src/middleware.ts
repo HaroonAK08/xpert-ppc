@@ -4,7 +4,6 @@ import {
   COURSES_ORIGIN,
   isCoursePath,
   isCoursesHost,
-  isLegacyCoursesHost,
 } from '@/lib/site-href';
 
 function isStaticOrAsset(pathname: string): boolean {
@@ -25,13 +24,7 @@ export function middleware(req: NextRequest) {
   const host = req.headers.get('host') || '';
   const { pathname, search } = req.nextUrl;
 
-  // Old courses domain → new .ai host
-  if (isLegacyCoursesHost(host)) {
-    const destPath = pathname === '/' ? '/courses' : pathname;
-    return NextResponse.redirect(`${COURSES_ORIGIN}${destPath}${search}`, 308);
-  }
-
-  // Agency / other hosts: send course URLs to .ai
+  // Agency / other hosts: send course URLs to .net
   if (!isCoursesHost(host)) {
     if (isCoursePath(pathname)) {
       return NextResponse.redirect(`${COURSES_ORIGIN}${pathname}${search}`, 308);
@@ -39,7 +32,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Courses site (xpertppc.ai)
+  // Courses site (xpertppc.net)
   if (pathname === '/') {
     const url = req.nextUrl.clone();
     url.pathname = '/courses';

@@ -19,7 +19,7 @@ const PRIVATE_DISALLOW = [
 function canonicalOrigin(hostHeader: string): { origin: string; host: string } {
   const host = (hostHeader || '').toLowerCase().split(':')[0];
   if (isCoursesHost(host)) {
-    return { origin: COURSES_ORIGIN, host: 'xpertppc.ai' };
+    return { origin: COURSES_ORIGIN, host: 'xpertppc.net' };
   }
   return {
     origin: siteConfig.url || COM_ORIGIN,

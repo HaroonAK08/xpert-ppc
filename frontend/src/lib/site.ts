@@ -54,7 +54,7 @@ export const mainNav: NavItem[] = [
   { label: 'Contact', href: '/contact' },
 ];
 
-/** Nav for xpertppc.ai (Digital Academy / courses site). */
+/** Nav for xpertppc.net (Digital Academy / courses site). */
 export const coursesNav: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'SEM Course', href: '/xpert-ppc-digital-academy/sem' },

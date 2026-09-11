@@ -17,7 +17,7 @@ export function useSiteHref() {
   return {
     to: (href: string) => publicHref(href, host),
     isCourses,
-    /** @deprecated Use isCourses — courses site is xpertppc.ai */
+    /** @deprecated Use isCourses — courses site is xpertppc.net */
     isNet: isCourses,
     host,
   };

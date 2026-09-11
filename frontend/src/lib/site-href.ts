@@ -1,15 +1,8 @@
 export const COM_ORIGIN = 'https://xpertppc.com';
 /** Digital Academy / courses site. */
-export const COURSES_ORIGIN = 'https://xpertppc.ai';
-/** Legacy courses host — redirects to .ai. */
-export const LEGACY_COURSES_ORIGIN = 'https://xpertppc.net';
+export const COURSES_ORIGIN = 'https://xpertppc.net';
 
 export function isCoursesHost(host: string | null | undefined): boolean {
-  const h = (host || '').toLowerCase();
-  return h.includes('xpertppc.ai');
-}
-
-export function isLegacyCoursesHost(host: string | null | undefined): boolean {
   const h = (host || '').toLowerCase();
   return h.includes('xpertppc.net');
 }
@@ -30,8 +23,8 @@ export function isCoursePath(pathname: string): boolean {
 
 /**
  * Cross-host link helper.
- * - On xpertppc.ai: keep home + course paths local; send agency paths to .com
- * - Elsewhere: send course paths to xpertppc.ai
+ * - On xpertppc.net: keep home + course paths local; send agency paths to .com
+ * - Elsewhere: send course paths to xpertppc.net
  */
 export function publicHref(href: string, host?: string | null): string {
   if (!href.startsWith('/')) return href;
