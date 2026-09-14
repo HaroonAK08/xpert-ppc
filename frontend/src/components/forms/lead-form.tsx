@@ -50,13 +50,22 @@ export function LeadForm({
     setError('');
 
     const fd = new FormData(e.currentTarget);
+    // Ignore honeypot if a password manager/autofill stuffed it — real bots usually only fill that field.
+    const honeypot = String(fd.get('companyWebsite') || '').trim();
+    const phone = String(fd.get('phone') || '').trim();
+    const email = String(fd.get('email') || '').trim();
+    const name = String(fd.get('name') || '').trim();
+    const looksLikeAutofill =
+      honeypot.length > 0 &&
+      (honeypot === phone || honeypot === email || honeypot === name || honeypot.includes('@'));
+
     const payload = {
-      name: String(fd.get('name') || ''),
-      email: String(fd.get('email') || ''),
-      phone: String(fd.get('phone') || ''),
+      name,
+      email,
+      phone,
       platform: String(fd.get('platform') || 'Other'),
       message: String(fd.get('message') || ''),
-      companyWebsite: String(fd.get('companyWebsite') || ''),
+      companyWebsite: looksLikeAutofill ? '' : honeypot,
       source,
       sourcePath: pathname,
       utm: {
@@ -103,10 +112,23 @@ export function LeadForm({
 
   return (
     <form onSubmit={onSubmit} className={cn('space-y-4', className)} noValidate>
-      {/* Honeypot: visually hidden, ignored by users, filled by bots. */}
-      <div className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
-        <label htmlFor={`cw-${uid}`}>Company website</label>
-        <input id={`cw-${uid}`} name="companyWebsite" type="text" tabIndex={-1} autoComplete="off" />
+      {/* Honeypot: hidden from users. Obscure name/attrs so browsers don't autofill phone/email into it. */}
+      <div
+        className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
+        aria-hidden="true"
+      >
+        <label htmlFor={`hp-${uid}`}>Leave blank</label>
+        <input
+          id={`hp-${uid}`}
+          name="companyWebsite"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          defaultValue=""
+        />
       </div>
 
       {compact ? (

@@ -50,8 +50,8 @@ export const createLeadSchema = z.object({
       content: z.string().max(160).optional().default(''),
     })
     .optional(),
-  // Honeypot — real users never fill this in.
-  companyWebsite: z.string().max(0).optional().default(''),
+  // Honeypot — allow any length so autofill doesn't fail Zod; non-empty = spam (handled in route).
+  companyWebsite: z.string().optional().default(''),
 });
 
 export const updateLeadSchema = z.object({

@@ -32,8 +32,15 @@ router.post(
 
     const { companyWebsite, ...data } = parsed.data;
 
-    // Honeypot tripped — accept silently so the bot doesn't learn it was caught.
-    if (companyWebsite) {
+    // Honeypot tripped by a bot — accept silently. Ignore autofill dumping phone/email into the trap.
+    const hp = (companyWebsite || '').trim();
+    const autofilled =
+      hp &&
+      (hp === data.phone?.trim() ||
+        hp === data.email?.trim() ||
+        hp === data.name?.trim() ||
+        hp.includes('@'));
+    if (hp && !autofilled) {
       return res.status(201).json({ ok: true });
     }
 
