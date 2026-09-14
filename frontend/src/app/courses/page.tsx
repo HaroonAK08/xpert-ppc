@@ -12,6 +12,7 @@ import {
   LandingOutcomes,
   LandingProof,
   LandingTestimonials,
+  LandingTrust,
 } from '@/components/courses/landing';
 import { buildMetadata } from '@/lib/seo';
 
@@ -37,6 +38,7 @@ export default function CoursesLandingPage() {
     <div className="academy-shell">
       <CoursesLandingChrome />
       <LandingHero />
+      <LandingTrust />
       <LandingHowItWorks />
       <LandingCourseGrid />
       <LandingBenefits />

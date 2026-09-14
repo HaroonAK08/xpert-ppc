@@ -127,8 +127,22 @@
     animation-play-state: paused;
   }
 
-  /* Study portal — light, calm learning UI */
+  /* Study portal — light, calm learning UI (override dark :root tokens) */
   .academy-shell {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 40%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+    --secondary: 214 32% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --accent: 215 100% 54%;
+    --accent-foreground: 0 0% 100%;
     --academy-ink: 222 47% 11%;
     --academy-panel: 0 0% 100%;
     --academy-line: 214 32% 88%;
@@ -142,6 +156,15 @@
 
   .academy-shell .text-foreground {
     color: hsl(222 47% 11%);
+  }
+
+  .academy-shell .text-muted-foreground {
+    color: hsl(215 16% 40%);
+  }
+
+  .academy-shell .bg-card,
+  .academy-shell .bg-card\/60 {
+    background-color: hsl(0 0% 100% / 0.95);
   }
 
   .academy-cta {

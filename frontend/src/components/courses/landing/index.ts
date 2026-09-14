@@ -1,4 +1,5 @@
 export { LandingHero } from './hero';
+export { LandingTrust } from './trust';
 export { LandingTestimonials } from './testimonials';
 export { LandingBenefits } from './benefits';
 export { LandingCourseGrid } from './course-grid';

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { academySkills, coursesLanding } from '@shared/content/courses-landing';
@@ -23,6 +24,32 @@ export function LandingCourseGrid() {
             title="Many skills. Your path is decided after the call."
             subtitle="Browse what we teach. On the interview we pick what fits your background — you don’t have to buy everything."
           />
+        </Reveal>
+
+        <Reveal className="mb-10 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-md shadow-slate-200/50">
+          <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="relative min-h-[220px] sm:min-h-[280px]">
+              <Image
+                src="/study-portal/study-portal-skills.jpg"
+                alt="Creative and digital tools used across marketing, design, and development skills"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 58vw"
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-3 p-6 sm:p-8">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#1d6ff2]">
+                Marketing · Creative · Development
+              </p>
+              <h3 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+                One portal. Multiple skill tracks.
+              </h3>
+              <p className="text-sm leading-relaxed text-slate-600">
+                From paid search and SEO to design, video, and full-stack web — we help you
+                choose the stack that matches where you are today.
+              </p>
+            </div>
+          </div>
         </Reveal>
 
         <RevealGroup stagger={0.06} className="mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
