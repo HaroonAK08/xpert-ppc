@@ -5,13 +5,13 @@ import { AcademyPanel, SectionEyebrow, SectionHeading } from './section';
 
 export function LandingHowItWorks() {
   return (
-    <section id="how-it-works" className="scroll-mt-28 border-b border-slate-200/80 py-16 sm:py-20">
+    <section id="how-it-works" className="scroll-mt-28 border-b border-slate-200/80 bg-white/70 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center">
-          <SectionEyebrow>Process</SectionEyebrow>
+          <SectionEyebrow>How it works</SectionEyebrow>
           <SectionHeading
-            title="From first message to your study plan"
-            subtitle="Meeting → interview → skills & pricing → portal access."
+            title="The story in four clear steps"
+            subtitle="Meeting → interview about your background → skills & pricing decided → then you learn."
           />
         </Reveal>
 
@@ -35,7 +35,8 @@ export function LandingHowItWorks() {
         </RevealGroup>
 
         <div className="text-center">
-          <ApplyCta variant="warm">Book step 1 — discovery meeting</ApplyCta>
+          <p className="mb-4 text-sm text-slate-500">Ready for step 1?</p>
+          <ApplyCta variant="warm">Book a meeting with us</ApplyCta>
         </div>
       </div>
     </section>

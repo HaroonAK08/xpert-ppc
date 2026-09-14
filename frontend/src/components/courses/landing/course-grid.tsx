@@ -21,8 +21,8 @@ export function LandingCourseGrid() {
           <SectionEyebrow>Skills catalog</SectionEyebrow>
           <SectionHeading
             id="courses-heading"
-            title="Many skills. Your path is decided after the call."
-            subtitle="Browse what we teach. On the interview we pick what fits your background — you don’t have to buy everything."
+            title="Lots of skills — we pick the right ones after the interview"
+            subtitle="SEM, SEO, social media, graphic design, video editing, frontend, backend, full-stack. Browse below. On the call we decide what you actually need."
           />
         </Reveal>
 
@@ -42,11 +42,11 @@ export function LandingCourseGrid() {
                 Marketing · Creative · Development
               </p>
               <h3 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
-                One portal. Multiple skill tracks.
+                You don’t buy everything. We choose with you.
               </h3>
               <p className="text-sm leading-relaxed text-slate-600">
-                From paid search and SEO to design, video, and full-stack web — we help you
-                choose the stack that matches where you are today.
+                After the interview we map only the skills that fit your background — then set
+                pricing for that plan, not a one-size package.
               </p>
             </div>
           </div>

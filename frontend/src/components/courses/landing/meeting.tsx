@@ -24,19 +24,19 @@ export function LandingMeeting() {
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1d6ff2] text-xs font-bold text-white">
                   1
                 </span>
-                Book a discovery meeting with the form
+                Book a meeting with the form — no payment yet
               </li>
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1d6ff2] text-xs font-bold text-white">
                   2
                 </span>
-                Initial interview — background & skillset
+                Initial interview — we hear your background & skillset
               </li>
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1d6ff2] text-xs font-bold text-white">
                   3
                 </span>
-                We decide skills + pricing together
+                We decide which skills you need + what it will cost
               </li>
             </ol>
           </Reveal>

@@ -34,10 +34,10 @@ export function LandingTrust() {
     <section className="border-b border-slate-200/80 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center">
-          <SectionEyebrow>Why learners trust us</SectionEyebrow>
+          <SectionEyebrow>Why this feels fair</SectionEyebrow>
           <SectionHeading
-            title="A calmer way to start learning digital skills"
-            subtitle="No flash checkout. A real conversation, a fair plan, then portal access."
+            title="We don’t sell you a package before we know you"
+            subtitle="First a meeting. Then an interview about your background and skillset. Only after that — skills, plan, and price."
           />
         </Reveal>
 
@@ -67,8 +67,8 @@ export function LandingTrust() {
               <div>
                 <p className="text-sm font-bold text-slate-900">Mentored by working practitioners</p>
                 <p className="text-sm leading-relaxed text-slate-600">
-                  Learn from an agency team that manages live campaigns and digital delivery —
-                  then decide your track together.
+                  On the call we listen first. Then we decide which skills fit you — marketing,
+                  creative, or web — and what that plan should cost.
                 </p>
               </div>
             </AcademyPanel>

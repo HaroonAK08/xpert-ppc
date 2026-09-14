@@ -18,10 +18,10 @@ export function LandingBenefits() {
     <section className="border-b border-slate-200/80 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center">
-          <SectionEyebrow>Why this portal</SectionEyebrow>
+          <SectionEyebrow>What you get from this model</SectionEyebrow>
           <SectionHeading
-            title="A study system that starts with listening"
-            subtitle="We don’t sell you a random bundle. We interview you, then build the plan."
+            title="Every part of the story, kept simple"
+            subtitle="Meeting first. Interview about you. Skills chosen for you. Price after that. Portal only when the plan is clear."
           />
         </Reveal>
 
@@ -43,7 +43,7 @@ export function LandingBenefits() {
         </RevealGroup>
 
         <div className="text-center">
-          <ApplyCta variant="warm">Book a discovery meeting</ApplyCta>
+          <ApplyCta variant="warm">Book a meeting with us</ApplyCta>
         </div>
       </div>
     </section>

@@ -17,13 +17,13 @@ import {
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Xpert PPC Study Portal | Skills, Interview & Custom Learning Path',
+  title: 'Xpert PPC Study Portal | Meet First, Then Skills & Pricing',
   description:
-    'Book a discovery meeting with Xpert PPC. After an initial interview we map the right skills — SEM, SEO, social, design, video, web development — and pricing for you.',
+    'Book a meeting with Xpert PPC Study Portal. After an initial interview about your background and skillset, we decide which skills you need — SEM, SEO, social, design, video, web — and what it will cost.',
   path: '/courses',
   keywords: [
     'study portal',
-    'digital skills',
+    'digital skills interview',
     'SEM training',
     'SEO course',
     'web development course',
@@ -38,9 +38,9 @@ export default function CoursesLandingPage() {
     <div className="academy-shell">
       <CoursesLandingChrome />
       <LandingHero />
-      <LandingTrust />
       <LandingHowItWorks />
       <LandingCourseGrid />
+      <LandingTrust />
       <LandingBenefits />
       <LandingTestimonials />
       <LandingOutcomes />

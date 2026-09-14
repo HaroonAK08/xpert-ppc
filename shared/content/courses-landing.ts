@@ -65,87 +65,104 @@ export const coursesLanding = {
   brand: 'Xpert PPC Study Portal',
   offer: {
     liveLabel: 'Open for interviews',
-    badge: 'Start with a free discovery call',
+    badge: 'No payment before the call',
     headline:
-      'Book a short meeting. We learn your background and goals — then we map the right skills and pricing for you.',
-    cta: 'Book my interview call',
-    dismiss: 'Browse skills first',
+      'Fill the form → we meet you → short interview about your background & skillset → then we decide which skills you need and what it will cost.',
+    cta: 'Book my meeting',
+    dismiss: 'See how it works first',
   },
   marquee: [
-    'Book a discovery call — we design your learning path with you',
-    'SEM · SEO · Social · Design · Video · Web development',
-    'Initial interview first — then skills & pricing',
-    'Agency mentors who work on real client projects',
-    'Study portal access after we agree your track',
+    'Step 1: Book a meeting — no payment yet',
+    'Step 2: Initial interview — your background & skillset',
+    'Step 3: We decide skills + pricing together',
+    'Skills: SEM · SEO · Social · Design · Video · Frontend · Backend · Full-stack',
+    'Study portal access only after your path is agreed',
   ],
   hero: {
     eyebrow: 'Xpert PPC Study Portal',
-    title: 'Learn the skills that fit your background — not a one-size course.',
+    title: 'Meet us first. Then we decide your skills and price.',
     subtitle:
-      'First we meet you. On a short interview call we hear where you are, what you already know, and where you want to go. Then we recommend the right skills and a fair plan to get there.',
-    primaryCta: 'Book a discovery meeting',
+      'This is not a ready-made course checkout. Book a meeting, complete a short interview about your background and skillset, and we will tell you what to learn and how much it will cost.',
+    primaryCta: 'Book a meeting with us',
     secondaryCta: 'Sign in to portal',
-    trust: ['Interview-first onboarding', 'Custom skill path', 'Pricing after we meet'],
+    storySteps: [
+      {
+        step: '1',
+        title: 'Book a meeting',
+        detail: 'Use the form. No payment yet.',
+      },
+      {
+        step: '2',
+        title: 'Initial interview',
+        detail: 'We hear your background & skillset.',
+      },
+      {
+        step: '3',
+        title: 'Skills + pricing',
+        detail: 'We decide what you need and the cost.',
+      },
+    ],
   },
   stats: [
     { value: '8+', label: 'Skills available' },
-    { value: '1:1', label: 'Discovery call' },
+    { value: '1:1', label: 'Interview call' },
+    { value: '0', label: 'Payment before call' },
     { value: '7+', label: 'Years mentoring' },
-    { value: '$4.5M+', label: 'Ads managed by team' },
   ],
   testimonials: [
     {
       quote:
-        'They didn’t push a package — the call helped me pick SEM first, then social later.',
+        'They didn’t push a package — after the interview they put me on SEM first, then social later.',
       name: 'Ahmed R.',
       role: 'Freelance media buyer',
     },
     {
       quote:
-        'I came from a non-tech background. The interview made the path feel realistic.',
+        'I was a beginner. The call was about my background first — then they told me what I actually needed.',
       name: 'Sara K.',
       role: 'Career switcher',
     },
     {
       quote:
-        'Clear lessons and someone who actually runs campaigns, not only teaching slides.',
+        'Clear path and fair pricing only after they understood my skillset. Felt honest.',
       name: 'Bilal M.',
       role: 'Agency junior',
     },
     {
       quote:
-        'Started with design + social. Pricing and scope only after they understood my goals.',
+        'I wanted design + social. They decided the order and price on the call — not from a price list.',
       name: 'Hina T.',
       role: 'Creator marketer',
     },
   ],
   benefits: [
     {
-      title: 'Interview before you pay',
+      title: 'Meeting before money',
       description:
-        'We learn your background and skillset first — then decide what you actually need.',
+        'You talk to us first. We never ask you to buy a package before the interview.',
     },
     {
-      title: 'Wide skill catalog',
+      title: 'Interview about you',
       description:
-        'Marketing, creative, and web development tracks — matched to your goals.',
+        'We listen to your background, experience, and current skillset — then place you correctly.',
     },
     {
-      title: 'Custom pricing',
+      title: 'Skills chosen for you',
       description:
-        'No flash price list. After the call we propose what to learn and what it costs.',
+        'SEM, SEO, social, graphic design, video editing, frontend, backend, or full-stack — only what you need.',
     },
     {
-      title: 'Mentor feedback',
-      description: 'Guidance from people who ship real client and product work.',
+      title: 'Pricing after the call',
+      description:
+        'Cost depends on the skills and plan we agree together. No flash price list.',
     },
     {
-      title: 'Study portal access',
-      description: 'Once your path is set, learn in the portal at your pace.',
+      title: 'Then portal access',
+      description: 'Once the path is set, you sign in and learn inside the study portal.',
     },
     {
-      title: 'Career or freelance ready',
-      description: 'Build skills you can sell, use in a job, or apply to your own brand.',
+      title: 'Built for real work',
+      description: 'Mentors who run client and product work — not theory-only teaching.',
     },
   ],
   outcomes: [
@@ -164,19 +181,19 @@ export const coursesLanding = {
   ],
   proof: [
     {
-      value: 'Call-first',
+      value: 'Meet first',
       title: 'Human onboarding',
-      description: 'Every learner starts with a real conversation — not a checkout page.',
+      description: 'Every learner starts with a meeting and interview — not a checkout page.',
     },
     {
-      value: '$4.5M+',
-      title: 'Ad spend managed',
-      description: 'Marketing tracks taught from live campaign experience.',
+      value: 'You + us',
+      title: 'Custom decision',
+      description: 'Skills and pricing are decided together after we hear your background.',
     },
     {
-      value: 'Multi-skill',
-      title: 'One portal',
-      description: 'Marketing, creative, and development under one study system.',
+      value: '8+',
+      title: 'Skill tracks',
+      description: 'Marketing, creative, and development in one study portal.',
     },
     {
       value: '7+ yrs',
@@ -187,68 +204,70 @@ export const coursesLanding = {
   howItWorks: [
     {
       step: 1,
-      time: '~2 min',
-      title: 'Book a discovery meeting',
-      description: 'Share your name, contact, background, and which skills interest you.',
+      time: 'Form',
+      title: 'Book a meeting with us',
+      description:
+        'Fill the call-to-action form. Tell us who you are and which skills you are curious about. No payment at this step.',
     },
     {
       step: 2,
-      time: 'Call',
-      title: 'Initial interview',
+      time: 'Interview',
+      title: 'Initial interview call',
       description:
-        'We talk through your experience, goals, and current skillset — honest and practical.',
+        'We hear your background, experience, and current skillset. This is how we understand what you truly need.',
     },
     {
       step: 3,
-      time: 'Plan',
-      title: 'Skills & pricing decided',
+      time: 'Decide',
+      title: 'We decide skills + pricing',
       description:
-        'We recommend what you should learn, in what order, and what the investment will be.',
+        'Together we choose what you will learn (and what you can skip) — then we set a fair price for that plan.',
     },
     {
       step: 4,
       time: 'Learn',
-      title: 'Access the study portal',
-      description: 'Start your path in the portal with lessons, tasks, and mentor support.',
+      title: 'Start in the study portal',
+      description:
+        'After you agree, you get portal access and begin the path we built for you.',
     },
   ],
   meeting: {
-    eyebrow: 'Start here',
-    title: 'Book your discovery meeting',
+    eyebrow: 'Your first step',
+    title: 'Book a meeting with us',
     subtitle:
-      'This is not a sales checkout. Tell us a bit about yourself — we will schedule a short interview call, then decide skills and pricing together.',
-    cta: 'Request my interview call',
-    finePrint: 'We usually reply within one business day to confirm a meeting time.',
+      'This form starts the process. Next we schedule your initial interview, listen to your background and skillset, then decide which skills you need and how much it will cost.',
+    cta: 'Request my meeting',
+    finePrint: 'No payment to book. We usually confirm a call time within one business day.',
   },
   faq: [
     {
       q: 'Do I pay before the call?',
-      a: 'No. First we meet. After the interview we decide which skills fit you and what the plan costs.',
+      a: 'No. First you book a meeting. After the initial interview we decide which skills fit you and what the plan costs.',
+    },
+    {
+      q: 'What happens on the initial interview?',
+      a: 'We ask about your background, experience, and skillset. Then we recommend what you should learn — and only then talk pricing.',
     },
     {
       q: 'What skills can I learn?',
-      a: 'Search engine marketing, SEO, social media marketing, graphic design, video editing, frontend, backend, and full-stack web development — plus combinations based on your goals.',
+      a: 'Search engine marketing, SEO, social media marketing, graphic design, video editing, frontend, backend, and full-stack web development — or a mix based on your goals.',
     },
     {
       q: 'I am a complete beginner. Is that okay?',
-      a: 'Yes. The interview helps us place you correctly — beginners and career switchers are welcome.',
-    },
-    {
-      q: 'How long is the discovery call?',
-      a: 'Usually a short interview — enough to understand your background and recommend a clear next step.',
+      a: 'Yes. The interview is exactly for that — so we place beginners and career switchers correctly.',
     },
     {
       q: 'When do I get portal access?',
-      a: 'After we agree your learning path and plan. Then you can sign in and start.',
+      a: 'After we agree your skills path and pricing. Then you can sign in and start learning.',
     },
     {
       q: 'Can I talk on WhatsApp instead?',
-      a: 'Yes. You can also message us on WhatsApp — but the form helps us prepare for your interview.',
+      a: 'Yes. WhatsApp is fine — but the form helps us prepare for your interview faster.',
     },
   ],
   finalCta: {
-    title: 'Your next skill path starts with a conversation',
-    body: 'Book a discovery meeting. We listen first — then we build the right study plan with you.',
-    cta: 'Book a discovery meeting',
+    title: 'Ready for the meeting?',
+    body: 'Book the call. We listen to your background first — then we decide the skills and the price with you.',
+    cta: 'Book a meeting with us',
   },
 } as const;

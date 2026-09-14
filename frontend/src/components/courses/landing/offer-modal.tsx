@@ -78,7 +78,7 @@ export function OfferModal() {
                 Xpert PPC Study Portal
               </p>
               <h2 id="offer-modal-title" className="text-balance text-2xl font-extrabold leading-tight sm:text-3xl">
-                Meet us first. <span className="academy-text-gradient">Then we decide your path.</span>
+                Meet us first. <span className="academy-text-gradient">Then skills & price.</span>
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">{offer.headline}</p>
 
