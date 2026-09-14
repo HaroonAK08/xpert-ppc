@@ -16,6 +16,7 @@ export const LEAD_SOURCES = [
   'contact-page',
   'service-page',
   'academy',
+  'academy-meeting',
   'industry',
   'footer',
   'other',

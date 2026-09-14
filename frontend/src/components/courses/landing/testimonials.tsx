@@ -12,35 +12,31 @@ function initials(name: string) {
 }
 
 export function LandingTestimonials() {
-  const items = coursesLanding.testimonials;
-
   return (
-    <section id="success-stories" className="scroll-mt-28 border-b border-white/[0.06] py-16 sm:py-20">
+    <section id="success-stories" className="scroll-mt-28 border-b border-slate-200/80 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center">
-          <SectionEyebrow>Student voices</SectionEyebrow>
+          <SectionEyebrow>Learner voices</SectionEyebrow>
           <SectionHeading
-            title="Trusted by people building real careers"
-            subtitle="Honest feedback from learners who started with the same questions you have now."
+            title="Built around real people — not packages"
+            subtitle="The call-first approach helps each person start in the right place."
           />
         </Reveal>
 
         <RevealGroup stagger={0.08} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((t) => (
+          {coursesLanding.testimonials.map((t) => (
             <RevealItem key={t.name}>
               <AcademyPanel className="flex h-full flex-col p-5 sm:p-6">
                 <div className="mb-4 flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-sky-400/30 to-primary/40 text-xs font-bold text-sky-100 ring-1 ring-white/10">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1d6ff2]/10 text-xs font-bold text-[#1558c7] ring-1 ring-[#1d6ff2]/15">
                     {initials(t.name)}
                   </span>
                   <div>
-                    <p className="text-sm font-bold text-white">{t.name}</p>
+                    <p className="text-sm font-bold text-slate-900">{t.name}</p>
                     <p className="text-xs text-slate-500">{t.role}</p>
                   </div>
                 </div>
-                <p className="flex-1 text-sm leading-relaxed text-slate-300/90">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
+                <p className="flex-1 text-sm leading-relaxed text-slate-600">&ldquo;{t.quote}&rdquo;</p>
               </AcademyPanel>
             </RevealItem>
           ))}

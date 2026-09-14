@@ -107,10 +107,10 @@ export default async function CoursePage({ params }: Props) {
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
-              href="/courses/signup"
+              href="/courses#meeting"
               className="btn-hover-effect academy-cta inline-flex h-11 w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-extrabold transition-all hover:opacity-95 sm:w-auto"
             >
-              Apply for academy access
+              Book a discovery meeting
             </Link>
             <a
               href="#curriculum"
@@ -319,10 +319,10 @@ export default async function CoursePage({ params }: Props) {
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
-              href="/courses/signup"
+              href="/courses#meeting"
               className="btn-hover-effect academy-cta inline-flex h-11 items-center justify-center rounded-full px-6 text-sm font-extrabold transition-all hover:opacity-95"
             >
-              Apply now
+              Book a discovery meeting
             </Link>
             <a
               href={whatsappHref}

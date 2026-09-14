@@ -120,11 +120,11 @@ export function Footer() {
             <div>
               <Logo className="mb-5" />
               <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-sky-300/80">
-                Digital Academy
+                Study Portal
               </p>
               <p className="max-w-xs text-sm leading-relaxed text-slate-400">
-                SEM, SEO, and social media training from the Xpert PPC media buying team — apply
-                once, learn after acceptance.
+                Book a discovery meeting first. After an interview we map your skills and pricing —
+                then you learn in the portal.
               </p>
             </div>
 

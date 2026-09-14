@@ -2,14 +2,13 @@ import type { Metadata } from 'next';
 
 import {
   LandingBenefits,
-  LandingComparison,
   LandingCourseGrid,
   LandingFaq,
   LandingFinalCta,
   LandingHero,
   LandingHowItWorks,
+  LandingMeeting,
   LandingOutcomes,
-  LandingPricing,
   LandingProof,
   LandingTestimonials,
   OfferMarquee,
@@ -18,16 +17,18 @@ import {
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Xpert PPC Digital Academy | SEM, Social Media & SEO Courses',
+  title: 'Xpert PPC Study Portal | Skills, Interview & Custom Learning Path',
   description:
-    'Apply for Xpert PPC Digital Academy — SEM, Social Media Marketing, and SEO tracks taught by media buyers who scale real accounts. Current cohort pricing.',
+    'Book a discovery meeting with Xpert PPC. After an initial interview we map the right skills — SEM, SEO, social, design, video, web development — and pricing for you.',
   path: '/courses',
   keywords: [
-    'PPC courses',
-    'digital academy',
+    'study portal',
+    'digital skills',
     'SEM training',
     'SEO course',
-    'Meta Ads course',
+    'web development course',
+    'graphic design course',
+    'video editing course',
     'Xpert PPC Academy',
   ],
 });
@@ -38,14 +39,13 @@ export default function CoursesLandingPage() {
       <OfferMarquee />
       <OfferModal />
       <LandingHero />
-      <LandingTestimonials />
-      <LandingBenefits />
+      <LandingHowItWorks />
       <LandingCourseGrid />
+      <LandingBenefits />
+      <LandingTestimonials />
       <LandingOutcomes />
       <LandingProof />
-      <LandingComparison />
-      <LandingHowItWorks />
-      <LandingPricing />
+      <LandingMeeting />
       <LandingFaq />
       <LandingFinalCta />
     </div>

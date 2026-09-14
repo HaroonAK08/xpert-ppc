@@ -54,30 +54,29 @@ export const mainNav: NavItem[] = [
   { label: 'Contact', href: '/contact' },
 ];
 
-/** Nav for xpertppc.net (Digital Academy / courses site). */
+/** Nav for xpertppc.net (study portal). */
 export const coursesNav: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Courses', href: '/courses#courses' },
-  { label: 'Pricing', href: '/courses#pricing' },
+  { label: 'Skills', href: '/courses#courses' },
   { label: 'How it works', href: '/courses#how-it-works' },
+  { label: 'Book a call', href: '/courses#meeting' },
   { label: 'FAQ', href: '/courses#faq' },
   { label: 'Sign in', href: '/courses/login' },
 ];
 
 export const footerNav = {
   academy: {
-    title: 'Digital Academy',
+    title: 'Study Portal',
     links: [
-      { label: 'Academy home', href: '/courses' },
-      { label: 'All courses', href: '/courses#courses' },
-      { label: 'Pricing', href: '/courses#pricing' },
+      { label: 'Portal home', href: '/courses' },
+      { label: 'All skills', href: '/courses#courses' },
+      { label: 'Book discovery meeting', href: '/courses#meeting' },
       { label: 'SEM Course', href: '/xpert-ppc-digital-academy/sem' },
       {
         label: 'Social Media Marketing Course',
         href: '/xpert-ppc-digital-academy/social-media-marketing',
       },
       { label: 'Complete SEO Course', href: '/xpert-ppc-digital-academy/seo' },
-      { label: 'Apply', href: '/courses/signup' },
       { label: 'Sign in', href: '/courses/login' },
     ],
   },

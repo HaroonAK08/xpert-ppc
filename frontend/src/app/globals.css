@@ -127,35 +127,39 @@
     animation-play-state: paused;
   }
 
-  /* Academy funnel design system — calm navy + electric blue trust palette */
+  /* Study portal — light, calm learning UI */
   .academy-shell {
-    --academy-ink: 222 47% 6%;
-    --academy-panel: 222 40% 12%;
-    --academy-line: 215 40% 55%;
-    --academy-glow: 199 89% 48%;
+    --academy-ink: 222 47% 11%;
+    --academy-panel: 0 0% 100%;
+    --academy-line: 214 32% 88%;
+    --academy-glow: 215 100% 54%;
+    color: hsl(222 47% 11%);
     background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, hsla(215, 100%, 45%, 0.18), transparent 55%),
-      radial-gradient(ellipse 60% 40% at 100% 20%, hsla(199, 89%, 48%, 0.08), transparent 50%),
-      radial-gradient(ellipse 50% 30% at 0% 80%, hsla(221, 83%, 40%, 0.1), transparent 45%),
-      hsl(var(--background));
+      radial-gradient(ellipse 90% 55% at 50% -15%, hsla(215, 100%, 60%, 0.14), transparent 55%),
+      radial-gradient(ellipse 50% 40% at 100% 0%, hsla(199, 90%, 55%, 0.08), transparent 50%),
+      linear-gradient(180deg, #f4f8ff 0%, #f8fafc 35%, #ffffff 100%);
+  }
+
+  .academy-shell .text-foreground {
+    color: hsl(222 47% 11%);
   }
 
   .academy-cta {
     background-image: linear-gradient(
       105deg,
-      hsl(199 92% 52%) 0%,
-      hsl(215 100% 54%) 45%,
-      hsl(221 85% 50%) 100%
+      hsl(199 92% 48%) 0%,
+      hsl(215 100% 52%) 50%,
+      hsl(221 85% 48%) 100%
     );
     color: #fff;
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.18) inset,
-      0 12px 32px hsla(215, 100%, 45%, 0.35);
+      0 1px 0 rgba(255, 255, 255, 0.25) inset,
+      0 10px 28px hsla(215, 100%, 45%, 0.28);
     letter-spacing: 0.01em;
   }
 
   .academy-cta:hover {
-    filter: brightness(1.06);
+    filter: brightness(1.05);
   }
 
   .academy-cta:active {
@@ -163,22 +167,13 @@
   }
 
   .academy-marquee {
-    background: linear-gradient(
-      90deg,
-      hsl(222 55% 14%) 0%,
-      hsl(215 70% 22%) 40%,
-      hsl(199 60% 22%) 100%
-    );
-    border-color: hsla(215, 80%, 60%, 0.2);
+    background: linear-gradient(90deg, #0b1f4d 0%, #1558c7 55%, #0ea5e9 100%);
+    border-color: transparent;
+    color: #fff;
   }
 
   .academy-text-gradient {
-    background-image: linear-gradient(
-      105deg,
-      hsl(199 95% 72%) 0%,
-      hsl(215 100% 75%) 50%,
-      hsl(210 90% 85%) 100%
-    );
+    background-image: linear-gradient(105deg, #0284c7 0%, #1d6ff2 50%, #2563eb 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -186,19 +181,14 @@
 
   .academy-divider {
     height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      hsla(215, 80%, 60%, 0.35),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, hsla(215, 80%, 60%, 0.35), transparent);
   }
 
   .academy-mesh {
     background-image:
-      radial-gradient(at 20% 20%, hsla(215, 100%, 50%, 0.12) 0px, transparent 45%),
-      radial-gradient(at 80% 10%, hsla(199, 90%, 50%, 0.1) 0px, transparent 40%),
-      radial-gradient(at 50% 90%, hsla(221, 80%, 40%, 0.12) 0px, transparent 45%);
+      radial-gradient(at 15% 10%, hsla(215, 100%, 60%, 0.12) 0px, transparent 45%),
+      radial-gradient(at 85% 5%, hsla(199, 90%, 55%, 0.1) 0px, transparent 40%),
+      radial-gradient(at 50% 100%, hsla(221, 80%, 55%, 0.08) 0px, transparent 45%);
   }
 }
 

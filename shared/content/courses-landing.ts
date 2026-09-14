@@ -1,219 +1,254 @@
+export type AcademySkill = {
+  slug: string;
+  name: string;
+  category: 'Marketing' | 'Creative' | 'Development' | 'Growth';
+  tagline: string;
+  detailHref?: string;
+};
+
+/** Skills shown on the study portal — path decided after the interview call. */
+export const academySkills: AcademySkill[] = [
+  {
+    slug: 'sem',
+    name: 'Search Engine Marketing',
+    category: 'Marketing',
+    tagline: 'Google Ads & Microsoft Ads — campaigns that convert.',
+    detailHref: '/xpert-ppc-digital-academy/sem',
+  },
+  {
+    slug: 'seo',
+    name: 'Search Engine Optimization',
+    category: 'Marketing',
+    tagline: 'Organic rankings, technical SEO, and content that ranks.',
+    detailHref: '/xpert-ppc-digital-academy/seo',
+  },
+  {
+    slug: 'social-media-marketing',
+    name: 'Social Media Marketing',
+    category: 'Marketing',
+    tagline: 'Meta, TikTok & social ads plus organic growth systems.',
+    detailHref: '/xpert-ppc-digital-academy/social-media-marketing',
+  },
+  {
+    slug: 'graphic-designing',
+    name: 'Graphic Designing',
+    category: 'Creative',
+    tagline: 'Brand visuals, ads creatives, and portfolio-ready design.',
+  },
+  {
+    slug: 'video-editing',
+    name: 'Video Editing',
+    category: 'Creative',
+    tagline: 'Short-form & long-form edits for ads, Reels, and YouTube.',
+  },
+  {
+    slug: 'web-frontend',
+    name: 'Frontend Web Development',
+    category: 'Development',
+    tagline: 'Modern UI with HTML, CSS, JavaScript / React fundamentals.',
+  },
+  {
+    slug: 'web-backend',
+    name: 'Backend Web Development',
+    category: 'Development',
+    tagline: 'APIs, databases, and server logic for real products.',
+  },
+  {
+    slug: 'full-stack',
+    name: 'Full-Stack Web Development',
+    category: 'Development',
+    tagline: 'Ship complete web apps — frontend + backend together.',
+  },
+];
+
 export const coursesLanding = {
-  brand: 'Xpert PPC Digital Academy',
+  brand: 'Xpert PPC Study Portal',
   offer: {
-    liveLabel: 'Cohort offer',
-    badge: 'Limited cohort · All 3 tracks',
-    headline: 'Agency-taught SEM, Social Media & SEO — one application, current cohort pricing.',
-    strikePrice: 'Rs. 99,000',
-    offerPrice: 'Rs. 35,000',
-    priceNote: 'one-time access to SEM, Social Media & SEO tracks',
-    urgencyPrefix: 'Standard pricing returns to',
-    cta: 'View cohort pricing',
-    dismiss: 'Continue browsing',
+    liveLabel: 'Open for interviews',
+    badge: 'Start with a free discovery call',
+    headline:
+      'Book a short meeting. We learn your background and goals — then we map the right skills and pricing for you.',
+    cta: 'Book my interview call',
+    dismiss: 'Browse skills first',
   },
   marquee: [
-    'Current cohort: Rs. 99,000 → Rs. 35,000 — all 3 academy tracks',
-    'Taught by media buyers who manage real ad spend',
-    'Apply once — get accepted — start learning',
-    'SEM · Meta Ads · SEO in one academy',
-    'Support from the Xpert PPC team',
+    'Book a discovery call — we design your learning path with you',
+    'SEM · SEO · Social · Design · Video · Web development',
+    'Initial interview first — then skills & pricing',
+    'Agency mentors who work on real client projects',
+    'Study portal access after we agree your track',
   ],
   hero: {
-    eyebrow: 'Digital Academy',
-    title: 'Learn PPC the way agencies actually run it.',
+    eyebrow: 'Xpert PPC Study Portal',
+    title: 'Learn the skills that fit your background — not a one-size course.',
     subtitle:
-      'Three complete tracks — Google & Microsoft Ads, Social Media Marketing, and SEO — taught by people who scale real client accounts. Apply once. Learn after acceptance.',
-    primaryCta: 'Apply for academy access',
-    secondaryCta: 'Sign in',
-    trust: ['Agency curriculum', 'Acceptance-based portal', 'WhatsApp support'],
+      'First we meet you. On a short interview call we hear where you are, what you already know, and where you want to go. Then we recommend the right skills and a fair plan to get there.',
+    primaryCta: 'Book a discovery meeting',
+    secondaryCta: 'Sign in to portal',
+    trust: ['Interview-first onboarding', 'Custom skill path', 'Pricing after we meet'],
   },
   stats: [
-    { value: '$4.5M+', label: 'Ad spend managed' },
-    { value: '3', label: 'Complete tracks' },
-    { value: '7+', label: 'Years in the trenches' },
-    { value: '100+', label: 'Client campaigns' },
+    { value: '8+', label: 'Skills available' },
+    { value: '1:1', label: 'Discovery call' },
+    { value: '7+', label: 'Years mentoring' },
+    { value: '$4.5M+', label: 'Ads managed by team' },
   ],
   testimonials: [
     {
       quote:
-        'Finally a course that shows how agencies actually structure Google Ads accounts — not just theory.',
+        'They didn’t push a package — the call helped me pick SEM first, then social later.',
       name: 'Ahmed R.',
       role: 'Freelance media buyer',
     },
     {
       quote:
-        'The SEM track alone paid for itself when I landed my first client after finishing the modules.',
+        'I came from a non-tech background. The interview made the path feel realistic.',
       name: 'Sara K.',
       role: 'Career switcher',
     },
     {
       quote:
-        'Clear lessons, real campaign examples, and someone who answers when you get stuck.',
+        'Clear lessons and someone who actually runs campaigns, not only teaching slides.',
       name: 'Bilal M.',
       role: 'Agency junior',
     },
     {
       quote:
-        'Social + SEM together made it easy to offer full-funnel ads instead of just one platform.',
+        'Started with design + social. Pricing and scope only after they understood my goals.',
       name: 'Hina T.',
-      role: 'Ecommerce marketer',
+      role: 'Creator marketer',
     },
   ],
   benefits: [
     {
-      title: 'Real campaign playbooks',
-      description: 'Learn structures we use on live client accounts — not outdated slide decks.',
+      title: 'Interview before you pay',
+      description:
+        'We learn your background and skillset first — then decide what you actually need.',
     },
     {
-      title: 'All 3 tracks, one apply',
-      description: 'SEM, Social Media Marketing, and SEO under one academy membership.',
+      title: 'Wide skill catalog',
+      description:
+        'Marketing, creative, and web development tracks — matched to your goals.',
     },
     {
-      title: 'Mentor-style feedback',
-      description: 'Ask questions when you are stuck — the same team that runs ads for brands.',
+      title: 'Custom pricing',
+      description:
+        'No flash price list. After the call we propose what to learn and what it costs.',
     },
     {
-      title: 'Freelancer-ready skills',
-      description: 'Build portfolio work you can sell on Upwork, to local clients, or in-house.',
+      title: 'Mentor feedback',
+      description: 'Guidance from people who ship real client and product work.',
     },
     {
-      title: 'Lifetime portal access',
-      description: 'Once accepted, keep lessons, videos, and updates in your student dashboard.',
+      title: 'Study portal access',
+      description: 'Once your path is set, learn in the portal at your pace.',
     },
     {
-      title: 'Learn on your schedule',
-      description: 'Self-paced modules with clear outcomes — laptop and internet required.',
+      title: 'Career or freelance ready',
+      description: 'Build skills you can sell, use in a job, or apply to your own brand.',
     },
   ],
   outcomes: [
     {
       title: 'Freelancing',
-      description:
-        'Sell Google Ads, Meta Ads, or SEO services and get paid for results — not guesswork.',
+      description: 'Offer services clients pay for — ads, design, video, or web.',
     },
     {
       title: 'Career',
-      description:
-        'Walk into media buyer / growth roles with a real skill stack and campaign language.',
+      description: 'Walk into interviews with a clear skill stack and portfolio language.',
     },
     {
-      title: 'Your own brand',
-      description:
-        'Run profitable ads for your store or local business without outsourcing every click.',
+      title: 'Your own projects',
+      description: 'Build and market your own products, stores, or local business.',
     },
   ],
   proof: [
     {
-      value: '$400K/mo',
-      title: 'Scaled ad accounts',
-      description: 'Profitable spend scaled within months on competitive niches.',
+      value: 'Call-first',
+      title: 'Human onboarding',
+      description: 'Every learner starts with a real conversation — not a checkout page.',
     },
     {
       value: '$4.5M+',
       title: 'Ad spend managed',
-      description: 'Hands-on experience across Google, Meta, and more for real brands.',
+      description: 'Marketing tracks taught from live campaign experience.',
     },
     {
-      value: 'Global',
-      title: 'Trusted by brands',
-      description: 'Campaign work with international funnels and high-intent lead gen.',
+      value: 'Multi-skill',
+      title: 'One portal',
+      description: 'Marketing, creative, and development under one study system.',
     },
     {
       value: '7+ yrs',
-      title: 'In the trenches',
-      description: 'Taught from live accounts — not textbook theory alone.',
+      title: 'In the field',
+      description: 'Mentors who work on real briefs, not theory alone.',
     },
   ],
-  comparison: {
-    badTitle: 'Buying skills separately',
-    badPrice: 'Rs. 99,000+ and rising',
-    badPoints: [
-      'Pay full price for every single course',
-      'Random YouTube tips with no feedback',
-      'No one to ask when a campaign fails',
-      'Outdated tactics that waste budget',
-      'Hard to package skills for clients',
-    ],
-    goodTitle: 'Xpert PPC Digital Academy',
-    goodPrice: 'Rs. 35,000 — current cohort',
-    goodPoints: [
-      'One apply unlocks SEM + Social + SEO',
-      'Curriculum from active media buyers',
-      'Acceptance-based cohort with support',
-      'Portal lessons, videos, and assignments',
-      'Skills you can sell or use in-house',
-    ],
-  },
   howItWorks: [
     {
       step: 1,
       time: '~2 min',
-      title: 'Create your account',
-      description: 'Apply with name, email, password, country, and what you want to learn.',
+      title: 'Book a discovery meeting',
+      description: 'Share your name, contact, background, and which skills interest you.',
     },
     {
       step: 2,
-      time: 'Review',
-      title: 'We review your application',
-      description: 'Our team checks your application and emails you if you are accepted.',
+      time: 'Call',
+      title: 'Initial interview',
+      description:
+        'We talk through your experience, goals, and current skillset — honest and practical.',
     },
     {
       step: 3,
-      time: 'Instant',
-      title: 'Sign in to the portal',
-      description: 'Use the password you set — open your dashboard and pick a track.',
+      time: 'Plan',
+      title: 'Skills & pricing decided',
+      description:
+        'We recommend what you should learn, in what order, and what the investment will be.',
     },
     {
       step: 4,
       time: 'Learn',
-      title: 'Start the lessons',
-      description: 'Watch modules, complete assignments, and build real campaign skills.',
+      title: 'Access the study portal',
+      description: 'Start your path in the portal with lessons, tasks, and mentor support.',
     },
   ],
-  pricing: {
-    eyebrow: 'Everything in one membership',
-    title: 'All 3 academy tracks — current cohort price',
-    strikePrice: 'Rs. 99,000',
-    offerPrice: 'Rs. 35,000',
-    bullets: [
-      'Complete SEM (Google & Microsoft Ads)',
-      'Social Media Marketing track',
-      'Complete SEO track',
-      'Student portal with videos & assignments',
-      'Apply once — learn after acceptance',
-    ],
-    cta: 'Apply now — Rs. 35,000 cohort',
-    finePrint: 'Price shown for the current cohort. Acceptance required before portal access.',
+  meeting: {
+    eyebrow: 'Start here',
+    title: 'Book your discovery meeting',
+    subtitle:
+      'This is not a sales checkout. Tell us a bit about yourself — we will schedule a short interview call, then decide skills and pricing together.',
+    cta: 'Request my interview call',
+    finePrint: 'We usually reply within one business day to confirm a meeting time.',
   },
   faq: [
     {
-      q: 'What is Xpert PPC Digital Academy?',
-      a: 'It is the training arm of Xpert PPC — agency-taught courses in SEM, Social Media Marketing, and SEO, delivered through an apply → accept → learn portal.',
+      q: 'Do I pay before the call?',
+      a: 'No. First we meet. After the interview we decide which skills fit you and what the plan costs.',
     },
     {
-      q: 'Do I get all courses with one application?',
-      a: 'Yes. The current offer is built around academy access to all three tracks. After acceptance you enroll into the lessons in your dashboard.',
+      q: 'What skills can I learn?',
+      a: 'Search engine marketing, SEO, social media marketing, graphic design, video editing, frontend, backend, and full-stack web development — plus combinations based on your goals.',
     },
     {
-      q: 'I am a beginner. Is this for me?',
-      a: 'Yes. Each track starts from fundamentals and builds to advanced campaign work. You need a laptop, stable internet, and willingness to practice.',
+      q: 'I am a complete beginner. Is that okay?',
+      a: 'Yes. The interview helps us place you correctly — beginners and career switchers are welcome.',
     },
     {
-      q: 'How does signup work?',
-      a: 'Click Apply, submit your details, wait for our email if accepted, then sign in with the password you created and start learning.',
+      q: 'How long is the discovery call?',
+      a: 'Usually a short interview — enough to understand your background and recommend a clear next step.',
     },
     {
-      q: 'Is there a payment checkout on the site?',
-      a: 'Applications are reviewed by our team. Cohort pricing and payment details are confirmed during / after acceptance — not a self-serve card checkout.',
+      q: 'When do I get portal access?',
+      a: 'After we agree your learning path and plan. Then you can sign in and start.',
     },
     {
-      q: 'Can I talk to someone first?',
-      a: 'Yes. Use WhatsApp from the site contact links if you want to ask about the cohort before applying.',
+      q: 'Can I talk on WhatsApp instead?',
+      a: 'Yes. You can also message us on WhatsApp — but the form helps us prepare for your interview.',
     },
   ],
   finalCta: {
-    title: 'Six months from now, you will wish you started today',
-    body: 'Agency skills compound. Apply for the current cohort, get accepted, and start building campaigns that clients actually pay for.',
-    cta: 'Start your application',
+    title: 'Your next skill path starts with a conversation',
+    body: 'Book a discovery meeting. We listen first — then we build the right study plan with you.',
+    cta: 'Book a discovery meeting',
   },
 } as const;

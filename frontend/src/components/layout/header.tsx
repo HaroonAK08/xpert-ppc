@@ -176,8 +176,8 @@ export function Header() {
         className={cn(
           'fixed top-0 z-50 w-full border-b transition-all duration-300',
           scrolled
-            ? 'border-white/10 bg-[#070d18]/90 shadow-lg shadow-black/20 backdrop-blur-xl'
-            : 'border-transparent bg-[#070d18]/70 backdrop-blur-md'
+            ? 'border-slate-200/90 bg-white/90 shadow-sm shadow-slate-200/50 backdrop-blur-xl'
+            : 'border-transparent bg-white/75 backdrop-blur-md'
         )}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -188,18 +188,18 @@ export function Header() {
                 alt=""
                 width={36}
                 height={36}
-                className="h-9 w-9 rounded-full object-cover ring-1 ring-sky-400/40"
+                className="h-9 w-9 rounded-full object-cover ring-1 ring-[#1d6ff2]/30"
               />
               <span className="leading-tight">
-                <span className="block text-lg font-extrabold tracking-tight text-white sm:text-xl">
-                  XPERT<span className="text-sky-300">PPC</span>
+                <span className="block text-lg font-extrabold tracking-tight text-slate-900 sm:text-xl">
+                  XPERT<span className="text-[#1d6ff2]">PPC</span>
                 </span>
                 <span className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:block">
-                  Digital Academy
+                  Study Portal
                 </span>
               </span>
             </Link>
-            <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Courses">
+            <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Study portal">
               {coursesNav.map((item) => (
                 <Link
                   key={item.href}
@@ -208,8 +208,8 @@ export function Header() {
                   className={cn(
                     'rounded-lg px-3 py-2 text-[13px] font-semibold transition-colors',
                     isActive(pathname, item.href)
-                      ? 'bg-white/10 text-white'
-                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                      ? 'bg-[#1d6ff2]/10 text-[#1558c7]'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   )}
                 >
                   {item.label}
@@ -219,28 +219,28 @@ export function Header() {
             <div className="hidden items-center gap-3 lg:flex">
               <a
                 href={COM_ORIGIN}
-                className="text-xs font-semibold text-slate-500 transition-colors hover:text-sky-300"
+                className="text-xs font-semibold text-slate-500 transition-colors hover:text-[#1d6ff2]"
               >
                 Agency
               </a>
               <Link
-                href={to('/courses/signup')}
+                href={to('/courses#meeting')}
                 className="academy-cta inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-extrabold transition"
               >
-                Apply
+                Book a call
               </Link>
             </div>
             <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
               <Link
-                href={to('/courses/signup')}
+                href={to('/courses#meeting')}
                 className="academy-cta inline-flex h-9 items-center justify-center rounded-full px-3.5 text-xs font-extrabold"
               >
-                Apply
+                Book call
               </Link>
               <button
                 type="button"
                 onClick={() => setMobileOpen((v) => !v)}
-                className="rounded-lg p-2 text-slate-200 transition-colors hover:bg-white/5 hover:text-white"
+                className="rounded-lg p-2 text-slate-700 transition-colors hover:bg-slate-100"
                 aria-label="Toggle navigation menu"
                 aria-expanded={mobileOpen}
               >
@@ -250,8 +250,8 @@ export function Header() {
           </div>
         </div>
         {mobileOpen ? (
-          <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-white/10 bg-[#070d18]/98 backdrop-blur-xl lg:hidden">
-            <nav className="container mx-auto flex flex-col px-4 py-3" aria-label="Courses mobile">
+          <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-slate-200 bg-white lg:hidden">
+            <nav className="container mx-auto flex flex-col px-4 py-3" aria-label="Study portal mobile">
               {coursesNav.map((item) => (
                 <Link
                   key={item.href}
@@ -259,8 +259,8 @@ export function Header() {
                   className={cn(
                     'rounded-lg px-3 py-3 text-sm font-semibold transition-colors',
                     isActive(pathname, item.href)
-                      ? 'bg-white/10 text-white'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                      ? 'bg-[#1d6ff2]/10 text-[#1558c7]'
+                      : 'text-slate-700 hover:bg-slate-50'
                   )}
                 >
                   {item.label}
@@ -268,7 +268,7 @@ export function Header() {
               ))}
               <a
                 href={COM_ORIGIN}
-                className="mt-2 rounded-lg px-3 py-3 text-sm font-semibold text-slate-500 hover:text-sky-300"
+                className="mt-2 rounded-lg px-3 py-3 text-sm font-semibold text-slate-500 hover:text-[#1d6ff2]"
               >
                 Agency site → xpertppc.com
               </a>
