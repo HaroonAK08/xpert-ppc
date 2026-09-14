@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import {
+  CoursesLandingChrome,
   LandingBenefits,
   LandingCourseGrid,
   LandingFaq,
@@ -11,8 +12,6 @@ import {
   LandingOutcomes,
   LandingProof,
   LandingTestimonials,
-  OfferMarquee,
-  OfferModal,
 } from '@/components/courses/landing';
 import { buildMetadata } from '@/lib/seo';
 
@@ -36,8 +35,7 @@ export const metadata: Metadata = buildMetadata({
 export default function CoursesLandingPage() {
   return (
     <div className="academy-shell">
-      <OfferMarquee />
-      <OfferModal />
+      <CoursesLandingChrome />
       <LandingHero />
       <LandingHowItWorks />
       <LandingCourseGrid />

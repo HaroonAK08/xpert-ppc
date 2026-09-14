@@ -1,5 +1,3 @@
-export { OfferMarquee } from './offer-marquee';
-export { OfferModal } from './offer-modal';
 export { LandingHero } from './hero';
 export { LandingTestimonials } from './testimonials';
 export { LandingBenefits } from './benefits';
@@ -10,3 +8,4 @@ export { LandingHowItWorks } from './how-it-works';
 export { LandingMeeting } from './meeting';
 export { LandingFaq } from './faq';
 export { LandingFinalCta } from './final-cta';
+export { CoursesLandingChrome } from './chrome';
