@@ -1,7 +1,7 @@
-# Xpert PPC — Website
+# Xpert PPC — Website + Lead CRM
 
-A custom MERN rebuild of [xpertppc.com](https://xpertppc.com), replacing the
-client-rendered Vite SPA with a server-rendered Next.js frontend and a dedicated
+A custom MERN rebuild of [xpertppc.com](https://xpertppc.com), plus an internal
+**XpertPPC Lead Management** mobile app (Expo) that works against the same
 Express + MongoDB backend.
 
 The design, copy, and page structure are a 1:1 match with the production site.
@@ -15,26 +15,52 @@ SPA could not give a crawler.
 
 ```
 website-xpertppc/
-├── frontend/          Next.js 15 (App Router) — the public site + admin UI
-│   ├── src/app/       Routes, one folder per URL
-│   ├── src/components/
-│   ├── src/lib/       API client, SEO builders, utils
-│   └── public/        Favicons, logo, OG image
-│
-├── backend/           Express 4 + Mongoose — REST API
-│   ├── src/models/    Mongoose schemas
-│   ├── src/routes/    leads, auth, content
-│   ├── src/middleware/
-│   └── src/seed/      Populates MongoDB from shared/content
-│
-└── shared/            Imported by BOTH apps — single source of truth
-    ├── content/       All page copy as typed data
-    └── site.ts        Company details, phone numbers, socials
+├── frontend/          Next.js 15 — public site + admin UI
+├── backend/           Express + Mongoose — website API + CRM /api/v1
+├── apps/mobile/       Expo Router — internal Lead CRM
+├── shared/            Content + CRM constants/types
+├── docs/              Architecture, API, Google Sheets, development
+└── docker-compose.yml MongoDB (+ optional backend container)
 ```
 
-**Why `shared/`:** the frontend renders page copy at build time (static HTML is
-what makes the site fast and indexable), and the backend seeds the same copy
-into MongoDB. Keeping one copy of the data means the two can never drift.
+**Why `shared/`:** the frontend renders page copy at build time, the backend
+seeds the same copy into MongoDB, and the CRM mobile app shares lead status
+enums / normalization helpers.
+
+---
+
+## Lead CRM (mobile)
+
+Internal tool for the XpertPPC team:
+
+- Login with existing admin accounts (JWT in SecureStore)
+- Dashboard stats, follow-ups, recent leads
+- Search / filter / paginated lead list
+- Call · WhatsApp · Email (explicit Mark contacted / Mark replied)
+- Notes, statuses, follow-ups, activity history
+- Google Sheets connect + two-way sync (credentials stay on backend)
+
+Docs:
+
+- [docs/implementation-plan.md](docs/implementation-plan.md)
+- [docs/architecture.md](docs/architecture.md)
+- [docs/api.md](docs/api.md)
+- [docs/google-sheets.md](docs/google-sheets.md)
+- [docs/development.md](docs/development.md)
+
+Quick start:
+
+```bash
+npm install
+cp backend/.env.example backend/.env   # MONGODB_URI, JWT_SECRET, SEED_ADMIN_*
+cp apps/mobile/.env.example apps/mobile/.env
+npm run seed
+npm run dev:backend                    # :5000
+npm run dev:mobile                     # Expo
+```
+
+Sign in with the seeded admin. On a physical device set
+`EXPO_PUBLIC_API_URL` to your machine LAN IP.
 
 ---
 
@@ -42,6 +68,7 @@ into MongoDB. Keeping one copy of the data means the two can never drift.
 
 - Node.js 20+
 - MongoDB 6+ (local, or a MongoDB Atlas connection string)
+- Expo Go (optional, for on-device mobile testing)
 
 ---
 
@@ -57,15 +84,22 @@ cp backend/.env.example backend/.env
 #      MONGODB_URI  — your database
 #      JWT_SECRET   — openssl rand -base64 48
 #      SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD — your first admin login
+#      GOOGLE_SERVICE_ACCOUNT_JSON — optional, for Sheets sync
 
 # 3. Frontend config
 cp frontend/.env.example frontend/.env.local
 
-# 4. Load content + create the admin user
+# 4. Mobile config
+cp apps/mobile/.env.example apps/mobile/.env
+
+# 5. Load content + create the admin user + CRM demo leads
 npm run seed
 
-# 5. Run both apps
+# 6. Run website stack
 npm run dev
+
+# 7. Run mobile CRM (separate terminal)
+npm run dev:mobile
 ```
 
 | App      | URL                     |
@@ -73,6 +107,7 @@ npm run dev
 | Frontend | http://localhost:3000   |
 | Backend  | http://localhost:5000   |
 | Admin    | http://localhost:3000/admin |
+| Mobile   | Expo Dev Tools          |
 
 ---
 
@@ -83,10 +118,12 @@ Run from the repo root:
 | Command             | Does                                              |
 | ------------------- | ------------------------------------------------- |
 | `npm run dev`       | Runs backend + frontend together                  |
+| `npm run dev:mobile`| Starts Expo CRM app                               |
 | `npm run build`     | Compiles backend, then builds the frontend        |
 | `npm start`         | Runs both in production mode                      |
-| `npm run seed`      | Loads `shared/content` into MongoDB (re-runnable) |
-| `npm run typecheck` | Typechecks both workspaces                        |
+| `npm run seed`      | Loads `shared/content` + CRM demo leads           |
+| `npm run test:backend` | Backend unit + API tests                       |
+| `npm run typecheck` | Typechecks backend, frontend, and mobile          |
 
 Each workspace also runs on its own — `cd backend && npm run dev`.
 
@@ -127,13 +164,26 @@ Base URL: `http://localhost:5000`
 | `PATCH`  | `/api/leads/:id`  | Update `status` / `notes`                      |
 | `DELETE` | `/api/leads/:id`  | Delete a lead                                  |
 
+### CRM mobile (`/api/v1`, Bearer JWT)
+
+| Method | Endpoint | Purpose |
+| ------ | -------- | ------- |
+| `GET` | `/api/v1/dashboard` | Stats + follow-ups + recent |
+| `GET/POST/PATCH/DELETE` | `/api/v1/leads…` | Full CRM lead workflows |
+| `*` | `/api/v1/integrations/google-sheets…` | Connect / sync / disconnect |
+
+Full CRM contract: [docs/api.md](docs/api.md).
+
 ---
 
 ## Data model
 
 | Collection     | Holds                                              |
 | -------------- | -------------------------------------------------- |
-| `leads`        | Form submissions, status pipeline, UTM attribution |
+| `leads`        | Website + CRM leads (status, replied, follow-ups, sheet sync) |
+| `leadnotes`    | Structured CRM notes                               |
+| `leadactivities` | Lightweight audit trail                          |
+| `googlesheetconnections` | Sheet connection + mapping + sync report   |
 | `adminusers`   | Admin logins (scrypt password hashes)              |
 | `services`     | Six ad-platform service pages                      |
 | `faqs`         | 20 Q&As across 7 categories                        |
@@ -176,6 +226,8 @@ URLs, the sitemap, and OG tags are all derived from it.
 
 - Passwords hashed with `scrypt` and compared in constant time
 - Sessions in signed, httpOnly JWT cookies (`SameSite=None; Secure` in production)
+- Mobile JWT stored in Expo SecureStore (not plain AsyncStorage)
+- Google service-account credentials never leave the backend
 - CORS restricted to an explicit origin allowlist, credentials enabled
 - `helmet` security headers on the API, plus CSP-adjacent headers from Next
 - Rate limits on lead submission and login
@@ -193,6 +245,8 @@ Set `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_API_URL`, then `npm run build`.
 **Backend** — Render, Railway, Fly.io, or a VPS behind Nginx.
 Set every variable in `backend/.env.example`. Build with
 `npm run build:backend`, start with `npm run start:backend`.
+
+**Mobile** — Expo EAS Build for internal APK/IPA distribution.
 
 Two things to get right in production:
 

@@ -33,6 +33,8 @@ export const env = {
   siteUrl: (process.env.PUBLIC_SITE_URL || 'https://xpertppc.com').replace(/\/$/, ''),
   /** Courses / Digital Academy origin (student + application links). */
   coursesSiteUrl: (process.env.COURSES_SITE_URL || 'https://xpertppc.net').replace(/\/$/, ''),
+  /** Service-account JSON (raw or base64). Never ship this to the mobile app. */
+  googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '',
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT ?? 587),

@@ -25,6 +25,12 @@ export const LEAD_SOURCES = [
 export const LEAD_STATUSES = [
   'new',
   'contacted',
+  'replied',
+  'interested',
+  'follow_up',
+  'converted',
+  'not_interested',
+  'closed',
   'qualified',
   'won',
   'lost',

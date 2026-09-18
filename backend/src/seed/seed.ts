@@ -24,6 +24,7 @@ import { Testimonial } from '../models/Testimonial';
 import { AdminUser } from '../models/AdminUser';
 import { Student } from '../models/Student';
 import { hashPassword } from '../utils/password';
+import { seedCrmDemoLeads } from './crmLeads';
 
 const upsert = { upsert: true, setDefaultsOnInsert: true };
 
@@ -294,6 +295,10 @@ async function main() {
       '• skipped student user (set SEED_STUDENT_EMAIL and SEED_STUDENT_PASSWORD to create one)'
     );
   }
+
+  /* --------------------------- CRM demo leads -------------------------- */
+  const crmCreated = await seedCrmDemoLeads();
+  console.log(`✓ CRM demo leads upserted (${crmCreated} created this run)`);
 
   await mongoose.disconnect();
   console.log('\nDone.');

@@ -16,6 +16,7 @@ import contentRouter from './routes/content';
 import studentAuthRouter from './routes/studentAuth';
 import studentPortalRouter from './routes/studentPortal';
 import adminPortalRouter from './routes/adminPortal';
+import crmV1Router from './routes/crmV1';
 
 export function createApp() {
   const app = express();
@@ -63,6 +64,7 @@ export function createApp() {
   app.use('/api/student/auth', studentAuthRouter);
   app.use('/api/student/courses', studentPortalRouter);
   app.use('/api/admin/portal', adminPortalRouter);
+  app.use('/api/v1', crmV1Router);
 
   app.use(notFound);
   app.use(errorHandler);

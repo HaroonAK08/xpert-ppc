@@ -36,6 +36,20 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+/** CRM routes only — set CRM_AUTH_DISABLED=true to skip login while developing. */
+export function requireCrmAuth(req: Request, res: Response, next: NextFunction) {
+  if (process.env.CRM_AUTH_DISABLED === 'true') {
+    req.admin = {
+      sub: '000000000000000000000001',
+      email: process.env.SEED_ADMIN_EMAIL || 'dev@local',
+      name: process.env.SEED_ADMIN_NAME || 'Dev User',
+      role: 'admin',
+    };
+    return next();
+  }
+  return requireAuth(req, res, next);
+}
+
 export function requireRole(...roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.admin || !roles.includes(req.admin.role)) {

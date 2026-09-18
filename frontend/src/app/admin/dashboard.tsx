@@ -9,11 +9,30 @@ import { Select } from '@/components/ui/input';
 import { api, type AdminUser, type Lead, type LeadsResponse } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
-const STATUSES = ['new', 'contacted', 'qualified', 'won', 'lost', 'spam'] as const;
+const STATUSES = [
+  'new',
+  'contacted',
+  'replied',
+  'interested',
+  'follow_up',
+  'converted',
+  'not_interested',
+  'closed',
+  'qualified',
+  'won',
+  'lost',
+  'spam',
+] as const;
 
 const statusStyles: Record<string, string> = {
   new: 'bg-primary/15 text-primary',
   contacted: 'bg-accent/15 text-accent',
+  replied: 'bg-success/15 text-success',
+  interested: 'bg-success/20 text-success',
+  follow_up: 'bg-accent/20 text-accent',
+  converted: 'bg-success/25 text-success',
+  not_interested: 'bg-muted text-muted-foreground',
+  closed: 'bg-muted text-muted-foreground',
   qualified: 'bg-success/15 text-success',
   won: 'bg-success/25 text-success',
   lost: 'bg-destructive/15 text-destructive',

@@ -1,0 +1,26 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - xpertppc_mongo_data:/data/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/xpertppc
+      PORT: 5000
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongo
+
+volumes:
+  xpertppc_mongo_data:

@@ -28,3 +28,12 @@ next-env.d.ts
 
 # course portal uploads
 backend/uploads/
+
+# expo
+apps/mobile/.expo/
+apps/mobile/dist/
+*.jks
+*.p8
+*.p12
+*.mobileprovision
+
