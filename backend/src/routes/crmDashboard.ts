@@ -12,14 +12,21 @@ const router = Router();
 
 router.use(requireAuth);
 
+/** Admins see stats across every lead; everyone else only sees their own. */
+function ownerFilter(admin?: { sub: string; role: string }): Record<string, unknown> {
+  if (!admin || admin.role === 'admin') return {};
+  return { ownerUserId: admin.sub };
+}
+
 router.get(
   '/',
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
     const endOfToday = new Date();
     endOfToday.setHours(23, 59, 59, 999);
     const now = new Date();
+    const scope = ownerFilter(req.admin);
 
     const [
       total,
@@ -31,8 +38,9 @@ router.get(
       recentActivity,
       sheet,
     ] = await Promise.all([
-      Lead.countDocuments(),
+      Lead.countDocuments(scope),
       Lead.aggregate<{ _id: string; n: number }>([
+        { $match: scope },
         {
           $group: {
             _id: {
@@ -50,15 +58,23 @@ router.get(
           },
         },
       ]),
-      Lead.countDocuments({ replied: true }),
-      Lead.countDocuments({ followUpAt: { $ne: null, $lte: now } }),
-      Lead.find({ followUpAt: { $gte: startOfToday, $lte: endOfToday } })
+      Lead.countDocuments({ ...scope, replied: true }),
+      Lead.countDocuments({ ...scope, followUpAt: { $ne: null, $lte: now } }),
+      Lead.find({ ...scope, followUpAt: { $gte: startOfToday, $lte: endOfToday } })
         .sort({ followUpAt: 1 })
         .limit(10)
         .lean(),
-      Lead.find().sort({ createdAt: -1 }).limit(8).lean(),
-      LeadActivity.find().sort({ createdAt: -1 }).limit(12).lean(),
-      GoogleSheetConnection.findOne({ connected: true }).sort({ updatedAt: -1 }).lean(),
+      Lead.find(scope).sort({ createdAt: -1 }).limit(8).lean(),
+      LeadActivity.find(
+        req.admin?.role === 'admin' ? {} : { user: req.admin?.sub }
+      )
+        .sort({ createdAt: -1 })
+        .limit(12)
+        .lean(),
+      GoogleSheetConnection.findOne({
+        ownerUserId: req.admin?.sub ?? null,
+        connected: true,
+      }).lean(),
     ]);
 
     const byStatus: Record<string, number> = {};

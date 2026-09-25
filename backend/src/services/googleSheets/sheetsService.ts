@@ -32,6 +32,18 @@ export function isGoogleConfigured(): boolean {
   return Boolean(env.googleServiceAccountJson);
 }
 
+/**
+ * Accepts either a raw spreadsheet ID or a full Google Sheets URL (people
+ * paste the share link far more often than the bare ID) and returns just
+ * the ID. A URL sent as-is to the Sheets API fails with a misleading
+ * "Requested entity was not found" rather than an obviously-bad-input error.
+ */
+export function extractSpreadsheetId(input: string): string {
+  const trimmed = input.trim();
+  const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  return match ? match[1] : trimmed;
+}
+
 export async function getSheetsClient(): Promise<sheets_v4.Sheets> {
   const credentials = parseServiceAccount();
   if (!credentials) {
@@ -258,26 +270,38 @@ async function findExistingLead(fields: {
   email: string;
   phoneNormalized: string;
   sheetRowNumber: number;
-  spreadsheetScoped?: boolean;
+  connectionId: string;
 }) {
+  // Scoped to this sheet's connection so leads from different users/sheets
+  // never match each other and get cross-contaminated.
   if (fields.externalId) {
-    const byExt = await Lead.findOne({ externalId: fields.externalId });
+    const byExt = await Lead.findOne({
+      externalId: fields.externalId,
+      sheetConnectionId: fields.connectionId,
+    });
     if (byExt) return byExt;
   }
 
   const byRow = await Lead.findOne({
     sheetRowNumber: fields.sheetRowNumber,
+    sheetConnectionId: fields.connectionId,
     source: 'google-sheets',
   });
   if (byRow) return byRow;
 
   if (fields.phoneNormalized) {
-    const byPhone = await Lead.findOne({ phoneNormalized: fields.phoneNormalized });
+    const byPhone = await Lead.findOne({
+      phoneNormalized: fields.phoneNormalized,
+      sheetConnectionId: fields.connectionId,
+    });
     if (byPhone) return byPhone;
   }
 
   if (fields.email && !fields.email.endsWith('@unknown.local')) {
-    const byEmail = await Lead.findOne({ email: fields.email });
+    const byEmail = await Lead.findOne({
+      email: fields.email,
+      sheetConnectionId: fields.connectionId,
+    });
     if (byEmail) return byEmail;
   }
 
@@ -349,6 +373,7 @@ export async function runTwoWaySync(connectionId: string, userId?: string): Prom
           email: fields.email,
           phoneNormalized: fields.phoneNormalized,
           sheetRowNumber: rowNumber,
+          connectionId: String(connection._id),
         });
 
         if (existing) {
@@ -402,6 +427,8 @@ export async function runTwoWaySync(connectionId: string, userId?: string): Prom
           existing.sheetRowNumber = rowNumber;
           existing.sheetChecksum = sheetCheck;
           existing.lastSyncedAt = new Date();
+          existing.sheetConnectionId = connection._id;
+          existing.ownerUserId = connection.ownerUserId ?? null;
           await existing.save();
           report.updated += 1;
           await recordLeadActivity({
@@ -417,6 +444,8 @@ export async function runTwoWaySync(connectionId: string, userId?: string): Prom
             sheetChecksum: sheetCheck,
             lastSyncedAt: new Date(),
             source: fields.source || 'google-sheets',
+            sheetConnectionId: connection._id,
+            ownerUserId: connection.ownerUserId ?? null,
           });
           report.created += 1;
           await recordLeadActivity({
@@ -435,10 +464,13 @@ export async function runTwoWaySync(connectionId: string, userId?: string): Prom
       }
     }
 
-    // Push local dirty leads that have a sheet row
+    // Push local dirty leads that have a sheet row — scoped to this connection
+    // only, so a dirty lead from one user's sheet never gets written into
+    // another user's spreadsheet.
     const dirtyLeads = await Lead.find({
       localDirtyAt: { $ne: null },
       sheetRowNumber: { $ne: null },
+      sheetConnectionId: connection._id,
     }).limit(500);
 
     for (const lead of dirtyLeads) {

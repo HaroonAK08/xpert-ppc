@@ -68,3 +68,15 @@ export const sheetMappingSchema = z.object({
   columnMapping: z.object(mappingShape).optional(),
   spreadsheetTitle: z.string().trim().max(300).optional(),
 });
+
+export const userCreateSchema = z.object({
+  email: z.string().trim().toLowerCase().email().max(200),
+  name: z.string().trim().min(1).max(120),
+  password: z.string().min(8).max(200),
+});
+
+export const userUpdateSchema = z.object({
+  name: z.string().trim().min(1).max(120).optional(),
+  active: z.boolean().optional(),
+  password: z.string().min(8).max(200).optional(),
+});

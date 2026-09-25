@@ -6,6 +6,7 @@ import { ApiError, asyncHandler } from '../middleware/error';
 import { ok, serializeSheetConnection } from '../utils/crmSerialize';
 import { sheetConnectSchema, sheetMappingSchema } from '../validation/crm';
 import {
+  extractSpreadsheetId,
   fetchSheetHeaders,
   isGoogleConfigured,
   runTwoWaySync,
@@ -18,10 +19,11 @@ router.use(requireAuth);
 
 router.get(
   '/',
-  asyncHandler(async (_req, res) => {
-    const connection = await GoogleSheetConnection.findOne({ connected: true })
-      .sort({ updatedAt: -1 })
-      .lean();
+  asyncHandler(async (req, res) => {
+    const connection = await GoogleSheetConnection.findOne({
+      ownerUserId: req.admin?.sub,
+      connected: true,
+    }).lean();
 
     res.json(
       ok({
@@ -34,10 +36,11 @@ router.get(
 
 router.get(
   '/status',
-  asyncHandler(async (_req, res) => {
-    const connection = await GoogleSheetConnection.findOne({ connected: true })
-      .sort({ updatedAt: -1 })
-      .lean();
+  asyncHandler(async (req, res) => {
+    const connection = await GoogleSheetConnection.findOne({
+      ownerUserId: req.admin?.sub,
+      connected: true,
+    }).lean();
 
     res.json(
       ok({
@@ -71,7 +74,8 @@ router.post(
       throw new ApiError(400, parsed.error.issues[0]?.message ?? 'Invalid connection payload.');
     }
 
-    const { spreadsheetId, worksheetName, spreadsheetTitle, columnMapping } = parsed.data;
+    const { worksheetName, spreadsheetTitle, columnMapping } = parsed.data;
+    const spreadsheetId = extractSpreadsheetId(parsed.data.spreadsheetId);
 
     let headers: string[] = [];
     try {
@@ -90,17 +94,22 @@ router.post(
         ? columnMapping
         : suggestColumnMapping(headers);
 
-    await GoogleSheetConnection.updateMany({ connected: true }, { connected: false });
-
-    const connection = await GoogleSheetConnection.create({
-      spreadsheetId,
-      worksheetName,
-      spreadsheetTitle: spreadsheetTitle || spreadsheetId,
-      columnMapping: mapping,
-      connected: true,
-      createdBy: req.admin?.sub,
-      lastSyncState: 'idle',
-    });
+    // Each user has at most one sheet — replace theirs in place rather than
+    // disconnecting everyone else's (the old single-tenant behavior).
+    const connection = await GoogleSheetConnection.findOneAndUpdate(
+      { ownerUserId: req.admin?.sub },
+      {
+        spreadsheetId,
+        worksheetName,
+        spreadsheetTitle: spreadsheetTitle || spreadsheetId,
+        columnMapping: mapping,
+        connected: true,
+        createdBy: req.admin?.sub,
+        ownerUserId: req.admin?.sub,
+        lastSyncState: 'idle',
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
 
     res.status(201).json(
       ok({
@@ -118,8 +127,9 @@ router.patch(
     const parsed = sheetMappingSchema.safeParse(req.body);
     if (!parsed.success) throw new ApiError(400, 'Invalid mapping payload.');
 
-    const connection = await GoogleSheetConnection.findOne({ connected: true }).sort({
-      updatedAt: -1,
+    const connection = await GoogleSheetConnection.findOne({
+      ownerUserId: req.admin?.sub,
+      connected: true,
     });
     if (!connection) throw new ApiError(404, 'No Google Sheet connected.');
 
@@ -139,9 +149,10 @@ router.patch(
 
 router.get(
   '/headers',
-  asyncHandler(async (_req, res) => {
-    const connection = await GoogleSheetConnection.findOne({ connected: true }).sort({
-      updatedAt: -1,
+  asyncHandler(async (req, res) => {
+    const connection = await GoogleSheetConnection.findOne({
+      ownerUserId: req.admin?.sub,
+      connected: true,
     });
     if (!connection) throw new ApiError(404, 'No Google Sheet connected.');
 
@@ -159,8 +170,9 @@ router.get(
 router.post(
   '/sync',
   asyncHandler(async (req, res) => {
-    const connection = await GoogleSheetConnection.findOne({ connected: true }).sort({
-      updatedAt: -1,
+    const connection = await GoogleSheetConnection.findOne({
+      ownerUserId: req.admin?.sub,
+      connected: true,
     });
     if (!connection) throw new ApiError(404, 'No Google Sheet connected.');
 
@@ -184,8 +196,11 @@ router.post(
 
 router.delete(
   '/disconnect',
-  asyncHandler(async (_req, res) => {
-    await GoogleSheetConnection.updateMany({ connected: true }, { connected: false });
+  asyncHandler(async (req, res) => {
+    await GoogleSheetConnection.updateMany(
+      { ownerUserId: req.admin?.sub },
+      { connected: false }
+    );
     res.json(ok({ disconnected: true }));
   })
 );

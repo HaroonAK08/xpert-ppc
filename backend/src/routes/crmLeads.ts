@@ -104,11 +104,23 @@ function sortFromQuery(query: Record<string, unknown>): Record<string, 1 | -1> {
   }
 }
 
+/** Admins see every lead; everyone else only sees leads assigned to them. */
+function ownerFilter(admin?: { sub: string; role: string }): FilterQuery<LeadDoc> {
+  if (!admin || admin.role === 'admin') return {};
+  return { ownerUserId: admin.sub };
+}
+
+async function findOwnedLead(admin: { sub: string; role: string } | undefined, id: string) {
+  const lead = await Lead.findOne({ _id: id, ...ownerFilter(admin) } as FilterQuery<LeadDoc>);
+  if (!lead) throw new ApiError(404, 'Lead not found.');
+  return lead;
+}
+
 router.get(
   '/',
   asyncHandler(async (req, res) => {
     const { page, pageSize } = parsePage(req.query as Record<string, unknown>);
-    const filter = buildLeadFilter(req.query as Record<string, unknown>);
+    const filter = { ...buildLeadFilter(req.query as Record<string, unknown>), ...ownerFilter(req.admin) };
     const sort = sortFromQuery(req.query as Record<string, unknown>);
 
     const [items, total] = await Promise.all([
@@ -137,7 +149,7 @@ router.get(
 router.get(
   '/:id',
   asyncHandler(async (req, res) => {
-    const lead = await Lead.findById(req.params.id).lean();
+    const lead = await Lead.findOne({ _id: req.params.id, ...ownerFilter(req.admin) }).lean();
     if (!lead) throw new ApiError(404, 'Lead not found.');
 
     const [notes, activity] = await Promise.all([
@@ -182,6 +194,7 @@ router.post(
       followUpAt: data.followUpAt ? new Date(data.followUpAt) : null,
       externalId: data.externalId || '',
       localDirtyAt: new Date(),
+      ownerUserId: req.admin?.role === 'admin' ? null : req.admin?.sub,
     });
 
     await recordLeadActivity({
@@ -201,8 +214,7 @@ router.patch(
     const parsed = crmLeadUpdateSchema.safeParse(req.body);
     if (!parsed.success) throw new ApiError(400, 'Invalid payload.');
 
-    const lead = await Lead.findById(req.params.id);
-    if (!lead) throw new ApiError(404, 'Lead not found.');
+    const lead = await findOwnedLead(req.admin, req.params.id);
 
     const prevStatus = lead.status;
     const data = parsed.data;
@@ -262,7 +274,10 @@ router.patch(
 router.delete(
   '/:id',
   asyncHandler(async (req, res) => {
-    const deleted = await Lead.findByIdAndDelete(req.params.id);
+    const deleted = await Lead.findOneAndDelete({
+      _id: req.params.id,
+      ...ownerFilter(req.admin),
+    });
     if (!deleted) throw new ApiError(404, 'Lead not found.');
     res.json(ok({ id: req.params.id }));
   })
@@ -274,8 +289,7 @@ router.post(
     const parsed = contactActionSchema.safeParse(req.body ?? {});
     if (!parsed.success) throw new ApiError(400, 'Invalid payload.');
 
-    const lead = await Lead.findById(req.params.id);
-    if (!lead) throw new ApiError(404, 'Lead not found.');
+    const lead = await findOwnedLead(req.admin, req.params.id);
 
     lead.contactedAt = new Date();
     const nextStatus = parsed.data.status || (lead.status === 'new' ? 'contacted' : lead.status);
@@ -313,8 +327,7 @@ router.post(
     const parsed = replyActionSchema.safeParse(req.body ?? {});
     if (!parsed.success) throw new ApiError(400, 'Invalid payload.');
 
-    const lead = await Lead.findById(req.params.id);
-    if (!lead) throw new ApiError(404, 'Lead not found.');
+    const lead = await findOwnedLead(req.admin, req.params.id);
 
     lead.replied = true;
     lead.repliedAt = new Date();
@@ -355,8 +368,7 @@ router.post(
     const parsed = noteCreateSchema.safeParse(req.body);
     if (!parsed.success) throw new ApiError(400, 'Note text is required.');
 
-    const lead = await Lead.findById(req.params.id);
-    if (!lead) throw new ApiError(404, 'Lead not found.');
+    const lead = await findOwnedLead(req.admin, req.params.id);
 
     const note = await LeadNote.create({
       lead: lead._id,
@@ -387,6 +399,7 @@ router.post(
 router.get(
   '/:id/notes',
   asyncHandler(async (req, res) => {
+    await findOwnedLead(req.admin, req.params.id);
     const notes = await LeadNote.find({ lead: req.params.id }).sort({ createdAt: -1 }).lean();
     res.json(ok(notes.map(serializeNote)));
   })
@@ -398,8 +411,7 @@ router.post(
     const parsed = followUpSchema.safeParse(req.body);
     if (!parsed.success) throw new ApiError(400, 'Invalid follow-up payload.');
 
-    const lead = await Lead.findById(req.params.id);
-    if (!lead) throw new ApiError(404, 'Lead not found.');
+    const lead = await findOwnedLead(req.admin, req.params.id);
 
     const prev = lead.followUpAt;
     lead.followUpAt = parsed.data.followUpAt ? new Date(parsed.data.followUpAt) : null;
@@ -441,8 +453,7 @@ router.post(
 router.post(
   '/:id/follow-up/complete',
   asyncHandler(async (req, res) => {
-    const lead = await Lead.findById(req.params.id);
-    if (!lead) throw new ApiError(404, 'Lead not found.');
+    const lead = await findOwnedLead(req.admin, req.params.id);
 
     lead.followUpAt = null;
     lead.localDirtyAt = new Date();
@@ -463,6 +474,7 @@ router.post(
 router.get(
   '/:id/activity',
   asyncHandler(async (req, res) => {
+    await findOwnedLead(req.admin, req.params.id);
     const items = await LeadActivity.find({ lead: req.params.id })
       .sort({ createdAt: -1 })
       .limit(100)
@@ -474,8 +486,7 @@ router.get(
 router.post(
   '/:id/sync',
   asyncHandler(async (req, res) => {
-    const lead = await Lead.findById(req.params.id);
-    if (!lead) throw new ApiError(404, 'Lead not found.');
+    const lead = await findOwnedLead(req.admin, req.params.id);
     lead.localDirtyAt = new Date();
     await lead.save();
     await markLeadDirty(String(lead._id));

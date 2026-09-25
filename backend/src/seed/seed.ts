@@ -23,6 +23,8 @@ import { TeamMember } from '../models/TeamMember';
 import { Testimonial } from '../models/Testimonial';
 import { AdminUser } from '../models/AdminUser';
 import { Student } from '../models/Student';
+import { GoogleSheetConnection } from '../models/GoogleSheetConnection';
+import { Lead } from '../models/Lead';
 import { hashPassword } from '../utils/password';
 import { seedCrmDemoLeads } from './crmLeads';
 
@@ -266,6 +268,28 @@ async function main() {
         { upsert: true, setDefaultsOnInsert: true }
       );
       console.log(`✓ admin user ready: ${admin.email}`);
+    }
+
+    // One-time migration: before per-user Google Sheets existed, the single
+    // connected sheet and its synced leads had no owner. Attach them to the
+    // first seeded admin so their existing Settings/sync flow keeps working.
+    const primaryAdmin = await AdminUser.findOne({
+      email: admins[0].email.toLowerCase(),
+    });
+    if (primaryAdmin) {
+      const sheetResult = await GoogleSheetConnection.updateMany(
+        { ownerUserId: null },
+        { ownerUserId: primaryAdmin._id }
+      );
+      const leadResult = await Lead.updateMany(
+        { ownerUserId: null, sheetConnectionId: null, source: 'google-sheets' },
+        { ownerUserId: primaryAdmin._id }
+      );
+      if (sheetResult.modifiedCount || leadResult.modifiedCount) {
+        console.log(
+          `✓ migrated legacy sheet/leads to ${primaryAdmin.email} (${sheetResult.modifiedCount} sheet, ${leadResult.modifiedCount} leads)`
+        );
+      }
     }
   } else {
     console.log('• skipped admin user (set SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD to create one)');

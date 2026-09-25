@@ -75,10 +75,13 @@ router.get(
     const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
     const status = typeof req.query.status === 'string' ? req.query.status : undefined;
 
-    const filter =
-      status && LEAD_STATUSES.includes(status as (typeof LEAD_STATUSES)[number])
-        ? { status }
-        : {};
+    // This endpoint backs the "Website Leads" admin view — leads submitted
+    // directly through the site's own contact forms. Sheet-synced leads
+    // live in the CRM (/api/v1/leads) and each client's own section instead.
+    const filter: Record<string, unknown> = { source: { $ne: 'google-sheets' } };
+    if (status && LEAD_STATUSES.includes(status as (typeof LEAD_STATUSES)[number])) {
+      filter.status = status;
+    }
 
     const [items, total, grouped] = await Promise.all([
       Lead.find(filter)
@@ -88,6 +91,7 @@ router.get(
         .lean(),
       Lead.countDocuments(filter),
       Lead.aggregate<{ _id: string; n: number }>([
+        { $match: filter },
         { $group: { _id: '$status', n: { $sum: 1 } } },
       ]),
     ]);

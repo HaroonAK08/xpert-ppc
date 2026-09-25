@@ -61,6 +61,15 @@ const LeadSchema = new Schema(
       userAgent: { type: String, default: '' },
       referer: { type: String, default: '' },
     },
+    // The team member this lead belongs to. null = admin-only / unassigned.
+    ownerUserId: { type: Schema.Types.ObjectId, ref: 'AdminUser', default: null, index: true },
+    // Which Google Sheet connection this lead was synced from, if any.
+    sheetConnectionId: {
+      type: Schema.Types.ObjectId,
+      ref: 'GoogleSheetConnection',
+      default: null,
+      index: true,
+    },
   },
   { timestamps: true }
 );

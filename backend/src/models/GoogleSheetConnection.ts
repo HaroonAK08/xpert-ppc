@@ -47,11 +47,17 @@ const GoogleSheetConnectionSchema = new Schema(
     },
     lastSyncReport: { type: SyncReportSchema, default: null },
     createdBy: { type: Schema.Types.ObjectId, ref: 'AdminUser', default: null },
+    // The team member this sheet belongs to. Each user has at most one sheet.
+    ownerUserId: { type: Schema.Types.ObjectId, ref: 'AdminUser', default: null },
   },
   { timestamps: true }
 );
 
 GoogleSheetConnectionSchema.index({ spreadsheetId: 1, worksheetName: 1 });
+GoogleSheetConnectionSchema.index(
+  { ownerUserId: 1 },
+  { unique: true, partialFilterExpression: { ownerUserId: { $type: 'objectId' } } }
+);
 
 export type GoogleSheetConnectionDoc = InferSchemaType<typeof GoogleSheetConnectionSchema>;
 

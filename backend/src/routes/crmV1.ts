@@ -7,6 +7,7 @@ import { CRM_LEAD_STATUSES, LEAD_STATUS_LABELS } from '../../../shared/crm/const
 import crmLeadsRouter from './crmLeads';
 import crmDashboardRouter from './crmDashboard';
 import crmGoogleSheetsRouter from './crmGoogleSheets';
+import crmClientsRouter from './crmClients';
 
 const router = Router();
 
@@ -28,5 +29,6 @@ router.get(
 router.use('/leads', crmLeadsRouter);
 router.use('/dashboard', crmDashboardRouter);
 router.use('/integrations/google-sheets', crmGoogleSheetsRouter);
+router.use('/clients', crmClientsRouter);
 
 export default router;

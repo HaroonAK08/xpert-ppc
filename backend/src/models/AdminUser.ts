@@ -6,7 +6,7 @@ const AdminUserSchema = new Schema(
     name: { type: String, required: true, trim: true },
     // scrypt hash — see src/utils/password.ts
     passwordHash: { type: String, required: true, select: false },
-    role: { type: String, enum: ['admin', 'editor'], default: 'admin' },
+    role: { type: String, enum: ['admin', 'editor', 'client'], default: 'admin' },
     lastLoginAt: { type: Date, default: null },
     active: { type: Boolean, default: true },
   },
