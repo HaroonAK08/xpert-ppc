@@ -104,15 +104,7 @@ export default function AdminCoursesPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="flex flex-wrap gap-4 text-sm text-primary">
-              <Link href="/admin" className="hover:underline">
-                ← Leads
-              </Link>
-              <Link href="/admin/students" className="hover:underline">
-                Applications
-              </Link>
-            </div>
-            <h1 className="mt-2 text-2xl font-extrabold text-foreground sm:text-3xl">
+            <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">
               Course manager
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">

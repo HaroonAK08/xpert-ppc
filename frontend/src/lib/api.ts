@@ -46,6 +46,8 @@ export const api = {
     request<T>(path, { method: 'POST', body: JSON.stringify(body ?? {}) }),
   patch: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'PATCH', body: JSON.stringify(body ?? {}) }),
+  put: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: 'PUT', body: JSON.stringify(body ?? {}) }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
   upload: async <T>(path: string, file: File) => {
     const fd = new FormData();
@@ -80,6 +82,42 @@ export type LeadsResponse = {
 };
 
 export type AdminUser = { sub: string; email: string; name: string; role: string };
+
+export type CrmSheetConnection = {
+  id: string;
+  spreadsheetId: string;
+  spreadsheetTitle: string;
+  worksheetName: string;
+  connected: boolean;
+  lastSyncedAt: string | null;
+  lastSyncState: 'idle' | 'syncing' | 'success' | 'failed';
+};
+
+export type CrmClient = {
+  id: string;
+  email: string;
+  name: string;
+  active: boolean;
+  createdAt: string;
+  lastLoginAt: string | null;
+  leadCount: number;
+  sheet: CrmSheetConnection | null;
+};
+
+export type CrmLead = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  businessName: string;
+  source: string;
+  message: string;
+  status: string;
+  notes: string;
+  replied: boolean;
+  followUpAt: string | null;
+  createdAt: string;
+};
 
 export type StudentUser = { id: string; email: string; name: string };
 

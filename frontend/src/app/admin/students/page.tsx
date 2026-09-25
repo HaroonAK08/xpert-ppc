@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
@@ -70,10 +69,7 @@ export default function AdminStudentsPage() {
   return (
     <section className="bg-background py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href="/admin" className="text-sm text-primary hover:underline">
-          ← Leads
-        </Link>
-        <h1 className="mt-2 text-2xl font-extrabold sm:text-3xl">Course applications</h1>
+        <h1 className="text-2xl font-extrabold sm:text-3xl">Course applications</h1>
         <p className="mb-8 mt-1 text-sm text-muted-foreground">
           Accept someone so they can sign in with the password they chose.
         </p>

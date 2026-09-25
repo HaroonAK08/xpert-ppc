@@ -1,12 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Loader2, LogOut, RefreshCw, Trash2 } from 'lucide-react';
+import { Loader2, RefreshCw, Trash2 } from 'lucide-react';
 
 import { Select } from '@/components/ui/input';
-import { api, type AdminUser, type Lead, type LeadsResponse } from '@/lib/api';
+import { api, type Lead, type LeadsResponse } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const STATUSES = [
@@ -40,40 +38,28 @@ const statusStyles: Record<string, string> = {
 };
 
 export function AdminDashboard() {
-  const router = useRouter();
-  const [user, setUser] = useState<AdminUser | null>(null);
   const [data, setData] = useState<LeadsResponse | null>(null);
   const [filter, setFilter] = useState('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const load = useCallback(
-    async (status: string) => {
-      setLoading(true);
-      setError('');
+  const load = useCallback(async (status: string) => {
+    setLoading(true);
+    setError('');
 
-      const me = await api.get<{ user: AdminUser }>('/api/auth/me');
-      if (!me.ok) {
-        router.replace('/admin/login');
-        return;
-      }
-      setUser(me.data.user);
+    const query = status === 'all' ? '' : `?status=${encodeURIComponent(status)}`;
+    const res = await api.get<LeadsResponse>(`/api/leads${query}`);
 
-      const query = status === 'all' ? '' : `?status=${encodeURIComponent(status)}`;
-      const res = await api.get<LeadsResponse>(`/api/leads${query}`);
-
-      if (!res.ok) {
-        setError(res.error);
-        setLoading(false);
-        return;
-      }
-
-      setData(res.data);
+    if (!res.ok) {
+      setError(res.error);
       setLoading(false);
-    },
-    [router]
-  );
+      return;
+    }
+
+    setData(res.data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     void load(filter);
@@ -88,11 +74,6 @@ export function AdminDashboard() {
     if (!confirm('Delete this lead permanently? This cannot be undone.')) return;
     await api.delete(`/api/leads/${id}`);
     void load(filter);
-  }
-
-  async function logout() {
-    await api.post('/api/auth/logout');
-    router.replace('/admin/login');
   }
 
   if (loading && !data) {
@@ -117,40 +98,20 @@ export function AdminDashboard() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Leads</h1>
-            {user ? (
-              <p className="mt-1 text-sm text-muted-foreground">Signed in as {user.email}</p>
-            ) : null}
+            <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Website leads</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Submissions from xpertppc.com&apos;s own contact forms. Client sheet leads live under
+              each client in Clients.
+            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href="/admin/students"
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-border px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
-            >
-              Applications
-            </Link>
-            <Link
-              href="/admin/courses"
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-border px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
-            >
-              Courses
-            </Link>
-            <button
-              type="button"
-              onClick={() => void load(filter)}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
-            >
-              <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} /> Refresh
-            </button>
-            <button
-              type="button"
-              onClick={logout}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
-            >
-              <LogOut className="h-4 w-4" /> Sign out
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => void load(filter)}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+          >
+            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} /> Refresh
+          </button>
         </div>
 
         {error ? (

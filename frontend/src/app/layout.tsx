@@ -1,12 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
-import { Suspense } from 'react';
 import './globals.css';
 
 import { GoogleTags } from '@/components/analytics/google-tags';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
-import { WhatsAppFab } from '@/components/layout/whatsapp-fab';
+import { SiteChrome } from '@/components/layout/site-chrome';
 import { JsonLd } from '@/components/seo/json-ld';
 import { MotionProvider } from '@/components/motion';
 import { organizationSchema, websiteSchema } from '@/lib/seo';
@@ -118,16 +115,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <MotionProvider>
           <div className="flex min-h-screen flex-col">
-            <Suspense fallback={null}>
-              <Header />
-            </Suspense>
-            <main id="main" className="flex-1 pt-20">
-              {children}
-            </main>
-            <Footer />
+            <SiteChrome>{children}</SiteChrome>
           </div>
-
-          <WhatsAppFab />
         </MotionProvider>
       </body>
     </html>
