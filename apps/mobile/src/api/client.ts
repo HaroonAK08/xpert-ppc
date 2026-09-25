@@ -60,6 +60,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
     const json = await parseJson(res);
 
+    if (res.status === 401 && auth) {
+      void useAuthStore.getState().clearSession();
+    }
+
     if (!res.ok) {
       const errBody = json as ApiErrorBody | { error?: string };
       if (errBody && typeof errBody === 'object' && 'error' in errBody) {

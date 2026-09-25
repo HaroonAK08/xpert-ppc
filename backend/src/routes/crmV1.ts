@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { requireCrmAuth } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
 import { asyncHandler } from '../middleware/error';
 import { ok } from '../utils/crmSerialize';
 import { CRM_LEAD_STATUSES, LEAD_STATUS_LABELS } from '../../../shared/crm/constants';
@@ -12,7 +12,7 @@ const router = Router();
 
 router.get(
   '/meta/statuses',
-  requireCrmAuth,
+  requireAuth,
   asyncHandler(async (_req, res) => {
     res.json(
       ok(

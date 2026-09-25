@@ -4,7 +4,7 @@ import type { FilterQuery } from 'mongoose';
 import { Lead } from '../models/Lead';
 import { LeadNote } from '../models/LeadNote';
 import { LeadActivity } from '../models/LeadActivity';
-import { requireCrmAuth } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import { recordLeadActivity } from '../utils/activity';
 import { markLeadDirty } from '../services/googleSheets/sheetsService';
@@ -28,7 +28,7 @@ import type { LeadDoc } from '../models/Lead';
 
 const router = Router();
 
-router.use(requireCrmAuth);
+router.use(requireAuth);
 
 function parsePage(query: Record<string, unknown>) {
   const page = Math.max(1, Number(query.page) || 1);

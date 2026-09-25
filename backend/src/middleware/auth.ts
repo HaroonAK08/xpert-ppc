@@ -36,17 +36,6 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-/** CRM routes — auth temporarily disabled for internal mobile use. */
-export function requireCrmAuth(req: Request, _res: Response, next: NextFunction) {
-  req.admin = {
-    sub: '000000000000000000000001',
-    email: process.env.SEED_ADMIN_EMAIL || 'dev@local',
-    name: process.env.SEED_ADMIN_NAME || 'Dev User',
-    role: 'admin',
-  };
-  next();
-}
-
 export function requireRole(...roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.admin || !roles.includes(req.admin.role)) {

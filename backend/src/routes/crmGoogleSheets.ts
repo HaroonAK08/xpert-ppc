@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { GoogleSheetConnection } from '../models/GoogleSheetConnection';
-import { requireCrmAuth } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import { ok, serializeSheetConnection } from '../utils/crmSerialize';
 import { sheetConnectSchema, sheetMappingSchema } from '../validation/crm';
@@ -14,7 +14,7 @@ import {
 
 const router = Router();
 
-router.use(requireCrmAuth);
+router.use(requireAuth);
 
 router.get(
   '/',

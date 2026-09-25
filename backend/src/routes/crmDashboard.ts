@@ -3,14 +3,14 @@ import { Router } from 'express';
 import { Lead } from '../models/Lead';
 import { LeadActivity } from '../models/LeadActivity';
 import { GoogleSheetConnection } from '../models/GoogleSheetConnection';
-import { requireCrmAuth } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
 import { asyncHandler } from '../middleware/error';
 import { ok, serializeLead, serializeActivity } from '../utils/crmSerialize';
 import type { DashboardStats } from '../../../shared/crm/types';
 
 const router = Router();
 
-router.use(requireCrmAuth);
+router.use(requireAuth);
 
 router.get(
   '/',

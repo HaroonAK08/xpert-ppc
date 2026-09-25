@@ -6,13 +6,6 @@ import type { CrmUser } from '@/types/crm';
 const TOKEN_KEY = 'xppc_crm_jwt';
 const USER_KEY = 'xppc_crm_user';
 
-const DEV_USER: CrmUser = {
-  id: '000000000000000000000001',
-  email: 'dev@local',
-  name: 'Dev User',
-  role: 'admin',
-};
-
 type AuthState = {
   token: string | null;
   user: CrmUser | null;
@@ -54,10 +47,18 @@ async function deleteSecure(key: string): Promise<void> {
   }
 }
 
+async function readSecure(key: string): Promise<string | null> {
+  try {
+    return await withTimeout(SecureStore.getItemAsync(key), 2000);
+  } catch {
+    return null;
+  }
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   token: null,
-  user: DEV_USER,
-  hydrated: true,
+  user: null,
+  hydrated: false,
 
   setSession: async (token, user) => {
     await writeSecure(TOKEN_KEY, token);
@@ -68,10 +69,20 @@ export const useAuthStore = create<AuthState>((set) => ({
   clearSession: async () => {
     await deleteSecure(TOKEN_KEY);
     await deleteSecure(USER_KEY);
-    set({ token: null, user: DEV_USER });
+    set({ token: null, user: null });
   },
 
   hydrate: async () => {
-    set({ token: null, user: DEV_USER, hydrated: true });
+    const token = await readSecure(TOKEN_KEY);
+    const rawUser = token ? await readSecure(USER_KEY) : null;
+    let user: CrmUser | null = null;
+    if (rawUser) {
+      try {
+        user = JSON.parse(rawUser) as CrmUser;
+      } catch {
+        user = null;
+      }
+    }
+    set({ token: token && user ? token : null, user: token && user ? user : null, hydrated: true });
   },
 }));

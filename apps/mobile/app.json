@@ -23,6 +23,7 @@
         "backgroundColor": "#0B1F17"
       },
       "package": "com.xpertppc.leads",
+      "versionCode": 1,
       "permissions": [
         "INTERNET",
         "VIBRATE",

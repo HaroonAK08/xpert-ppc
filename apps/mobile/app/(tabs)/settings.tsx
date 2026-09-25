@@ -7,12 +7,14 @@ import {
   View,
 } from 'react-native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import {
   connectSheet,
   disconnectSheet,
   fetchSheetConnection,
   syncSheet,
 } from '@/api/googleSheets';
+import { logout } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -24,11 +26,24 @@ import { colors, radius, spacing, typography } from '@/theme';
 
 export default function SettingsScreen() {
   const user = useAuthStore((s) => s.user);
+  const clearSession = useAuthStore((s) => s.clearSession);
+  const router = useRouter();
   const qc = useQueryClient();
 
   const [spreadsheetId, setSpreadsheetId] = useState('');
   const [worksheetName, setWorksheetName] = useState('Sheet1');
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function onSignOut() {
+    setSigningOut(true);
+    try {
+      await logout();
+    } finally {
+      await clearSession();
+      router.replace('/login');
+    }
+  }
 
   const query = useQuery({
     queryKey: ['sheets'],
@@ -88,7 +103,7 @@ export default function SettingsScreen() {
         <Text style={styles.section}>Account</Text>
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.meta}>{user?.email}</Text>
-        <Text style={styles.help}>Sign-in is disabled for local development.</Text>
+        <Button title="Sign out" variant="danger" loading={signingOut} onPress={onSignOut} />
       </View>
 
       <View style={styles.card}>
