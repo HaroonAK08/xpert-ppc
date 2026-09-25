@@ -22,6 +22,14 @@ function isStaticOrAsset(pathname: string): boolean {
 
 export function middleware(req: NextRequest) {
   const host = req.headers.get('host') || '';
+
+  // The xpertppc.com/.net domain split only makes sense against the real
+  // production hosts — on localhost there's only one server, so skip it
+  // entirely rather than bouncing local requests out to production.
+  if (host.startsWith('localhost') || host.startsWith('127.0.0.1')) {
+    return NextResponse.next();
+  }
+
   const { pathname, search } = req.nextUrl;
 
   // Agency / other hosts: send course URLs to .net
