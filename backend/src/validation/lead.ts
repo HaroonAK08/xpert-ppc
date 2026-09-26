@@ -19,6 +19,8 @@ export const LEAD_SOURCES = [
   'academy-meeting',
   'industry',
   'footer',
+  'lp-restaurant',
+  'lp-property',
   'other',
 ] as const;
 

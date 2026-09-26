@@ -26,6 +26,20 @@ type Props = {
 
 const AUDIT_PLATFORMS = ['Google Ads', 'Meta Ads', 'TikTok Ads', 'Amazon Ads', 'Other'] as const;
 
+/** Digits only, with an optional single leading "+" — no letters, spaces, or punctuation. */
+function sanitizePhoneInput(raw: string): string {
+  const stripped = raw.replace(/[^\d+]/g, '');
+  const hasLeadingPlus = stripped.startsWith('+');
+  const digits = stripped.replace(/\+/g, '');
+  return hasLeadingPlus ? `+${digits}` : digits;
+}
+
+function onPhoneInput(e: FormEvent<HTMLInputElement>) {
+  const el = e.currentTarget;
+  const clean = sanitizePhoneInput(el.value);
+  if (clean !== el.value) el.value = clean;
+}
+
 export function LeadForm({
   variant = 'contact',
   source,
@@ -52,7 +66,7 @@ export function LeadForm({
     const fd = new FormData(e.currentTarget);
     // Ignore honeypot if a password manager/autofill stuffed it — real bots usually only fill that field.
     const honeypot = String(fd.get('companyWebsite') || '').trim();
-    const phone = String(fd.get('phone') || '').trim();
+    const phone = sanitizePhoneInput(String(fd.get('phone') || '').trim());
     const email = String(fd.get('email') || '').trim();
     const name = String(fd.get('name') || '').trim();
     const looksLikeAutofill =
@@ -141,18 +155,18 @@ export function LeadForm({
               name="name"
               required
               autoComplete="name"
-              placeholder="Dr. Sara Ahmed"
+              placeholder="Your full name"
             />
           </Field>
           <Field>
-            <Label htmlFor={`email-${uid}`}>Work email *</Label>
+            <Label htmlFor={`email-${uid}`}>Email *</Label>
             <Input
               id={`email-${uid}`}
               name="email"
               type="email"
               required
               autoComplete="email"
-              placeholder="clinic@email.com"
+              placeholder="you@email.com"
             />
           </Field>
           <Field>
@@ -163,7 +177,9 @@ export function LeadForm({
               type="tel"
               required
               autoComplete="tel"
-              placeholder="+1 555 000 0000"
+              inputMode="tel"
+              placeholder="+92 300 1234567"
+              onInput={onPhoneInput}
             />
           </Field>
         </div>
@@ -177,7 +193,7 @@ export function LeadForm({
                 name="name"
                 required
                 autoComplete="name"
-                placeholder={isAudit ? 'Dr. Sara Ahmed' : 'Your name'}
+                placeholder="Your full name"
               />
             </Field>
 
@@ -189,7 +205,7 @@ export function LeadForm({
                 type="email"
                 required
                 autoComplete="email"
-                placeholder={isAudit ? 'clinic@email.com' : 'you@company.com'}
+                placeholder="you@email.com"
               />
             </Field>
 
@@ -201,7 +217,9 @@ export function LeadForm({
                 type="tel"
                 required={!isAudit}
                 autoComplete="tel"
-                placeholder="+1 555 000 0000"
+                inputMode="tel"
+                placeholder="+92 300 1234567"
+                onInput={onPhoneInput}
               />
             </Field>
 
@@ -229,7 +247,7 @@ export function LeadForm({
 
           <Field>
             <Label htmlFor={`message-${uid}`}>
-              {isAudit ? 'Clinic / city (optional)' : 'Message *'}
+              {isAudit ? 'Business / city (optional)' : 'Message *'}
             </Label>
             <Textarea
               id={`message-${uid}`}
@@ -237,7 +255,7 @@ export function LeadForm({
               required={!isAudit}
               placeholder={
                 isAudit
-                  ? 'e.g. Acne & laser clinic in London, ~$5k/month ads'
+                  ? 'e.g. Your business & city, ~$500/month ad budget'
                   : 'Tell us about your goals'
               }
             />
