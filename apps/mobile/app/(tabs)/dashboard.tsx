@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
+  AppState,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -48,6 +49,19 @@ export default function DashboardScreen() {
     },
   });
 
+  useEffect(() => {
+    // Pull the latest sheet rows the moment the app opens, and again each
+    // time it's brought back to the foreground — not just when someone
+    // taps "Sync" manually. Silent: errors already surface via the
+    // existing sync-error banner below if this fails.
+    syncMutation.mutate();
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') syncMutation.mutate();
+    });
+    return () => sub.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (query.isLoading && !query.data) {
     return <LoadingState label="Loading dashboard…" />;
   }
@@ -70,7 +84,12 @@ export default function DashboardScreen() {
       style={styles.screen}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={query.isFetching} onRefresh={() => void query.refetch()} />
+        <RefreshControl
+          refreshing={query.isFetching}
+          onRefresh={() => void query.refetch()}
+          tintColor={colors.brand}
+          colors={[colors.brand]}
+        />
       }
     >
       <View style={styles.header}>
