@@ -22,6 +22,17 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
+      {
+        // Static image/font assets served straight from /public — Next.js
+        // gives these no cache headers by default (unlike hashed /_next/static
+        // files), so repeat visits were re-downloading every image from
+        // scratch. Content here doesn't change without a filename change in
+        // practice, so cache for a week client-side, longer at the edge.
+        source: '/:path*(png|jpg|jpeg|webp|avif|svg|gif|ico|woff|woff2)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=604800, s-maxage=2592000, stale-while-revalidate=86400' },
+        ],
+      },
     ];
   },
   async redirects() {

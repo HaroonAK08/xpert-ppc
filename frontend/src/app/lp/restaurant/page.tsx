@@ -18,6 +18,16 @@ import { LoadFade, LoadGroup, LoadItem, Reveal, RevealGroup, RevealItem } from '
 import { buildMetadata } from '@/lib/seo';
 import { siteConfig } from '@/lib/site';
 
+// Statically imported so Next.js can generate a real blurDataURL — a plain
+// string src="/lp/..." gets no placeholder and shows an empty box until the
+// full image downloads and decodes.
+import heroImage from '../../../../public/lp/restaurant/lp-restaurant-hero.png';
+import fineImage from '../../../../public/lp/restaurant/lp-restaurant-fine.png';
+import burgerImage from '../../../../public/lp/restaurant/lp-restaurant-burger.png';
+import familyImage from '../../../../public/lp/restaurant/lp-restaurant-family.png';
+import deliveryImage from '../../../../public/lp/restaurant/lp-restaurant-delivery.png';
+import metaAdImage from '../../../../public/lp/restaurant/lp-restaurant-meta-ad.png';
+
 const display = Bebas_Neue({
   subsets: ['latin'],
   weight: '400',
@@ -67,22 +77,22 @@ const dishes = [
   {
     title: 'Fine Dining',
     body: 'Plated presentation and ambience that justify a premium check and a special-occasion booking.',
-    image: '/lp/restaurant/lp-restaurant-fine.png',
+    image: fineImage,
   },
   {
     title: 'Fast Food & Quick Bites',
     body: 'High-intent near-me searches at peak hunger hours — built for volume, not just awareness.',
-    image: '/lp/restaurant/lp-restaurant-burger.png',
+    image: burgerImage,
   },
   {
     title: 'Family & Group Dining',
     body: 'Weekend offers and group deals that fill tables instead of two-seaters.',
-    image: '/lp/restaurant/lp-restaurant-family.png',
+    image: familyImage,
   },
   {
     title: 'Delivery & Takeout',
     body: 'Direct orders through your own number and WhatsApp — not routed through an aggregator’s cut.',
-    image: '/lp/restaurant/lp-restaurant-delivery.png',
+    image: deliveryImage,
   },
 ];
 
@@ -134,10 +144,11 @@ export default function RestaurantLpPage() {
       {/* Hero — food-first, no form */}
       <section className="relative min-h-[85vh] overflow-hidden">
         <Image
-          src="/lp/restaurant/lp-restaurant-hero.png"
+          src={heroImage}
           alt="Gourmet plated dish under warm restaurant light"
           fill
           priority
+          placeholder="blur"
           sizes="100vw"
           className="object-cover object-center"
         />
@@ -299,6 +310,7 @@ export default function RestaurantLpPage() {
                     src={d.image}
                     alt={d.title}
                     fill
+                    placeholder="blur"
                     sizes="(min-width: 640px) 50vw, 100vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
@@ -506,9 +518,10 @@ export default function RestaurantLpPage() {
                 </div>
                 <div className="relative h-52 bg-neutral-100">
                   <Image
-                    src="/lp/restaurant/lp-restaurant-meta-ad.png"
+                    src={metaAdImage}
                     alt="Food Meta ad creative"
                     fill
+                    placeholder="blur"
                     sizes="250px"
                     className="object-cover"
                   />
@@ -557,9 +570,10 @@ export default function RestaurantLpPage() {
       {/* Final CTA — food photo back, text sits on a local scrim */}
       <section className="relative overflow-hidden py-16 sm:py-20">
         <Image
-          src="/lp/restaurant/lp-restaurant-family.png"
+          src={familyImage}
           alt=""
           fill
+          placeholder="blur"
           sizes="100vw"
           className="object-cover object-center"
         />

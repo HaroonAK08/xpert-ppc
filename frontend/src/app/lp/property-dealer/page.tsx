@@ -21,6 +21,16 @@ import { LoadGroup, LoadItem, Reveal, RevealGroup, RevealItem } from '@/componen
 import { buildMetadata } from '@/lib/seo';
 import { siteConfig } from '@/lib/site';
 
+// Statically imported so Next.js can generate a real blurDataURL — a plain
+// string src="/lp/..." gets no placeholder and shows an empty box until the
+// full image downloads and decodes.
+import heroImage from '../../../../public/lp/property-dealer/lp-property-hero.png';
+import plotsImage from '../../../../public/lp/property-dealer/lp-property-plots.png';
+import houseImage from '../../../../public/lp/property-dealer/lp-property-house.png';
+import apartmentImage from '../../../../public/lp/property-dealer/lp-property-apartment.png';
+import commercialImage from '../../../../public/lp/property-dealer/lp-property-commercial.png';
+import metaAdImage from '../../../../public/lp/property-dealer/lp-property-meta-ad.png';
+
 const display = Libre_Baskerville({
   subsets: ['latin'],
   weight: ['400', '700'],
@@ -64,7 +74,7 @@ const listings = [
     beds: null as number | null,
     baths: null as number | null,
     body: 'Buyers and investors hunting plots and new phases.',
-    image: '/lp/property-dealer/lp-property-plots.png',
+    image: plotsImage,
   },
   {
     title: 'Houses & Villas',
@@ -74,7 +84,7 @@ const listings = [
     beds: 5,
     baths: 4,
     body: 'Families ready to book a site visit this week.',
-    image: '/lp/property-dealer/lp-property-house.png',
+    image: houseImage,
   },
   {
     title: 'Apartments & Flats',
@@ -84,7 +94,7 @@ const listings = [
     beds: 2,
     baths: 2,
     body: 'Renters and first-time buyers searching nearby.',
-    image: '/lp/property-dealer/lp-property-apartment.png',
+    image: apartmentImage,
   },
   {
     title: 'Commercial Property',
@@ -94,7 +104,7 @@ const listings = [
     beds: null,
     baths: null,
     body: 'Offices, shops, and warehouses for serious tenants.',
-    image: '/lp/property-dealer/lp-property-commercial.png',
+    image: commercialImage,
   },
 ];
 
@@ -159,10 +169,11 @@ export default function PropertyDealerLpPage() {
       {/* Hero — full-bleed estate photography */}
       <section className="relative min-h-[85vh] overflow-hidden">
         <Image
-          src="/lp/property-dealer/lp-property-hero.png"
+          src={heroImage}
           alt="Modern villa exterior at dusk"
           fill
           priority
+          placeholder="blur"
           sizes="100vw"
           className="object-cover object-center"
         />
@@ -256,6 +267,7 @@ export default function PropertyDealerLpPage() {
                       src={l.image}
                       alt={l.title}
                       fill
+                      placeholder="blur"
                       sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 78vw"
                       className="object-cover"
                     />
@@ -497,9 +509,10 @@ export default function PropertyDealerLpPage() {
                 </div>
                 <div className="relative h-52 bg-slate-100">
                   <Image
-                    src="/lp/property-dealer/lp-property-meta-ad.png"
+                    src={metaAdImage}
                     alt="Villa exterior Meta ad creative"
                     fill
+                    placeholder="blur"
                     sizes="260px"
                     className="object-cover"
                   />
@@ -525,9 +538,10 @@ export default function PropertyDealerLpPage() {
       {/* Final CTA */}
       <section className="relative overflow-hidden py-16 sm:py-20">
         <Image
-          src="/lp/property-dealer/lp-property-house.png"
+          src={houseImage}
           alt=""
           fill
+          placeholder="blur"
           sizes="100vw"
           className="object-cover opacity-20"
         />
