@@ -1,6 +1,12 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { colors, radius, spacing, typography } from '@/theme';
 
 type Props = {
@@ -10,11 +16,27 @@ type Props = {
   color?: string;
 };
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 export function ActionButton({ icon, label, onPress, color = colors.brand }: Props) {
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.btn, pressed && { opacity: 0.8 }]}
+    <AnimatedPressable
+      onPressIn={() => {
+        scale.value = withSpring(0.92, { damping: 14, stiffness: 300 });
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, { damping: 10, stiffness: 220 });
+      }}
+      onPress={() => {
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        onPress();
+      }}
+      style={[styles.btn, animatedStyle]}
       accessibilityRole="button"
       accessibilityLabel={label}
     >
@@ -22,7 +44,7 @@ export function ActionButton({ icon, label, onPress, color = colors.brand }: Pro
         <Ionicons name={icon} size={20} color={color} />
       </View>
       <Text style={styles.label}>{label}</Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 

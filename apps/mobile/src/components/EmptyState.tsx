@@ -2,7 +2,7 @@ import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from './Button';
-import { colors, spacing, typography } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 
 export function LoadingState({ label = 'Loading…' }: { label?: string }) {
   return (
@@ -26,7 +26,9 @@ export function EmptyState({
 }) {
   return (
     <View style={styles.center}>
-      <Ionicons name="folder-open-outline" size={40} color={colors.textMuted} />
+      <View style={styles.iconWrap}>
+        <Ionicons name="folder-open-outline" size={32} color={colors.brand} />
+      </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.text}>{message}</Text>
       {actionLabel && onAction ? (
@@ -47,7 +49,9 @@ export function ErrorState({
 }) {
   return (
     <View style={styles.center}>
-      <Ionicons name="alert-circle-outline" size={40} color={colors.danger} />
+      <View style={[styles.iconWrap, styles.iconWrapDanger]}>
+        <Ionicons name="alert-circle-outline" size={32} color={colors.danger} />
+      </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.text}>{message}</Text>
       {onRetry ? (
@@ -64,6 +68,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.xl,
     gap: spacing.sm,
+  },
+  iconWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: radius.xl,
+    backgroundColor: colors.brandSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xs,
+  },
+  iconWrapDanger: {
+    backgroundColor: 'rgba(220, 38, 38, 0.1)',
   },
   title: { ...typography.subtitle, color: colors.text, textAlign: 'center' },
   text: { ...typography.body, color: colors.textSecondary, textAlign: 'center' },

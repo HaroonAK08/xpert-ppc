@@ -1,6 +1,13 @@
 import React, { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import Animated, {
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import type { CrmLead } from '@/types/crm';
 import { StatusBadge } from './StatusBadge';
 import { colors, radius, shadows, spacing, typography } from '@/theme';
@@ -32,49 +39,67 @@ type Props = {
   onPress: () => void;
 };
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 function LeadCardComponent({ lead, onPress }: Props) {
   const followUp = formatFollowUp(lead.followUpAt);
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}
-      accessibilityRole="button"
-      accessibilityLabel={`Lead ${lead.name}`}
-    >
-      <View style={styles.top}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{lead.name}</Text>
-          {lead.businessName ? (
-            <Text style={styles.business}>{lead.businessName}</Text>
+    <Animated.View entering={FadeInDown.duration(280).springify().damping(18)}>
+      <AnimatedPressable
+        onPressIn={() => {
+          scale.value = withSpring(0.97, { damping: 16, stiffness: 300 });
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, { damping: 12, stiffness: 220 });
+        }}
+        onPress={() => {
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onPress();
+        }}
+        style={[styles.card, animatedStyle]}
+        accessibilityRole="button"
+        accessibilityLabel={`Lead ${lead.name}`}
+      >
+        <View style={styles.top}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{lead.name}</Text>
+            {lead.businessName ? (
+              <Text style={styles.business}>{lead.businessName}</Text>
+            ) : null}
+          </View>
+          <StatusBadge status={lead.status} />
+        </View>
+
+        <View style={styles.meta}>
+          {lead.phone ? (
+            <Text style={styles.metaText}>{lead.phone}</Text>
+          ) : null}
+          {lead.email && !lead.email.includes('@placeholder') && !lead.email.includes('@unknown') ? (
+            <Text style={styles.metaText}>{lead.email}</Text>
           ) : null}
         </View>
-        <StatusBadge status={lead.status} />
-      </View>
 
-      <View style={styles.meta}>
-        {lead.phone ? (
-          <Text style={styles.metaText}>{lead.phone}</Text>
-        ) : null}
-        {lead.email && !lead.email.includes('@placeholder') && !lead.email.includes('@unknown') ? (
-          <Text style={styles.metaText}>{lead.email}</Text>
-        ) : null}
-      </View>
-
-      <View style={styles.footer}>
-        {followUp ? (
-          <Text style={styles.followUp}>Follow-up: {followUp}</Text>
-        ) : (
-          <Text style={styles.followUpMuted}>No follow-up</Text>
-        )}
-        {lead.replied ? (
-          <View style={styles.replied}>
-            <Ionicons name="checkmark-circle" size={14} color={colors.success} />
-            <Text style={styles.repliedText}>Replied</Text>
-          </View>
-        ) : null}
-      </View>
-    </Pressable>
+        <View style={styles.footer}>
+          {followUp ? (
+            <Text style={styles.followUp}>Follow-up: {followUp}</Text>
+          ) : (
+            <Text style={styles.followUpMuted}>No follow-up</Text>
+          )}
+          {lead.replied ? (
+            <View style={styles.replied}>
+              <Ionicons name="checkmark-circle" size={14} color={colors.success} />
+              <Text style={styles.repliedText}>Replied</Text>
+            </View>
+          ) : null}
+        </View>
+      </AnimatedPressable>
+    </Animated.View>
   );
 }
 

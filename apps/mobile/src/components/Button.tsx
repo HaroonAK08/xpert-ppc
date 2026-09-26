@@ -8,6 +8,12 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { colors, radius, spacing, typography } from '@/theme';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -26,20 +32,47 @@ const variantStyles: Record<Variant, { bg: string; text: string; border?: string
   danger: { bg: colors.danger, text: colors.white },
 };
 
-export function Button({ title, loading, variant = 'primary', style, disabled, ...rest }: Props) {
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+export function Button({
+  title,
+  loading,
+  variant = 'primary',
+  style,
+  disabled,
+  onPress,
+  ...rest
+}: Props) {
   const v = variantStyles[variant];
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel={title}
       disabled={disabled || loading}
-      style={({ pressed }) => [
+      onPressIn={() => {
+        scale.value = withSpring(0.96, { damping: 16, stiffness: 300 });
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, { damping: 12, stiffness: 220 });
+      }}
+      onPress={(e) => {
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress?.(e);
+      }}
+      style={[
         styles.base,
         {
           backgroundColor: v.bg,
           borderColor: v.border || 'transparent',
-          opacity: pressed || disabled || loading ? 0.7 : 1,
+          opacity: disabled || loading ? 0.6 : 1,
         },
+        animatedStyle,
         style,
       ]}
       {...rest}
@@ -49,7 +82,7 @@ export function Button({ title, loading, variant = 'primary', style, disabled, .
       ) : (
         <Text style={[styles.label, { color: v.text }]}>{title}</Text>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 

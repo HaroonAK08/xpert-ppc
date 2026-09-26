@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  RefreshControl,
   StyleSheet,
   View,
 } from 'react-native';
@@ -90,8 +91,14 @@ export default function LeadsScreen() {
         renderItem={({ item }) => (
           <LeadCard lead={item} onPress={() => router.push(`/leads/${item.id}`)} />
         )}
-        onRefresh={() => void query.refetch()}
-        refreshing={query.isRefetching}
+        refreshControl={
+          <RefreshControl
+            refreshing={query.isRefetching}
+            onRefresh={() => void query.refetch()}
+            tintColor={colors.brand}
+            colors={[colors.brand]}
+          />
+        }
         onEndReached={() => {
           if (query.hasNextPage && !query.isFetchingNextPage) {
             void query.fetchNextPage();
