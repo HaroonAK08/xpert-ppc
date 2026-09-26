@@ -8,7 +8,12 @@ import type { ReactNode } from 'react';
  * CSS alone can't do this — framer-motion animates via JS transforms.
  */
 export function MotionProvider({ children }: { children: ReactNode }) {
-  return <MotionConfig reducedMotion="user">{children}</MotionConfig>;
+  return (
+    <MotionConfig reducedMotion="user">
+      {/* Fragment avoids duplicate @types/react ReactNode mismatch in workspaces */}
+      <>{children}</>
+    </MotionConfig>
+  );
 }
 
 /**
