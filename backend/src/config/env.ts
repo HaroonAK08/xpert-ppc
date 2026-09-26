@@ -35,6 +35,8 @@ export const env = {
   coursesSiteUrl: (process.env.COURSES_SITE_URL || 'https://xpertppc.net').replace(/\/$/, ''),
   /** Service-account JSON (raw or base64). Never ship this to the mobile app. */
   googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '',
+  /** How often every connected Google Sheet gets auto-synced, in ms. 0 disables it. */
+  sheetSyncIntervalMs: Number(process.env.SHEET_SYNC_INTERVAL_MS ?? 5 * 60 * 1000),
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT ?? 587),

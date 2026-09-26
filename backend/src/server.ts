@@ -1,6 +1,7 @@
 import { createApp } from './app';
 import { connectDb, disconnectDb } from './config/db';
 import { env } from './config/env';
+import { startSheetSyncScheduler } from './services/googleSheets/scheduler';
 
 async function start() {
   await connectDb();
@@ -10,6 +11,8 @@ async function start() {
     console.log(`[server] xpertppc-backend listening on http://localhost:${env.port}`);
     console.log(`[server] env=${env.nodeEnv} cors=${env.corsOrigins.join(', ')}`);
   });
+
+  startSheetSyncScheduler();
 
   const shutdown = async (signal: string) => {
     console.log(`\n[server] ${signal} received, shutting down…`);
