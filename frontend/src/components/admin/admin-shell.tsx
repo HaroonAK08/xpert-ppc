@@ -31,10 +31,17 @@ function isNavActive(pathname: string, href: string) {
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname() || '';
+  const isLoginRoute = pathname === '/admin/login';
   const [user, setUser] = useState<AdminUser | null>(null);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    // /admin/login isn't a real page — it just redirects to /courses/login.
+    // Running the auth check here would try to bounce back to this same
+    // route on a 401, which is a no-op, leaving the page stuck "checking"
+    // forever instead of letting that redirect happen.
+    if (isLoginRoute) return;
+
     let active = true;
     (async () => {
       const res = await api.get<{ user: AdminUser }>('/api/auth/me');
@@ -49,7 +56,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     return () => {
       active = false;
     };
-  }, [router]);
+  }, [router, isLoginRoute]);
+
+  if (isLoginRoute) {
+    return <>{children}</>;
+  }
 
   async function signOut() {
     await api.post('/api/auth/logout');
