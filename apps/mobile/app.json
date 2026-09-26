@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0B1F17"
+      "backgroundColor": "#001833"
     },
     "ios": {
       "supportsTablet": false,
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0B1F17"
+        "backgroundColor": "#FFFFFF"
       },
       "package": "com.xpertppc.leads",
       "versionCode": 1,
@@ -37,7 +37,7 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#1F7A4D"
+          "color": "#1476FF"
         }
       ],
       "expo-font",

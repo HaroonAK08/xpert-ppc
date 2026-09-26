@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -42,10 +43,11 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.hero}>
-        <View style={styles.logoMark}>
-          <Text style={styles.logoMarkText}>XP</Text>
-        </View>
-        <Text style={styles.brand}>XpertPPC</Text>
+        <Image
+          source={require('../assets/adaptive-icon.png')}
+          style={styles.logoMark}
+          resizeMode="contain"
+        />
         <Text style={styles.subtitle}>Lead Management</Text>
         <Text style={styles.tagline}>Internal CRM for the XpertPPC team</Text>
       </View>
@@ -88,22 +90,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   logoMark: {
-    width: 72,
-    height: 72,
-    borderRadius: radius.lg,
-    backgroundColor: colors.brand,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-  },
-  logoMarkText: {
-    color: colors.white,
-    fontSize: 28,
-    fontWeight: '800',
-  },
-  brand: {
-    ...typography.brand,
-    color: colors.white,
+    width: 160,
+    height: 160,
+    marginBottom: spacing.xs,
   },
   subtitle: {
     ...typography.subtitle,
