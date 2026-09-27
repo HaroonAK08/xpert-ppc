@@ -2,8 +2,17 @@ import type { LeadDoc } from '../models/Lead';
 import type { LeadNoteDoc } from '../models/LeadNote';
 import type { LeadActivityDoc } from '../models/LeadActivity';
 import type { GoogleSheetConnectionDoc } from '../models/GoogleSheetConnection';
+import type { ContactDoc } from '../models/Contact';
+import type { ContactActivityDoc } from '../models/ContactActivity';
 import { normalizeLeadStatus } from '../../../shared/crm/constants';
-import type { CrmLead, LeadNote, LeadActivity, GoogleSheetConnection } from '../../../shared/crm/types';
+import type {
+  CrmLead,
+  LeadNote,
+  LeadActivity,
+  GoogleSheetConnection,
+  Contact,
+  ContactActivity,
+} from '../../../shared/crm/types';
 
 type LeanLead = LeadDoc & { _id: { toString(): string }; createdAt?: Date; updatedAt?: Date };
 
@@ -21,8 +30,10 @@ export function serializeLead(doc: LeanLead | Record<string, unknown>): CrmLead 
     email: String(l.email || ''),
     businessName,
     source: String(l.source || ''),
+    sourcePath: String(l.sourcePath || ''),
     message: String(l.message || ''),
     status: normalizeLeadStatus(String(l.status || 'new')),
+    qualification: (l.qualification as CrmLead['qualification']) || 'unreviewed',
     notes: String(l.notes || ''),
     replied: Boolean(l.replied),
     contactedAt: l.contactedAt ? new Date(l.contactedAt).toISOString() : null,
@@ -36,6 +47,48 @@ export function serializeLead(doc: LeanLead | Record<string, unknown>): CrmLead 
     website: String(l.website || ''),
     platform: String(l.platform || 'Other'),
     monthlyBudget: String(l.monthlyBudget || ''),
+    contactId: l.contactId ? String(l.contactId) : null,
+    formId: l.formId ? String(l.formId) : null,
+    formName: String(l.formName || ''),
+    formTags: Array.isArray(l.formTags) ? l.formTags.map((t) => String(t)).filter(Boolean) : [],
+    customFields: (l.customFields as Record<string, string | number | null>) || {},
+  };
+}
+
+export function serializeContact(
+  doc: (ContactDoc & { _id: { toString(): string }; createdAt?: Date; updatedAt?: Date }) | Record<string, unknown>
+): Contact {
+  const c = doc as ContactDoc & { _id: { toString(): string } };
+  return {
+    id: String(c._id),
+    anonymousId: String(c.anonymousId || ''),
+    name: String(c.name || ''),
+    email: String(c.email || ''),
+    phone: String(c.phone || ''),
+    firstSeenAt: c.firstSeenAt ? new Date(c.firstSeenAt).toISOString() : new Date().toISOString(),
+    lastSeenAt: c.lastSeenAt ? new Date(c.lastSeenAt).toISOString() : new Date().toISOString(),
+    convertedLeadId: c.convertedLeadId ? String(c.convertedLeadId) : null,
+  };
+}
+
+export function serializeContactActivity(
+  doc: (ContactActivityDoc & { _id: { toString(): string }; createdAt?: Date }) | Record<string, unknown>
+): ContactActivity {
+  const a = doc as ContactActivityDoc & { _id: { toString(): string }; createdAt?: Date };
+  return {
+    id: String(a._id),
+    contactId: String(a.contact),
+    type: 'page_view',
+    url: String(a.url || ''),
+    referrer: String(a.referrer || ''),
+    utm: {
+      source: String(a.utm?.source || ''),
+      medium: String(a.utm?.medium || ''),
+      campaign: String(a.utm?.campaign || ''),
+      term: String(a.utm?.term || ''),
+      content: String(a.utm?.content || ''),
+    },
+    createdAt: a.createdAt ? new Date(a.createdAt).toISOString() : new Date().toISOString(),
   };
 }
 
@@ -46,7 +99,7 @@ export function serializeNote(
   return {
     id: String(n._id),
     leadId: String(n.lead),
-    authorId: String(n.author),
+    authorId: n.author ? String(n.author) : null,
     authorName: String(n.authorName || ''),
     text: String(n.text || ''),
     createdAt: n.createdAt ? new Date(n.createdAt).toISOString() : new Date().toISOString(),

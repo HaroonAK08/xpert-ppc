@@ -8,6 +8,7 @@ import { api } from '@/lib/api';
 import { siteConfig } from '@/lib/site';
 import { PLATFORMS, type LEAD_SOURCES } from '@/lib/validation';
 import { cn } from '@/lib/utils';
+import { getVisitorId } from '@/lib/visitor';
 
 type Variant = 'audit' | 'contact';
 
@@ -39,6 +40,7 @@ function onPhoneInput(e: FormEvent<HTMLInputElement>) {
   const clean = sanitizePhoneInput(el.value);
   if (clean !== el.value) el.value = clean;
 }
+
 
 export function LeadForm({
   variant = 'contact',
@@ -80,6 +82,7 @@ export function LeadForm({
       platform: String(fd.get('platform') || 'Other'),
       message: String(fd.get('message') || ''),
       companyWebsite: looksLikeAutofill ? '' : honeypot,
+      visitorId: getVisitorId(),
       source,
       sourcePath: pathname,
       utm: {

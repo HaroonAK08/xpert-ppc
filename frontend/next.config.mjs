@@ -14,10 +14,20 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/:path*',
+        // Every path except the embeddable widgets below, which must be frameable
+        // on other domains — X-Frame-Options: SAMEORIGIN would otherwise blank them out.
+        source: '/:path((?!embed\\/|embed$).*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+      {
+        source: '/embed/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],

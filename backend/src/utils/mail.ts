@@ -3,8 +3,10 @@ import nodemailer from 'nodemailer';
 import { env } from '../config/env';
 import type { CreateLeadInput } from '../validation/lead';
 
-type LeadMailPayload = Omit<CreateLeadInput, 'companyWebsite'> & {
+type LeadMailPayload = Omit<CreateLeadInput, 'companyWebsite' | 'visitorId' | 'customFields' | 'formId'> & {
   id?: string;
+  formName?: string;
+  formId?: string;
 };
 
 function escapeHtml(value: string): string {
@@ -63,10 +65,14 @@ export async function sendLeadNotification(lead: LeadMailPayload): Promise<void>
     `Budget: ${lead.monthlyBudget || '—'}`,
     `Source: ${lead.source || '—'}`,
     `Page: ${lead.sourcePath || '—'}`,
+    `Form: ${lead.formName || '—'}`,
+    lead.formId ? `Form ID: ${lead.formId}` : '',
     '',
     'Message:',
     lead.message || '—',
-  ].join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   const html = `
     <div style="font-family:Inter,Segoe UI,Arial,sans-serif;max-width:640px;margin:0 auto">
@@ -81,6 +87,8 @@ export async function sendLeadNotification(lead: LeadMailPayload): Promise<void>
         ${row('Budget', lead.monthlyBudget)}
         ${row('Source', lead.source)}
         ${row('Page', lead.sourcePath)}
+        ${row('Form', lead.formName)}
+        ${row('Form ID', lead.formId)}
         ${row('Message', lead.message)}
       </table>
       ${lead.id ? `<p style="margin:16px 0 0;color:#94a3b8;font-size:12px">Lead ID: ${escapeHtml(lead.id)}</p>` : ''}
@@ -95,6 +103,41 @@ export async function sendLeadNotification(lead: LeadMailPayload): Promise<void>
     text,
     html,
   });
+}
+
+export async function sendSequenceStepEmail(opts: {
+  to: string;
+  name: string;
+  subject: string;
+  body: string;
+  unsubscribeUrl: string;
+}): Promise<{ sent: boolean }> {
+  if (!isMailConfigured()) {
+    console.warn(`[mail] SMTP not configured — sequence email to ${opts.to} not sent.`);
+    return { sent: false };
+  }
+
+  const mergedSubject = opts.subject.replace(/\{\{\s*name\s*\}\}/gi, opts.name || 'there');
+  const mergedBody = opts.body.replace(/\{\{\s*name\s*\}\}/gi, opts.name || 'there');
+
+  const html = `
+    <div style="font-family:Inter,Segoe UI,Arial,sans-serif;max-width:560px;margin:0 auto;white-space:pre-wrap">
+      ${escapeHtml(mergedBody)}
+      <p style="margin-top:32px;padding-top:16px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:11px">
+        <a href="${escapeHtml(opts.unsubscribeUrl)}" style="color:#94a3b8">Unsubscribe from these emails</a>
+      </p>
+    </div>
+  `;
+
+  const transporter = createTransport();
+  await transporter.sendMail({
+    from: env.smtp.from,
+    to: opts.to,
+    subject: mergedSubject,
+    text: `${mergedBody}\n\nUnsubscribe: ${opts.unsubscribeUrl}`,
+    html,
+  });
+  return { sent: true };
 }
 
 export async function sendOtpEmail(opts: {

@@ -2,10 +2,15 @@ import { Router, type Request } from 'express';
 import rateLimit from 'express-rate-limit';
 
 import { Lead } from '../models/Lead';
+import { Contact } from '../models/Contact';
+import { LeadFormDefinition } from '../models/LeadFormDefinition';
 import { requireAuth } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import { sendLeadNotification } from '../utils/mail';
+import { runLeadCreatedAutomations } from '../utils/automations';
 import { createLeadSchema, updateLeadSchema, LEAD_STATUSES } from '../validation/lead';
+import { normalizeEmail } from '../../../shared/crm/normalize';
+import mongoose from 'mongoose';
 
 const router = Router();
 
@@ -30,7 +35,7 @@ router.post(
       throw new ApiError(400, parsed.error.issues[0]?.message ?? 'Please check the form.');
     }
 
-    const { companyWebsite, ...data } = parsed.data;
+    const { companyWebsite, visitorId, formId, ...data } = parsed.data;
 
     // Honeypot tripped by a bot — accept silently. Ignore autofill dumping phone/email into the trap.
     const hp = (companyWebsite || '').trim();
@@ -44,8 +49,49 @@ router.post(
       return res.status(201).json({ ok: true });
     }
 
+    // If the tracking script saw this browser before, link the new lead to that
+    // visitor's page-view history instead of losing it once they're identified.
+    let contactId: string | null = null;
+    if (visitorId) {
+      const contact = await Contact.findOneAndUpdate(
+        { anonymousId: visitorId },
+        {
+          $setOnInsert: { anonymousId: visitorId, firstSeenAt: new Date() },
+          $set: {
+            lastSeenAt: new Date(),
+            ...(data.name ? { name: data.name } : {}),
+            ...(data.email ? { email: normalizeEmail(data.email) } : {}),
+            ...(data.phone ? { phone: data.phone } : {}),
+          },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+      contactId = String(contact._id);
+    }
+
+    // Resolve the builder form (if any) so we store both its id and a name snapshot.
+    let resolvedFormId: mongoose.Types.ObjectId | null = null;
+    let resolvedFormName = '';
+    let resolvedFormTags: string[] = [];
+    if (formId) {
+      if (!mongoose.Types.ObjectId.isValid(formId)) {
+        throw new ApiError(400, 'Invalid form.');
+      }
+      const form = await LeadFormDefinition.findOne({ _id: formId, enabled: true })
+        .select('name tags')
+        .lean();
+      if (!form) throw new ApiError(404, 'This form is not available.');
+      resolvedFormId = form._id as mongoose.Types.ObjectId;
+      resolvedFormName = String(form.name || '');
+      resolvedFormTags = Array.isArray(form.tags) ? form.tags.map((t) => String(t)).filter(Boolean) : [];
+    }
+
     const lead = await Lead.create({
       ...data,
+      contactId,
+      formId: resolvedFormId,
+      formName: resolvedFormName,
+      formTags: resolvedFormTags,
       meta: {
         ip: req.ip ?? '',
         userAgent: req.get('user-agent') ?? '',
@@ -53,9 +99,20 @@ router.post(
       },
     });
 
+    if (contactId) {
+      await Contact.findByIdAndUpdate(contactId, { convertedLeadId: lead._id });
+    }
+
+    await runLeadCreatedAutomations(lead.toObject());
+
     // Notify inbox — never fail the form if mail delivery has a hiccup.
     try {
-      await sendLeadNotification({ ...data, id: String(lead._id) });
+      await sendLeadNotification({
+        ...data,
+        id: String(lead._id),
+        formId: resolvedFormId ? String(resolvedFormId) : undefined,
+        formName: resolvedFormName || undefined,
+      });
     } catch (err) {
       console.error('[mail] Failed to send lead notification:', err);
     }

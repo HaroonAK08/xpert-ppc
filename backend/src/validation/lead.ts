@@ -21,6 +21,7 @@ export const LEAD_SOURCES = [
   'footer',
   'lp-restaurant',
   'lp-property',
+  'embed',
   'other',
 ] as const;
 
@@ -61,6 +62,13 @@ export const createLeadSchema = z.object({
     .optional(),
   // Honeypot — allow any length so autofill doesn't fail Zod; non-empty = spam (handled in route).
   companyWebsite: z.string().optional().default(''),
+  // The tracking script's anonymous visitor id, if this browser was seen before — links this
+  // submission to its pre-conversion page-view history (see models/Contact.ts).
+  visitorId: z.string().trim().max(100).optional().default(''),
+  // Values for any custom-property fields a form builder added beyond the standard ones.
+  customFields: z.record(z.string(), z.union([z.string(), z.number()])).optional().default({}),
+  // Which builder-created form this came through, if submitted via the form-builder widget.
+  formId: z.string().trim().max(60).optional().default(''),
 });
 
 export const updateLeadSchema = z.object({

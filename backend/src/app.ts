@@ -17,6 +17,10 @@ import studentAuthRouter from './routes/studentAuth';
 import studentPortalRouter from './routes/studentPortal';
 import adminPortalRouter from './routes/adminPortal';
 import crmV1Router from './routes/crmV1';
+import metaWebhookRouter from './routes/metaWebhook';
+import trackRouter from './routes/track';
+import sequenceUnsubscribeRouter from './routes/sequenceUnsubscribe';
+import publicFormsRouter from './routes/publicForms';
 
 export function createApp() {
   const app = express();
@@ -30,13 +34,25 @@ export function createApp() {
     })
   );
   app.use(compression());
-  app.use(express.json({ limit: '1mb' }));
+  app.use(
+    express.json({
+      limit: '1mb',
+      // Meta's webhook signature is verified over the exact raw body — capture it before parsing.
+      verify: (req, _res, buf) => {
+        (req as unknown as { rawBody?: Buffer }).rawBody = buf;
+      },
+    })
+  );
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
   app.use(cookieParser());
   app.use(morgan(env.isProd ? 'combined' : 'dev'));
 
-  app.use(
-    cors({
+  // The tracking beacon (/api/track) is meant to be called from ANY third-party
+  // site embedding the snippet, so it's exempt from the strict allowlist below —
+  // same as a real analytics collector. Applied here, before the strict check.
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/track')) return next();
+    return cors({
       origin(origin, cb) {
         // Allow same-origin/server-side calls, which send no Origin header.
         if (!origin) return cb(null, true);
@@ -44,8 +60,9 @@ export function createApp() {
         cb(new Error(`Origin ${origin} is not allowed by CORS.`));
       },
       credentials: true,
-    })
-  );
+    })(req, res, next);
+  });
+  app.use('/api/track', cors({ origin: true }));
 
   app.use('/uploads', express.static(path.resolve(UPLOAD_DIR)));
 
@@ -59,6 +76,10 @@ export function createApp() {
   });
 
   app.use('/api/leads', leadsRouter);
+  app.use('/api/track', trackRouter);
+  app.use('/api/meta/webhook', metaWebhookRouter);
+  app.use('/api/sequences', sequenceUnsubscribeRouter);
+  app.use('/api/forms', publicFormsRouter);
   app.use('/api/auth', authRouter);
   app.use('/api/content', contentRouter);
   app.use('/api/student/auth', studentAuthRouter);

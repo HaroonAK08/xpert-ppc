@@ -2,6 +2,7 @@ import type {
   ColumnMapping,
   CrmLeadStatus,
   LeadActivityAction,
+  LeadQualification,
   SyncState,
 } from './constants';
 
@@ -35,11 +36,32 @@ export type CrmUser = {
 export type LeadNote = {
   id: string;
   leadId: string;
-  authorId: string;
+  authorId: string | null;
   authorName: string;
   text: string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type Contact = {
+  id: string;
+  anonymousId: string;
+  name: string;
+  email: string;
+  phone: string;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  convertedLeadId: string | null;
+};
+
+export type ContactActivity = {
+  id: string;
+  contactId: string;
+  type: 'page_view';
+  url: string;
+  referrer: string;
+  utm: { source: string; medium: string; campaign: string; term: string; content: string };
+  createdAt: string;
 };
 
 export type LeadActivity = {
@@ -61,8 +83,10 @@ export type CrmLead = {
   email: string;
   businessName: string;
   source: string;
+  sourcePath: string;
   message: string;
   status: CrmLeadStatus;
+  qualification: LeadQualification;
   notes: string;
   replied: boolean;
   contactedAt: string | null;
@@ -76,6 +100,13 @@ export type CrmLead = {
   website: string;
   platform: string;
   monthlyBudget: string;
+  contactId: string | null;
+  formId: string | null;
+  /** Form title snapshot when the lead was submitted (empty if not from a builder form). */
+  formName: string;
+  /** Tags copied from the form at submit time (CRM-only). */
+  formTags: string[];
+  customFields: Record<string, string | number | null>;
 };
 
 export type DashboardStats = {

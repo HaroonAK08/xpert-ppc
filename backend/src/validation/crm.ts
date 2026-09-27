@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { CRM_LEAD_STATUSES, SHEET_FIELD_KEYS } from '../../../shared/crm/constants';
+import { CRM_LEAD_STATUSES, LEAD_QUALIFICATIONS, SHEET_FIELD_KEYS } from '../../../shared/crm/constants';
+import { leadCustomFieldValuesSchema } from './customFields';
 
 export const crmLeadCreateSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -25,12 +26,14 @@ export const crmLeadUpdateSchema = z.object({
   source: z.string().trim().max(120).optional(),
   message: z.string().trim().max(4000).optional(),
   status: z.enum(CRM_LEAD_STATUSES).optional(),
+  qualification: z.enum(LEAD_QUALIFICATIONS).optional(),
   notes: z.string().trim().max(8000).optional(),
   replied: z.boolean().optional(),
   contactedAt: z.string().datetime().nullable().optional(),
   repliedAt: z.string().datetime().nullable().optional(),
   followUpAt: z.string().datetime().nullable().optional(),
   externalId: z.string().trim().max(200).optional(),
+  customFields: leadCustomFieldValuesSchema.optional(),
 });
 
 export const noteCreateSchema = z.object({
@@ -67,6 +70,10 @@ export const sheetMappingSchema = z.object({
   worksheetName: z.string().trim().min(1).max(120).optional(),
   columnMapping: z.object(mappingShape).optional(),
   spreadsheetTitle: z.string().trim().max(300).optional(),
+});
+
+export const metaSelectPageSchema = z.object({
+  pageId: z.string().trim().min(1),
 });
 
 export const userCreateSchema = z.object({

@@ -8,6 +8,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { MotionProvider } from '@/components/motion';
 import { organizationSchema, websiteSchema } from '@/lib/seo';
 import { siteConfig } from '@/lib/site';
+import { API_URL } from '@/lib/api';
 
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
@@ -104,6 +105,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground">
         <GoogleTags />
+        {/* First-party visitor tracking (CRM-side) — see public/track.js */}
+        <script src="/track.js" data-api={API_URL} async />
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
 
         <a

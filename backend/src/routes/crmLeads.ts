@@ -4,15 +4,22 @@ import type { FilterQuery } from 'mongoose';
 import { Lead } from '../models/Lead';
 import { LeadNote } from '../models/LeadNote';
 import { LeadActivity } from '../models/LeadActivity';
+import { Contact } from '../models/Contact';
+import { ContactActivity } from '../models/ContactActivity';
+import { LeadFormDefinition } from '../models/LeadFormDefinition';
+import { SequenceEnrollment } from '../models/SequenceEnrollment';
 import { requireAuth } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import { recordLeadActivity } from '../utils/activity';
+import { runLeadCreatedAutomations, runStatusChangedAutomations } from '../utils/automations';
 import { markLeadDirty } from '../services/googleSheets/sheetsService';
 import {
   ok,
   serializeLead,
   serializeNote,
   serializeActivity,
+  serializeContact,
+  serializeContactActivity,
 } from '../utils/crmSerialize';
 import {
   contactActionSchema,
@@ -44,6 +51,11 @@ function buildLeadFilter(query: Record<string, unknown>): FilterQuery<LeadDoc> {
     if (statuses.length) filter.status = { $in: statuses };
   }
 
+  if (typeof query.qualification === 'string' && query.qualification) {
+    const qualifications = query.qualification.split(',').map((s) => s.trim()).filter(Boolean);
+    if (qualifications.length) filter.qualification = { $in: qualifications };
+  }
+
   if (query.replied === 'true') filter.replied = true;
   if (query.replied === 'false') filter.replied = false;
 
@@ -57,6 +69,10 @@ function buildLeadFilter(query: Record<string, unknown>): FilterQuery<LeadDoc> {
 
   if (typeof query.source === 'string' && query.source) {
     filter.source = query.source;
+  }
+
+  if (typeof query.form_id === 'string' && query.form_id.trim()) {
+    filter.formId = query.form_id.trim();
   }
 
   if (typeof query.search === 'string' && query.search.trim()) {
@@ -132,9 +148,30 @@ router.get(
       Lead.countDocuments(filter),
     ]);
 
+    // Fill formName for older leads that only stored formId.
+    const missingNameIds = [
+      ...new Set(
+        items
+          .filter((l) => l.formId && !l.formName)
+          .map((l) => String(l.formId))
+      ),
+    ];
+    const nameById = new Map<string, string>();
+    if (missingNameIds.length) {
+      const forms = await LeadFormDefinition.find({ _id: { $in: missingNameIds } })
+        .select('name')
+        .lean();
+      for (const f of forms) nameById.set(String(f._id), String(f.name || ''));
+    }
+
     res.json(
       ok(
-        items.map((l) => serializeLead(l)),
+        items.map((l) =>
+          serializeLead({
+            ...l,
+            formName: l.formName || (l.formId ? nameById.get(String(l.formId)) || '' : ''),
+          })
+        ),
         {
           page,
           pageSize,
@@ -152,16 +189,25 @@ router.get(
     const lead = await Lead.findOne({ _id: req.params.id, ...ownerFilter(req.admin) }).lean();
     if (!lead) throw new ApiError(404, 'Lead not found.');
 
-    const [notes, activity] = await Promise.all([
+    const [notes, activity, contact, form] = await Promise.all([
       LeadNote.find({ lead: lead._id }).sort({ createdAt: -1 }).limit(50).lean(),
       LeadActivity.find({ lead: lead._id }).sort({ createdAt: -1 }).limit(50).lean(),
+      lead.contactId ? Contact.findById(lead.contactId).lean() : null,
+      lead.formId ? LeadFormDefinition.findById(lead.formId).select('name').lean() : null,
     ]);
+
+    const contactActivity = contact
+      ? await ContactActivity.find({ contact: contact._id }).sort({ createdAt: -1 }).limit(100).lean()
+      : [];
 
     res.json(
       ok({
         lead: serializeLead(lead),
         notes: notes.map(serializeNote),
         activity: activity.map(serializeActivity),
+        contact: contact ? serializeContact(contact) : null,
+        contactActivity: contactActivity.map(serializeContactActivity),
+        form: form ? { id: String(form._id), name: form.name } : null,
       })
     );
   })
@@ -203,6 +249,7 @@ router.post(
       userName: req.admin?.name,
       action: 'lead_created',
     });
+    await runLeadCreatedAutomations(lead.toObject());
 
     res.status(201).json(ok(serializeLead(lead.toObject())));
   })
@@ -217,6 +264,7 @@ router.patch(
     const lead = await findOwnedLead(req.admin, req.params.id);
 
     const prevStatus = lead.status;
+    const prevQualification = lead.qualification;
     const data = parsed.data;
 
     if (data.name !== undefined) lead.name = data.name;
@@ -233,6 +281,7 @@ router.patch(
     if (data.source !== undefined) lead.source = data.source;
     if (data.message !== undefined) lead.message = data.message;
     if (data.status !== undefined) lead.status = data.status;
+    if (data.qualification !== undefined) lead.qualification = data.qualification;
     if (data.notes !== undefined) lead.notes = data.notes;
     if (data.replied !== undefined) lead.replied = data.replied;
     if (data.contactedAt !== undefined) {
@@ -245,12 +294,20 @@ router.patch(
       lead.followUpAt = data.followUpAt ? new Date(data.followUpAt) : null;
     }
     if (data.externalId !== undefined) lead.externalId = data.externalId;
+    if (data.customFields !== undefined) {
+      lead.customFields = { ...(lead.customFields as object), ...data.customFields };
+    }
 
     lead.localDirtyAt = new Date();
     await lead.save();
     await markLeadDirty(String(lead._id));
 
-    if (data.status && data.status !== prevStatus) {
+    const statusChanged = Boolean(data.status && data.status !== prevStatus);
+    const qualificationChanged = Boolean(
+      data.qualification && data.qualification !== prevQualification
+    );
+
+    if (statusChanged) {
       await recordLeadActivity({
         leadId: String(lead._id),
         userId: req.admin?.sub,
@@ -258,7 +315,18 @@ router.patch(
         action: 'status_changed',
         metadata: { from: prevStatus, to: data.status },
       });
-    } else {
+      await runStatusChangedAutomations(lead.toObject(), prevStatus, data.status!);
+    }
+    if (qualificationChanged) {
+      await recordLeadActivity({
+        leadId: String(lead._id),
+        userId: req.admin?.sub,
+        userName: req.admin?.name,
+        action: 'qualification_changed',
+        metadata: { from: prevQualification, to: data.qualification },
+      });
+    }
+    if (!statusChanged && !qualificationChanged) {
       await recordLeadActivity({
         leadId: String(lead._id),
         userId: req.admin?.sub,
@@ -279,6 +347,14 @@ router.delete(
       ...ownerFilter(req.admin),
     });
     if (!deleted) throw new ApiError(404, 'Lead not found.');
+
+    const leadId = deleted._id;
+    await Promise.all([
+      LeadNote.deleteMany({ lead: leadId }),
+      LeadActivity.deleteMany({ lead: leadId }),
+      SequenceEnrollment.deleteMany({ lead: leadId }),
+    ]);
+
     res.json(ok({ id: req.params.id }));
   })
 );

@@ -40,6 +40,22 @@ export const LEAD_STATUS_LABELS: Record<CrmLeadStatus, string> = {
   closed: 'Closed',
 };
 
+/**
+ * A separate axis from `status` (which tracks pipeline progress): whether the
+ * lead itself is legitimate. A lead can be "converted" and still get marked
+ * "spam" later if it turns out to be junk — the two are independent.
+ */
+export const LEAD_QUALIFICATIONS = ['unreviewed', 'real', 'false_lead', 'spam'] as const;
+
+export type LeadQualification = (typeof LEAD_QUALIFICATIONS)[number];
+
+export const LEAD_QUALIFICATION_LABELS: Record<LeadQualification, string> = {
+  unreviewed: 'Unreviewed',
+  real: 'Real lead',
+  false_lead: 'False lead',
+  spam: 'Spam',
+};
+
 /** Map legacy website statuses into the CRM set for display/stats. */
 export function normalizeLeadStatus(status: string): CrmLeadStatus {
   switch (status) {
@@ -72,6 +88,7 @@ export const LEAD_ACTIVITY_ACTIONS = [
   'synced_to_sheets',
   'sync_conflict',
   'lead_updated',
+  'qualification_changed',
 ] as const;
 
 export type LeadActivityAction = (typeof LEAD_ACTIVITY_ACTIONS)[number];
@@ -99,3 +116,20 @@ export type SheetFieldKey = (typeof SHEET_FIELD_KEYS)[number];
 export type ColumnMapping = Partial<Record<SheetFieldKey, string>>;
 
 export type SyncState = 'idle' | 'syncing' | 'success' | 'failed';
+
+/**
+ * The fixed set of "standard" Lead fields a form builder can offer, beyond
+ * whatever admin-defined custom properties also exist. Name and email are
+ * required on every form — the public lead endpoint needs at least one to
+ * identify who submitted it.
+ */
+export const STANDARD_FORM_FIELDS = [
+  { key: 'name', label: 'Name', type: 'text', locked: true },
+  { key: 'email', label: 'Email', type: 'email', locked: true },
+  { key: 'phone', label: 'Phone', type: 'tel', locked: false },
+  { key: 'company', label: 'Company', type: 'text', locked: false },
+  { key: 'message', label: 'Message', type: 'textarea', locked: false },
+] as const;
+
+export type StandardFormFieldKey = (typeof STANDARD_FORM_FIELDS)[number]['key'];
+export type FormFieldType = 'text' | 'email' | 'tel' | 'textarea' | 'select';

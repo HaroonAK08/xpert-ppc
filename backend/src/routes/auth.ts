@@ -10,13 +10,14 @@ import { loginSchema } from '../validation/lead';
 
 const router = Router();
 
-/** Brute-force guard: 10 attempts per 15 minutes per IP. */
+/** Brute-force guard: 10 attempts per 15 minutes per IP (much looser in local dev). */
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 10,
+  limit: process.env.NODE_ENV === 'production' ? 10 : 200,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many login attempts. Try again later.' },
+  skip: () => process.env.NODE_ENV !== 'production' && process.env.DISABLE_LOGIN_RATE_LIMIT === '1',
 });
 
 router.post(

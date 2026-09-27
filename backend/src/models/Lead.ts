@@ -1,5 +1,5 @@
 import mongoose, { Schema, type Model, type InferSchemaType } from 'mongoose';
-import { LEAD_STATUSES } from '../../../shared/crm/constants';
+import { LEAD_STATUSES, LEAD_QUALIFICATIONS } from '../../../shared/crm/constants';
 import { normalizeEmail, normalizePhone } from '../../../shared/crm/normalize';
 
 const LeadSchema = new Schema(
@@ -39,6 +39,13 @@ const LeadSchema = new Schema(
       default: 'new',
       index: true,
     },
+    // Independent of `status` — whether this lead is legitimate at all.
+    qualification: {
+      type: String,
+      enum: [...LEAD_QUALIFICATIONS],
+      default: 'unreviewed',
+      index: true,
+    },
     notes: { type: String, trim: true, maxlength: 8000, default: '' },
     replied: { type: Boolean, default: false, index: true },
     contactedAt: { type: Date, default: null },
@@ -70,6 +77,20 @@ const LeadSchema = new Schema(
       default: null,
       index: true,
     },
+    // Full provider payload for externally-sourced leads (e.g. Meta field_data), kept for debugging.
+    metaRaw: { type: Schema.Types.Mixed, default: null },
+    // The anonymous website visitor this lead was identified from, if the tracking script saw them first.
+    contactId: { type: Schema.Types.ObjectId, ref: 'Contact', default: null, index: true },
+    // Which builder-created form this lead was submitted through, if any (source: 'embed').
+    formId: { type: Schema.Types.ObjectId, ref: 'LeadFormDefinition', default: null, index: true },
+    // Snapshot of the form name at submit time — survives form renames/deletes in the leads list.
+    formName: { type: String, trim: true, maxlength: 120, default: '' },
+    // Tags copied from the form at submit time (Website, Facebook, …) — CRM-only context.
+    formTags: { type: [String], default: [] },
+    // Values for admin-defined custom properties, keyed by CustomFieldDefinition.key.
+    customFields: { type: Schema.Types.Mixed, default: {} },
+    // Set via the unsubscribe link in a sequence email — stops all future sequence sends to this lead.
+    emailOptOut: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -79,6 +100,12 @@ LeadSchema.index({ updatedAt: -1 });
 LeadSchema.index({ email: 1, createdAt: -1 });
 LeadSchema.index({ phoneNormalized: 1, email: 1 });
 LeadSchema.index({ name: 'text', email: 'text', phone: 'text', company: 'text', businessName: 'text', message: 'text' });
+// Prevents re-importing the same externally-sourced lead (e.g. on a Meta webhook retry).
+// Scoped to non-empty externalId so manual/website leads (externalId = '') are unaffected.
+LeadSchema.index(
+  { source: 1, externalId: 1 },
+  { unique: true, partialFilterExpression: { externalId: { $gt: '' } } }
+);
 
 LeadSchema.pre('validate', function (next) {
   if (this.email) this.email = normalizeEmail(String(this.email));

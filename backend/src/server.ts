@@ -2,6 +2,7 @@ import { createApp } from './app';
 import { connectDb, disconnectDb } from './config/db';
 import { env } from './config/env';
 import { startSheetSyncScheduler } from './services/googleSheets/scheduler';
+import { startSequenceScheduler } from './services/sequences/scheduler';
 
 async function start() {
   await connectDb();
@@ -13,6 +14,7 @@ async function start() {
   });
 
   startSheetSyncScheduler();
+  startSequenceScheduler();
 
   const shutdown = async (signal: string) => {
     console.log(`\n[server] ${signal} received, shutting down…`);

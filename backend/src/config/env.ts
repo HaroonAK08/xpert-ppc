@@ -31,12 +31,28 @@ export const env = {
     'umer@xpertppc.com',
   /** Public agency site origin (admin / marketing links). */
   siteUrl: (process.env.PUBLIC_SITE_URL || 'https://xpertppc.com').replace(/\/$/, ''),
+  /** The standalone CRM app (crm-frontend) — where Meta's OAuth callback sends the browser back to. */
+  crmAppUrl: (process.env.CRM_APP_URL || 'http://localhost:3100').replace(/\/$/, ''),
+  /** This API's own public origin — used for links that must be hit directly (e.g. email unsubscribe). */
+  apiPublicUrl: (process.env.API_PUBLIC_URL || `http://localhost:${process.env.PORT ?? 5000}`).replace(/\/$/, ''),
+  /** How often due email-sequence steps are checked and sent, in ms. 0 disables it. */
+  sequenceCheckIntervalMs: Number(process.env.SEQUENCE_CHECK_INTERVAL_MS ?? 5 * 60 * 1000),
   /** Courses / Digital Academy origin (student + application links). */
   coursesSiteUrl: (process.env.COURSES_SITE_URL || 'https://xpertppc.net').replace(/\/$/, ''),
   /** Service-account JSON (raw or base64). Never ship this to the mobile app. */
   googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '',
   /** How often every connected Google Sheet gets auto-synced, in ms. 0 disables it. */
   sheetSyncIntervalMs: Number(process.env.SHEET_SYNC_INTERVAL_MS ?? 5 * 60 * 1000),
+  /** Meta (Facebook/Instagram) Lead Ads integration — all optional; feature is disabled until every value is set. */
+  meta: {
+    appId: process.env.META_APP_ID || '',
+    appSecret: process.env.META_APP_SECRET || '',
+    graphVersion: process.env.META_GRAPH_VERSION || 'v21.0',
+    webhookVerifyToken: process.env.META_WEBHOOK_VERIFY_TOKEN || '',
+    oauthRedirectUri: process.env.META_OAUTH_REDIRECT_URI || '',
+    /** Encrypts Page access tokens at rest. Generate with: openssl rand -base64 48 */
+    tokenEncryptionKey: process.env.META_TOKEN_ENCRYPTION_KEY || '',
+  },
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT ?? 587),
