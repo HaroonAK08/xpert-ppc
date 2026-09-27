@@ -22,6 +22,7 @@ export const LEAD_SOURCES = [
   'lp-restaurant',
   'lp-property',
   'embed',
+  'quick-form',
   'other',
 ] as const;
 
