@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import * as Notifications from 'expo-notifications';
 import { useAuthStore } from '@/store/auth';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { registerForPushNotificationsAsync } from '@/services/notifications';
+import { registerDevice } from '@/api/devices';
 import { colors } from '@/theme';
 
 const queryClient = new QueryClient({
@@ -39,6 +42,35 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       router.replace('/(tabs)/dashboard');
     }
   }, [hydrated, token, segments, router]);
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    (async () => {
+      const pushToken = await registerForPushNotificationsAsync();
+      if (!pushToken || cancelled) return;
+      try {
+        await registerDevice(pushToken, Platform.OS === 'ios' ? 'ios' : 'android');
+      } catch (err) {
+        console.warn('[push] Failed to register device:', err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { leadId?: string } | undefined;
+      if (data?.leadId) {
+        router.push(`/leads/${data.leadId}`);
+      } else {
+        router.push('/(tabs)/leads');
+      }
+    });
+    return () => sub.remove();
+  }, [router]);
 
   if (!hydrated) {
     return (

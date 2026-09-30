@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "581882481810",
+    "project_id": "xpert-ppc-20f85",
+    "storage_bucket": "xpert-ppc-20f85.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581882481810:android:2e48082f6a837f0311ea4b",
+        "android_client_info": {
+          "package_name": "com.xpertppc.leads"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC53IQiEJyTDbIQqbQzXKC5KHSJQaJGhMI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

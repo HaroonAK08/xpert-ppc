@@ -15,6 +15,8 @@ import {
   syncSheet,
 } from '@/api/googleSheets';
 import { logout } from '@/api/auth';
+import { unregisterDevice } from '@/api/devices';
+import { registerForPushNotificationsAsync } from '@/services/notifications';
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -38,6 +40,8 @@ export default function SettingsScreen() {
   async function onSignOut() {
     setSigningOut(true);
     try {
+      const pushToken = await registerForPushNotificationsAsync().catch(() => null);
+      if (pushToken) await unregisterDevice(pushToken).catch(() => {});
       await logout();
     } finally {
       await clearSession();

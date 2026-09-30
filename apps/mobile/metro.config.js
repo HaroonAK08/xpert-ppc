@@ -16,11 +16,17 @@ config.resolver.nodeModulesPaths = [
 config.resolver.disableHierarchicalLookup = false;
 
 const queryStringShim = path.resolve(projectRoot, 'shims/query-string.js');
+const queryStringImpl = require.resolve('query-string', {
+  paths: [projectRoot, monorepoRoot],
+});
 const upstreamResolveRequest = config.resolver.resolveRequest;
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === 'query-string') {
     return { type: 'sourceFile', filePath: queryStringShim };
+  }
+  if (moduleName === '__xpertppc_query_string_impl') {
+    return { type: 'sourceFile', filePath: queryStringImpl };
   }
   if (upstreamResolveRequest) {
     return upstreamResolveRequest(context, moduleName, platform);

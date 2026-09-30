@@ -1,4 +1,4 @@
-const qs = require('../node_modules/query-string/index.js');
+const qs = require('__xpertppc_query_string_impl');
 
 // Expo Router uses __importStar(require('query-string')).
 // Ensure named exports exist on the namespace object for Metro/interop.
