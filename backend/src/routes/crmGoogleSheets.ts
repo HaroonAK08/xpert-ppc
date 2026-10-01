@@ -17,13 +17,35 @@ const router = Router();
 
 router.use(requireAuth);
 
+/** Admins share the main-pool sheet; prefer own connection, else any connected sheet. */
+async function findConnectedSheetLean(admin?: { sub: string; role: string }) {
+  const own = await GoogleSheetConnection.findOne({
+    ownerUserId: admin?.sub,
+    connected: true,
+  }).lean();
+  if (own) return own;
+  if (admin?.role === 'admin') {
+    return GoogleSheetConnection.findOne({ connected: true }).sort({ lastSyncedAt: -1 }).lean();
+  }
+  return null;
+}
+
+async function findConnectedSheetDoc(admin?: { sub: string; role: string }) {
+  const own = await GoogleSheetConnection.findOne({
+    ownerUserId: admin?.sub,
+    connected: true,
+  });
+  if (own) return own;
+  if (admin?.role === 'admin') {
+    return GoogleSheetConnection.findOne({ connected: true }).sort({ lastSyncedAt: -1 });
+  }
+  return null;
+}
+
 router.get(
   '/',
   asyncHandler(async (req, res) => {
-    const connection = await GoogleSheetConnection.findOne({
-      ownerUserId: req.admin?.sub,
-      connected: true,
-    }).lean();
+    const connection = await findConnectedSheetLean(req.admin);
 
     res.json(
       ok({
@@ -37,10 +59,7 @@ router.get(
 router.get(
   '/status',
   asyncHandler(async (req, res) => {
-    const connection = await GoogleSheetConnection.findOne({
-      ownerUserId: req.admin?.sub,
-      connected: true,
-    }).lean();
+    const connection = await findConnectedSheetLean(req.admin);
 
     res.json(
       ok({
@@ -127,10 +146,7 @@ router.patch(
     const parsed = sheetMappingSchema.safeParse(req.body);
     if (!parsed.success) throw new ApiError(400, 'Invalid mapping payload.');
 
-    const connection = await GoogleSheetConnection.findOne({
-      ownerUserId: req.admin?.sub,
-      connected: true,
-    });
+    const connection = await findConnectedSheetDoc(req.admin);
     if (!connection) throw new ApiError(404, 'No Google Sheet connected.');
 
     if (parsed.data.worksheetName) connection.worksheetName = parsed.data.worksheetName;
@@ -150,10 +166,7 @@ router.patch(
 router.get(
   '/headers',
   asyncHandler(async (req, res) => {
-    const connection = await GoogleSheetConnection.findOne({
-      ownerUserId: req.admin?.sub,
-      connected: true,
-    });
+    const connection = await findConnectedSheetDoc(req.admin);
     if (!connection) throw new ApiError(404, 'No Google Sheet connected.');
 
     const headers = await fetchSheetHeaders(connection.spreadsheetId, connection.worksheetName);
@@ -170,10 +183,7 @@ router.get(
 router.post(
   '/sync',
   asyncHandler(async (req, res) => {
-    const connection = await GoogleSheetConnection.findOne({
-      ownerUserId: req.admin?.sub,
-      connected: true,
-    });
+    const connection = await findConnectedSheetDoc(req.admin);
     if (!connection) throw new ApiError(404, 'No Google Sheet connected.');
 
     try {

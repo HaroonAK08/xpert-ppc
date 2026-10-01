@@ -13,16 +13,20 @@ export default function LoginPage() {
   const router = useRouter();
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  // Random per-mount field names so the browser's saved-password manager can't
+  // match this form to a previously saved login and silently fill it on load.
+  const [fieldId] = useState(() => Math.random().toString(36).slice(2, 10));
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus('loading');
     setError('');
 
-    const fd = new FormData(e.currentTarget);
     const res = await api.post<{ ok: boolean }>('/api/auth/login', {
-      email: String(fd.get('email') || '').trim(),
-      password: String(fd.get('password') || ''),
+      email: email.trim(),
+      password,
     });
 
     if (!res.ok) {
@@ -68,12 +72,21 @@ export default function LoginPage() {
           <h2 className="text-2xl font-semibold tracking-tight text-ink">Sign in</h2>
           <p className="mt-1.5 text-sm text-muted">Use the email and password for your CRM account.</p>
 
-          <form onSubmit={onSubmit} className="mt-8 space-y-4">
+          <form onSubmit={onSubmit} autoComplete="off" className="mt-8 space-y-4">
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-xs font-semibold text-ink">
                 Email
               </label>
-              <Input id="email" name="email" type="email" required autoComplete="email" placeholder="you@xpertppc.com" />
+              <Input
+                id="email"
+                name={`email_${fieldId}`}
+                type="email"
+                required
+                autoComplete="off"
+                placeholder="you@xpertppc.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
             <div className="space-y-1.5">
@@ -82,11 +95,13 @@ export default function LoginPage() {
               </label>
               <Input
                 id="password"
-                name="password"
+                name={`password_${fieldId}`}
                 type="password"
                 required
-                autoComplete="current-password"
+                autoComplete="new-password"
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 

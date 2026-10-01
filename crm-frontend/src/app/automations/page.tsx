@@ -677,6 +677,10 @@ export default function AutomationsSettingsPage() {
     setSaving(false);
   }
 
+  if (error && !rules) {
+    return <div className="page text-sm font-medium text-red-600">{error}</div>;
+  }
+
   if (!rules) {
     return (
       <div className="flex h-48 items-center justify-center">

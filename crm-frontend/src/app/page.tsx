@@ -74,8 +74,8 @@ export default function DashboardPage() {
         title={user.role === 'client' ? `Welcome back, ${user.name.split(' ')[0]}` : 'Dashboard'}
         description={
           user.role === 'client'
-            ? 'Here is how your leads are moving through the pipeline.'
-            : `${today} · pipeline health across every lead source.`
+            ? 'Your own leads only — form and main-team leads are hidden.'
+            : `${today} · pipeline health for form and main-team leads.`
         }
       />
 

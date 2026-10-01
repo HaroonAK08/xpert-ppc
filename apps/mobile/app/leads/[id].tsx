@@ -28,7 +28,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { LoadingState, ErrorState } from '@/components/EmptyState';
 import { CRM_LEAD_STATUSES, LEAD_STATUS_LABELS, type CrmLeadStatus } from '@/types/crm';
 import { ApiClientError } from '@/api/client';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, radius, shadows, spacing, typography } from '@/theme';
 
 function formatDate(iso: string | null) {
   if (!iso) return '—';
@@ -255,6 +255,7 @@ export default function LeadDetailScreen() {
       <Modal visible={replyOpen} transparent animationType="slide" onRequestClose={() => setReplyOpen(false)}>
         <Pressable style={styles.modalOverlay} onPress={() => setReplyOpen(false)}>
           <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.handle} />
             <Text style={styles.sheetTitle}>Reply via</Text>
             <Button
               title="Phone"
@@ -285,6 +286,7 @@ export default function LeadDetailScreen() {
       <Modal visible={Boolean(markOpen)} transparent animationType="fade" onRequestClose={() => setMarkOpen(null)}>
         <Pressable style={styles.modalOverlay} onPress={() => setMarkOpen(null)}>
           <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.handle} />
             <Text style={styles.sheetTitle}>
               {markOpen === 'replied' ? 'Mark as replied' : 'Mark as contacted'}
             </Text>
@@ -314,6 +316,7 @@ export default function LeadDetailScreen() {
       <Modal visible={statusOpen} transparent animationType="slide" onRequestClose={() => setStatusOpen(false)}>
         <Pressable style={styles.modalOverlay} onPress={() => setStatusOpen(false)}>
           <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.handle} />
             <Text style={styles.sheetTitle}>Change status</Text>
             {CRM_LEAD_STATUSES.map((s) => (
               <Button
@@ -330,6 +333,7 @@ export default function LeadDetailScreen() {
       <Modal visible={followUpOpen} transparent animationType="fade" onRequestClose={() => setFollowUpOpen(false)}>
         <Pressable style={styles.modalOverlay} onPress={() => setFollowUpOpen(false)}>
           <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.handle} />
             <Text style={styles.sheetTitle}>Follow-up</Text>
             <Input
               label="Date/time (YYYY-MM-DDTHH:mm)"
@@ -373,14 +377,20 @@ const styles = StyleSheet.create({
   header: { gap: spacing.sm },
   name: { ...typography.title, color: colors.text },
   business: { ...typography.body, color: colors.textSecondary },
-  actions: { flexDirection: 'row', flexWrap: 'wrap' },
+  actions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.sm,
+    ...shadows.xs,
+  },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
     gap: spacing.md,
+    ...shadows.card,
   },
   row: { gap: 2 },
   rowLabel: { ...typography.small, color: colors.textMuted, textTransform: 'uppercase' },
@@ -398,7 +408,17 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
     padding: spacing.xl,
+    paddingTop: spacing.md,
     gap: spacing.md,
+    ...shadows.floating,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: radius.pill,
+    backgroundColor: colors.border,
+    alignSelf: 'center',
+    marginBottom: spacing.xs,
   },
   sheetTitle: { ...typography.subtitle, color: colors.text },
 });

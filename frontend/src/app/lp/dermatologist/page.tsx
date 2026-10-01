@@ -179,6 +179,7 @@ function FormCard({ id = 'audit-form' }: { id?: string }) {
           variant="audit"
           source="industry"
           compact
+          showClinicName
           submitLabel="Get My Free Audit"
           className="[&_button]:rounded-full [&_button]:bg-[#1d6ff2] [&_button]:hover:bg-[#1558c7]"
         />

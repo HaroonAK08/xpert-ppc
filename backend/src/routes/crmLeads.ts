@@ -8,12 +8,13 @@ import { Contact } from '../models/Contact';
 import { ContactActivity } from '../models/ContactActivity';
 import { LeadFormDefinition } from '../models/LeadFormDefinition';
 import { SequenceEnrollment } from '../models/SequenceEnrollment';
+import { AdminUser } from '../models/AdminUser';
 import { requireAuth } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import { recordLeadActivity } from '../utils/activity';
-import { runLeadCreatedAutomations, runStatusChangedAutomations } from '../utils/automations';
-import { markLeadDirty } from '../services/googleSheets/sheetsService';
-import {
+import { leadOwnerScope } from '../utils/ownerScope';
+import { runStatusChangedAutomations } from '../utils/automations';
+import { markLeadDirty } from '../services/googleSheets/sheetsService';import {
   ok,
   serializeLead,
   serializeNote,
@@ -120,14 +121,13 @@ function sortFromQuery(query: Record<string, unknown>): Record<string, 1 | -1> {
   }
 }
 
-/** Admins see every lead; everyone else only sees leads assigned to them. */
-function ownerFilter(admin?: { sub: string; role: string }): FilterQuery<LeadDoc> {
-  if (!admin || admin.role === 'admin') return {};
-  return { ownerUserId: admin.sub };
+/** Admins see the main (unowned) pool; team users see their company/field (or own leads). */
+async function ownerFilter(admin?: { sub: string; role: string }): Promise<FilterQuery<LeadDoc>> {
+  return (await leadOwnerScope(admin)) as FilterQuery<LeadDoc>;
 }
 
 async function findOwnedLead(admin: { sub: string; role: string } | undefined, id: string) {
-  const lead = await Lead.findOne({ _id: id, ...ownerFilter(admin) } as FilterQuery<LeadDoc>);
+  const lead = await Lead.findOne({ _id: id, ...(await ownerFilter(admin)) } as FilterQuery<LeadDoc>);
   if (!lead) throw new ApiError(404, 'Lead not found.');
   return lead;
 }
@@ -136,7 +136,10 @@ router.get(
   '/',
   asyncHandler(async (req, res) => {
     const { page, pageSize } = parsePage(req.query as Record<string, unknown>);
-    const filter = { ...buildLeadFilter(req.query as Record<string, unknown>), ...ownerFilter(req.admin) };
+    const filter = {
+      ...buildLeadFilter(req.query as Record<string, unknown>),
+      ...(await ownerFilter(req.admin)),
+    };
     const sort = sortFromQuery(req.query as Record<string, unknown>);
 
     const [items, total] = await Promise.all([
@@ -186,7 +189,7 @@ router.get(
 router.get(
   '/:id',
   asyncHandler(async (req, res) => {
-    const lead = await Lead.findOne({ _id: req.params.id, ...ownerFilter(req.admin) }).lean();
+    const lead = await Lead.findOne({ _id: req.params.id, ...(await ownerFilter(req.admin)) }).lean();
     if (!lead) throw new ApiError(404, 'Lead not found.');
 
     const [notes, activity, contact, form] = await Promise.all([
@@ -225,6 +228,14 @@ router.post(
     const businessName = data.businessName || data.company || '';
     const email = data.email ? normalizeEmail(data.email) : '';
 
+    let ownerUserId: string | null = null;
+    let fieldId: string | null = null;
+    if (req.admin && req.admin.role !== 'admin') {
+      ownerUserId = req.admin.sub;
+      const creator = await AdminUser.findById(req.admin.sub).select('fieldId').lean();
+      fieldId = creator?.fieldId ? String(creator.fieldId) : null;
+    }
+
     const lead = await Lead.create({
       name: data.name,
       email: email || `lead-${Date.now()}@placeholder.local`,
@@ -240,7 +251,8 @@ router.post(
       followUpAt: data.followUpAt ? new Date(data.followUpAt) : null,
       externalId: data.externalId || '',
       localDirtyAt: new Date(),
-      ownerUserId: req.admin?.role === 'admin' ? null : req.admin?.sub,
+      ownerUserId,
+      fieldId,
     });
 
     await recordLeadActivity({
@@ -249,7 +261,8 @@ router.post(
       userName: req.admin?.name,
       action: 'lead_created',
     });
-    await runLeadCreatedAutomations(lead.toObject());
+    // Manual CRM adds stay quiet — no automation emails/sequences and no push alerts.
+    // Form embeds and Meta webhooks still run those paths.
 
     res.status(201).json(ok(serializeLead(lead.toObject())));
   })
@@ -344,7 +357,7 @@ router.delete(
   asyncHandler(async (req, res) => {
     const deleted = await Lead.findOneAndDelete({
       _id: req.params.id,
-      ...ownerFilter(req.admin),
+      ...(await ownerFilter(req.admin)),
     });
     if (!deleted) throw new ApiError(404, 'Lead not found.');
 

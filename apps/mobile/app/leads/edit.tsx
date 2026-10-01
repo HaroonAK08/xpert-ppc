@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchLead, updateLead } from '@/api/leads';
@@ -7,7 +7,7 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { LoadingState, ErrorState } from '@/components/EmptyState';
 import { ApiClientError } from '@/api/client';
-import { colors, spacing } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 
 export default function EditLeadScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -98,20 +98,18 @@ export default function EditLeadScreen() {
           multiline
           style={{ minHeight: 90, textAlignVertical: 'top' }}
         />
+        {mutation.isError ? (
+          <Text style={styles.error}>
+            {mutation.error instanceof ApiClientError
+              ? mutation.error.message
+              : 'Could not update lead'}
+          </Text>
+        ) : null}
         <Button
           title="Save changes"
           loading={mutation.isPending}
           onPress={() => mutation.mutate()}
         />
-        {mutation.isError ? (
-          <Input
-            error={
-              mutation.error instanceof ApiClientError
-                ? mutation.error.message
-                : 'Could not update lead'
-            }
-          />
-        ) : null}
       </ScrollView>
     </>
   );
@@ -120,4 +118,11 @@ export default function EditLeadScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.lg, gap: spacing.lg, paddingBottom: spacing.xxl },
+  error: {
+    ...typography.caption,
+    color: colors.danger,
+    backgroundColor: colors.dangerSoft,
+    borderRadius: radius.md,
+    padding: spacing.md,
+  },
 });

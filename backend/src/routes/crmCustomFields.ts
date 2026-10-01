@@ -38,7 +38,7 @@ router.get(
 
 router.post(
   '/',
-  requireRole('admin'),
+  requireRole('admin', 'client'),
   asyncHandler(async (req, res) => {
     const parsed = customFieldCreateSchema.safeParse(req.body);
     if (!parsed.success) {

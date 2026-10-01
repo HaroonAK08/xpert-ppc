@@ -6,22 +6,22 @@ import { LeadFormDefinition } from '../models/LeadFormDefinition';
 import { requireAuth } from '../middleware/auth';
 import { asyncHandler } from '../middleware/error';
 import { ok } from '../utils/crmSerialize';
+import { leadOwnerScope } from '../utils/ownerScope';
 import { CRM_LEAD_STATUSES, LEAD_STATUS_LABELS, normalizeLeadStatus } from '../../../shared/crm/constants';
 
 const router = Router();
 
 router.use(requireAuth);
 
-/** Admins see stats across every lead; everyone else only sees their own. */
-function ownerFilter(admin?: { sub: string; role: string }): Record<string, unknown> {
-  if (!admin || admin.role === 'admin') return {};
-  return { ownerUserId: admin.sub };
+/** Admins see main-pool stats; team users see their company/field (or own leads). */
+async function ownerFilter(admin?: { sub: string; role: string }): Promise<Record<string, unknown>> {
+  return leadOwnerScope(admin);
 }
 
 router.get(
   '/overview',
   asyncHandler(async (req, res) => {
-    const scope = ownerFilter(req.admin);
+    const scope = await ownerFilter(req.admin);
     const days = Math.min(90, Math.max(7, Number(req.query.days) || 30));
     const since = new Date();
     since.setDate(since.getDate() - days);

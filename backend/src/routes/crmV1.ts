@@ -8,6 +8,7 @@ import crmLeadsRouter from './crmLeads';
 import crmDashboardRouter from './crmDashboard';
 import crmGoogleSheetsRouter from './crmGoogleSheets';
 import crmClientsRouter from './crmClients';
+import crmClientFieldsRouter from './crmClientFields';
 import crmMetaRouter from './crmMeta';
 import crmCustomFieldsRouter from './crmCustomFields';
 import crmReportsRouter from './crmReports';
@@ -15,6 +16,7 @@ import crmAutomationsRouter from './crmAutomations';
 import crmTeamRouter from './crmTeam';
 import crmFormsRouter from './crmForms';
 import crmSequencesRouter from './crmSequences';
+import crmDevicesRouter from './crmDevices';
 
 const router = Router();
 
@@ -44,5 +46,7 @@ router.use('/team', crmTeamRouter);
 router.use('/forms', crmFormsRouter);
 router.use('/sequences', crmSequencesRouter);
 router.use('/clients', crmClientsRouter);
+router.use('/client-fields', crmClientFieldsRouter);
+router.use('/devices', crmDevicesRouter);
 
 export default router;

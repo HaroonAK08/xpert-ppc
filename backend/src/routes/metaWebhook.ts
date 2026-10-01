@@ -5,6 +5,7 @@ import { Lead } from '../models/Lead';
 import { asyncHandler } from '../middleware/error';
 import { recordLeadActivity } from '../utils/activity';
 import { runLeadCreatedAutomations } from '../utils/automations';
+import { notifyNewLead } from '../utils/push';
 import { sendLeadNotification } from '../utils/mail';
 import { markLeadDirty } from '../services/googleSheets/sheetsService';
 import { env } from '../config/env';
@@ -100,6 +101,7 @@ async function importMetaLead(pageId: string, leadgenId: string) {
     metadata: { via: 'meta_ads', pageId },
   });
   await runLeadCreatedAutomations(lead.toObject());
+  void notifyNewLead(lead);
 
   await markLeadDirty(String(lead._id)).catch(() => {});
 

@@ -38,9 +38,13 @@ const LeadFormDefinitionSchema = new Schema(
     tags: { type: [String], default: [] },
     enabled: { type: Boolean, default: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'AdminUser', default: null },
+    /** null = main admin pool; set for company/field team forms. */
+    fieldId: { type: Schema.Types.ObjectId, ref: 'ClientField', default: null, index: true },
   },
   { timestamps: true }
 );
+
+LeadFormDefinitionSchema.index({ fieldId: 1, createdAt: -1 });
 
 export type LeadFormDefinitionDoc = InferSchemaType<typeof LeadFormDefinitionSchema>;
 

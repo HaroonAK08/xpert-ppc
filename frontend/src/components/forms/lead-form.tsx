@@ -22,6 +22,8 @@ type Props = {
   whatsAppSubmit?: boolean;
   /** Name, email, phone only — for ad landing pages. */
   compact?: boolean;
+  /** Show a Clinic name field (maps to company / businessName in CRM). */
+  showClinicName?: boolean;
   className?: string;
 };
 
@@ -49,6 +51,7 @@ export function LeadForm({
   submitLabel,
   whatsAppSubmit = false,
   compact = false,
+  showClinicName = false,
   className,
 }: Props) {
   const uid = useId();
@@ -71,14 +74,20 @@ export function LeadForm({
     const phone = sanitizePhoneInput(String(fd.get('phone') || '').trim());
     const email = String(fd.get('email') || '').trim();
     const name = String(fd.get('name') || '').trim();
+    const company = String(fd.get('company') || '').trim();
     const looksLikeAutofill =
       honeypot.length > 0 &&
-      (honeypot === phone || honeypot === email || honeypot === name || honeypot.includes('@'));
+      (honeypot === phone ||
+        honeypot === email ||
+        honeypot === name ||
+        honeypot === company ||
+        honeypot.includes('@'));
 
     const payload = {
       name,
       email,
       phone,
+      company,
       platform: String(fd.get('platform') || 'Other'),
       message: String(fd.get('message') || ''),
       companyWebsite: looksLikeAutofill ? '' : honeypot,
@@ -161,6 +170,18 @@ export function LeadForm({
               placeholder="Your full name"
             />
           </Field>
+          {showClinicName ? (
+            <Field>
+              <Label htmlFor={`company-${uid}`}>Clinic name *</Label>
+              <Input
+                id={`company-${uid}`}
+                name="company"
+                required
+                autoComplete="organization"
+                placeholder="Your clinic name"
+              />
+            </Field>
+          ) : null}
           <Field>
             <Label htmlFor={`email-${uid}`}>Email *</Label>
             <Input
@@ -211,6 +232,19 @@ export function LeadForm({
                 placeholder="you@email.com"
               />
             </Field>
+
+            {showClinicName ? (
+              <Field>
+                <Label htmlFor={`company-${uid}`}>Clinic name *</Label>
+                <Input
+                  id={`company-${uid}`}
+                  name="company"
+                  required
+                  autoComplete="organization"
+                  placeholder="Your clinic name"
+                />
+              </Field>
+            ) : null}
 
             <Field>
               <Label htmlFor={`phone-${uid}`}>{isAudit ? 'WhatsApp / phone' : 'Phone *'}</Label>

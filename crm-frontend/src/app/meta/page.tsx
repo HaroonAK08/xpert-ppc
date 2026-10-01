@@ -83,6 +83,9 @@ function MetaSettingsInner() {
   }
 
   if (!status) {
+    if (error) {
+      return <p className="text-sm font-medium text-red-600">{error}</p>;
+    }
     return (
       <div className="flex h-48 items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-brand" />

@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CRM_LEAD_STATUSES, LEAD_STATUS_LABELS, type CrmLeadStatus } from '@/types/crm';
 import { Button } from './Button';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, radius, shadows, spacing, typography } from '@/theme';
 
 export type LeadFilters = {
   status?: CrmLeadStatus | '';
@@ -44,6 +44,7 @@ export function FilterSheet({ visible, value, onChange, onClose }: Props) {
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
+          <View style={styles.handle} />
           <Text style={styles.title}>Filters</Text>
           <ScrollView contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xl }}>
             <View>
@@ -146,21 +147,30 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
     padding: spacing.xl,
+    paddingTop: spacing.md,
     gap: spacing.md,
+    ...shadows.floating,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: radius.pill,
+    backgroundColor: colors.border,
+    alignSelf: 'center',
+    marginBottom: spacing.sm,
   },
   title: { ...typography.title, color: colors.text },
   section: { ...typography.caption, color: colors.textSecondary, marginBottom: spacing.sm },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chip: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.sm,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.pill,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     minHeight: 36,
     justifyContent: 'center',
   },
-  chipActive: { backgroundColor: colors.brandSoft, borderColor: colors.brand },
-  chipText: { ...typography.caption, color: colors.text },
-  chipTextActive: { color: colors.brandDark, fontWeight: '700' },
+  chipActive: { backgroundColor: colors.brand },
+  chipText: { ...typography.caption, color: colors.textSecondary },
+  chipTextActive: { color: colors.white, fontWeight: '700' },
 });

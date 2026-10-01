@@ -231,6 +231,7 @@ function AuditCard() {
           submitLabel="Show me the 3 searches"
           whatsAppSubmit
           compact
+          showClinicName
         />
       </Suspense>
       <p className="mt-4 text-center text-xs text-muted-foreground">

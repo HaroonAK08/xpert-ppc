@@ -51,7 +51,7 @@ export type LeadQualification = (typeof LEAD_QUALIFICATIONS)[number];
 
 export const LEAD_QUALIFICATION_LABELS: Record<LeadQualification, string> = {
   unreviewed: 'Unreviewed',
-  real: 'Real lead',
+  real: 'True lead',
   false_lead: 'False lead',
   spam: 'Spam',
 };

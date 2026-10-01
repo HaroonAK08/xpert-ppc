@@ -5,6 +5,7 @@ import { env } from '../../config/env';
 import { Lead } from '../../models/Lead';
 import { GoogleSheetConnection } from '../../models/GoogleSheetConnection';
 import { recordLeadActivity } from '../../utils/activity';
+import { notifyLeadsSynced } from '../../utils/push';
 import { normalizeEmail, normalizePhone, isValidEmail } from '../../../../shared/crm/normalize';
 import {
   CRM_LEAD_STATUSES,
@@ -541,6 +542,8 @@ export async function runTwoWaySync(connectionId: string, userId?: string): Prom
       pushed: report.pushed,
       failed: report.failed,
     });
+
+    void notifyLeadsSynced(report.created);
 
     return report;
   } catch (err) {

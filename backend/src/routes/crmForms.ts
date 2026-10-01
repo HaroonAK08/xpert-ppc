@@ -5,16 +5,16 @@ import { CustomFieldDefinition } from '../models/CustomFieldDefinition';
 import { requireAuth, requireRole } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import { ok } from '../utils/crmSerialize';
+import { resourceFieldScope } from '../utils/ownerScope';
 import { formCreateSchema, formUpdateSchema, hasRequiredIdentityFields } from '../validation/forms';
 import { STANDARD_FORM_FIELDS } from '../../../shared/crm/constants';
 
 const router = Router();
 
-router.use(requireAuth, requireRole('admin'));
+router.use(requireAuth, requireRole('admin', 'client'));
 
 const STANDARD_KEYS = new Set(STANDARD_FORM_FIELDS.map((f) => f.key));
 
-/** Every non-standard field key must be a real, currently-defined custom property. */
 async function validateFieldKeys(fields: { key: string; standard: boolean }[]): Promise<void> {
   const customKeys = fields.filter((f) => !f.standard).map((f) => f.key);
   if (customKeys.length) {
@@ -52,8 +52,9 @@ function serializeForm(doc: LeadFormDefinitionDoc & { _id: unknown; createdAt?: 
 
 router.get(
   '/',
-  asyncHandler(async (_req, res) => {
-    const forms = await LeadFormDefinition.find().sort({ createdAt: -1 }).lean();
+  asyncHandler(async (req, res) => {
+    const { scope } = await resourceFieldScope(req.admin);
+    const forms = await LeadFormDefinition.find(scope).sort({ createdAt: -1 }).lean();
     res.json(ok(forms.map(serializeForm)));
   })
 );
@@ -61,7 +62,8 @@ router.get(
 router.get(
   '/:id',
   asyncHandler(async (req, res) => {
-    const form = await LeadFormDefinition.findById(req.params.id).lean();
+    const { scope } = await resourceFieldScope(req.admin);
+    const form = await LeadFormDefinition.findOne({ _id: req.params.id, ...scope }).lean();
     if (!form) throw new ApiError(404, 'Form not found.');
     res.json(ok(serializeForm(form)));
   })
@@ -78,7 +80,16 @@ router.post(
     }
     await validateFieldKeys(parsed.data.fields);
 
-    const form = await LeadFormDefinition.create({ ...parsed.data, createdBy: req.admin?.sub });
+    const { fieldId } = await resourceFieldScope(req.admin);
+    if (req.admin?.role === 'client' && !fieldId) {
+      throw new ApiError(400, 'Assign this user to a company/field before creating forms.');
+    }
+
+    const form = await LeadFormDefinition.create({
+      ...parsed.data,
+      createdBy: req.admin?.sub,
+      fieldId,
+    });
     res.status(201).json(ok(serializeForm(form.toObject())));
   })
 );
@@ -96,7 +107,12 @@ router.patch(
       await validateFieldKeys(parsed.data.fields);
     }
 
-    const form = await LeadFormDefinition.findByIdAndUpdate(req.params.id, parsed.data, { new: true });
+    const { scope } = await resourceFieldScope(req.admin);
+    const form = await LeadFormDefinition.findOneAndUpdate(
+      { _id: req.params.id, ...scope },
+      parsed.data,
+      { new: true }
+    );
     if (!form) throw new ApiError(404, 'Form not found.');
     res.json(ok(serializeForm(form.toObject())));
   })
@@ -105,7 +121,8 @@ router.patch(
 router.delete(
   '/:id',
   asyncHandler(async (req, res) => {
-    const deleted = await LeadFormDefinition.findByIdAndDelete(req.params.id);
+    const { scope } = await resourceFieldScope(req.admin);
+    const deleted = await LeadFormDefinition.findOneAndDelete({ _id: req.params.id, ...scope });
     if (!deleted) throw new ApiError(404, 'Form not found.');
     res.json(ok({ id: req.params.id }));
   })

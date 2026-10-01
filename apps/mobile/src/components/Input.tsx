@@ -8,8 +8,9 @@ type Props = TextInputProps & {
   error?: string;
 };
 
-export function Input({ label, error, style, secureTextEntry, ...rest }: Props) {
+export function Input({ label, error, style, secureTextEntry, onFocus, onBlur, ...rest }: Props) {
   const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
   const isPassword = Boolean(secureTextEntry);
 
   return (
@@ -20,11 +21,20 @@ export function Input({ label, error, style, secureTextEntry, ...rest }: Props) 
           placeholderTextColor={colors.textMuted}
           style={[
             styles.input,
+            focused ? styles.inputFocused : null,
             isPassword ? styles.inputWithIcon : null,
             error ? styles.inputError : null,
             style,
           ]}
           secureTextEntry={isPassword && !visible}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
           {...rest}
         />
         {isPassword ? (
@@ -38,7 +48,7 @@ export function Input({ label, error, style, secureTextEntry, ...rest }: Props) 
             <Ionicons
               name={visible ? 'eye-off-outline' : 'eye-outline'}
               size={20}
-              color={colors.textMuted}
+              color={focused ? colors.brand : colors.textMuted}
             />
           </Pressable>
         ) : null}
@@ -53,14 +63,18 @@ const styles = StyleSheet.create({
   label: { ...typography.caption, color: colors.textSecondary },
   inputRow: { justifyContent: 'center' },
   input: {
-    minHeight: 48,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    minHeight: 50,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+    backgroundColor: colors.surfaceMuted,
     borderRadius: radius.md,
     paddingHorizontal: spacing.lg,
     color: colors.text,
     fontSize: 15,
+  },
+  inputFocused: {
+    borderColor: colors.brand,
+    backgroundColor: colors.surface,
   },
   inputWithIcon: { paddingRight: spacing.xl + spacing.lg },
   eyeButton: {

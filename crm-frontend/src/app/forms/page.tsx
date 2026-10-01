@@ -60,6 +60,10 @@ export default function FormsListPage() {
     setTimeout(() => setCopiedId(null), 2000);
   }
 
+  if (error && !forms) {
+    return <div className="page text-sm font-medium text-red-600">{error}</div>;
+  }
+
   if (!forms) {
     return (
       <div className="flex h-64 items-center justify-center">

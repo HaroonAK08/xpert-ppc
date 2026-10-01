@@ -6,16 +6,16 @@ import { GoogleSheetConnection } from '../models/GoogleSheetConnection';
 import { requireAuth } from '../middleware/auth';
 import { asyncHandler } from '../middleware/error';
 import { ok, serializeLead, serializeActivity } from '../utils/crmSerialize';
+import { leadOwnerScope } from '../utils/ownerScope';
 import type { DashboardStats } from '../../../shared/crm/types';
 
 const router = Router();
 
 router.use(requireAuth);
 
-/** Admins see stats across every lead; everyone else only sees their own. */
-function ownerFilter(admin?: { sub: string; role: string }): Record<string, unknown> {
-  if (!admin || admin.role === 'admin') return {};
-  return { ownerUserId: admin.sub };
+/** Admins see main-pool stats; team users see their company/field (or own leads). */
+async function ownerFilter(admin?: { sub: string; role: string }): Promise<Record<string, unknown>> {
+  return leadOwnerScope(admin);
 }
 
 router.get(
@@ -26,7 +26,7 @@ router.get(
     const endOfToday = new Date();
     endOfToday.setHours(23, 59, 59, 999);
     const now = new Date();
-    const scope = ownerFilter(req.admin);
+    const scope = await ownerFilter(req.admin);
 
     const [
       total,
@@ -71,10 +71,18 @@ router.get(
         .sort({ createdAt: -1 })
         .limit(12)
         .lean(),
-      GoogleSheetConnection.findOne({
-        ownerUserId: req.admin?.sub ?? null,
-        connected: true,
-      }).lean(),
+      (async () => {
+        const own = await GoogleSheetConnection.findOne({
+          ownerUserId: req.admin?.sub ?? null,
+          connected: true,
+        }).lean();
+        if (own) return own;
+        // Admins share the main-pool sheet connected by any admin account.
+        if (req.admin?.role === 'admin') {
+          return GoogleSheetConnection.findOne({ connected: true }).sort({ lastSyncedAt: -1 }).lean();
+        }
+        return null;
+      })(),
     ]);
 
     const byStatus: Record<string, number> = {};

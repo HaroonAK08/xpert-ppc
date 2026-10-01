@@ -44,13 +44,13 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/leads', label: 'Leads', icon: ListChecks },
       { href: '/reports', label: 'Reports', icon: BarChart3 },
-      { href: '/clients', label: 'Clients', icon: Users, adminOnly: true },
+      { href: '/users', label: 'Users', icon: Users, adminOnly: true },
     ],
   },
   {
     label: 'Outreach',
     items: [
-      { href: '/automations', label: 'Automations', icon: Workflow, adminOnly: true },
+      { href: '/automations', label: 'Automations', icon: Workflow },
       { href: '/sequences', label: 'Sequences', icon: Mail, adminOnly: true },
     ],
   },
@@ -59,7 +59,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/properties', label: 'Properties', icon: SlidersHorizontal, adminOnly: true },
       { href: '/meta', label: 'Meta Lead Ads', icon: Facebook, adminOnly: true },
-      { href: '/forms', label: 'Form builder', icon: Code2, adminOnly: true },
+      { href: '/forms', label: 'Form builder', icon: Code2 },
     ],
   },
 ];
@@ -159,7 +159,7 @@ function Sidebar({
       <div className="relative border-t border-white/10 p-3">
         {user.role === 'client' ? (
           <p className="mb-2 rounded-lg bg-white/5 px-2.5 py-1.5 text-[11px] font-medium text-white/55">
-            Showing your leads only
+            Company workspace — forms &amp; leads stay in your field
           </p>
         ) : null}
         <div className="flex items-center gap-3 rounded-xl px-2 py-2">

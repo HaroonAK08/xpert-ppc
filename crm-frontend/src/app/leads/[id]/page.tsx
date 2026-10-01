@@ -212,7 +212,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               </span>
               <div className="min-w-0">
                 <h1 className="truncate text-lg font-semibold tracking-tight text-ink">{lead.name}</h1>
-                <p className="text-sm text-muted">{lead.businessName || 'No company'}</p>
+                <p className="text-sm text-muted">{lead.businessName || 'No clinic name'}</p>
               </div>
             </div>
 
@@ -224,6 +224,12 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               <div className="flex justify-between">
                 <dt className="text-muted">Phone</dt>
                 <dd className="font-medium text-ink">{lead.phone || '—'}</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted">Clinic name</dt>
+                <dd className="min-w-0 truncate text-right font-medium text-ink">
+                  {lead.businessName || '—'}
+                </dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Source</dt>

@@ -80,10 +80,16 @@ export const userCreateSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(200),
   name: z.string().trim().min(1).max(120),
   password: z.string().min(8).max(200),
+  fieldId: z.string().trim().min(1).optional().nullable(),
 });
 
 export const userUpdateSchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   active: z.boolean().optional(),
   password: z.string().min(8).max(200).optional(),
+  fieldId: z.string().trim().min(1).nullable().optional(),
+});
+
+export const clientFieldCreateSchema = z.object({
+  name: z.string().trim().min(1).max(120),
 });

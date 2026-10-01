@@ -37,11 +37,14 @@ const AutomationRuleSchema = new Schema(
     enabled: { type: Boolean, default: true },
     order: { type: Number, default: 0 },
     createdBy: { type: Schema.Types.ObjectId, ref: 'AdminUser', default: null },
+    /** null = main admin pool; set for company/field team rules. */
+    fieldId: { type: Schema.Types.ObjectId, ref: 'ClientField', default: null, index: true },
   },
   { timestamps: true }
 );
 
 AutomationRuleSchema.index({ trigger: 1, enabled: 1, order: 1 });
+AutomationRuleSchema.index({ fieldId: 1, trigger: 1, enabled: 1, order: 1 });
 
 export type AutomationRuleDoc = InferSchemaType<typeof AutomationRuleSchema>;
 

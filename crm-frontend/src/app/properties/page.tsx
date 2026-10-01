@@ -72,6 +72,10 @@ export default function PropertiesSettingsPage() {
     load();
   }
 
+  if (error && !defs) {
+    return <div className="page text-sm font-medium text-red-600">{error}</div>;
+  }
+
   if (!defs) {
     return (
       <div className="flex h-48 items-center justify-center">

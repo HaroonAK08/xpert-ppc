@@ -24,7 +24,7 @@ export function NoteItem({ note }: { note: LeadNote }) {
 const styles = StyleSheet.create({
   item: {
     backgroundColor: colors.surfaceMuted,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
     gap: spacing.xs,
   },

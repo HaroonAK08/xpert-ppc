@@ -1,34 +1,30 @@
 import React from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { colors } from '@/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, layout, shadows } from '@/theme';
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
-        headerShown: true,
-        headerShadowVisible: false,
-        headerStyle: { backgroundColor: colors.background },
-        headerTitleStyle: { color: colors.brandDark, fontWeight: '700' },
+        headerShown: false,
         tabBarActiveTintColor: colors.brand,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarLabelStyle: { fontWeight: '600', fontSize: 11 },
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-          borderTopWidth: StyleSheet.hairlineWidth,
-          height: Platform.OS === 'ios' ? 88 : 64,
-          paddingTop: 8,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
-          shadowColor: colors.brandDark,
-          shadowOpacity: 0.06,
-          shadowRadius: 12,
-          shadowOffset: { width: 0, height: -2 },
-          elevation: 8,
-        },
+        tabBarLabelStyle: { fontWeight: '600', fontSize: 11, marginTop: -2 },
+        tabBarItemStyle: { paddingVertical: 4 },
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            height: layout.tabBarHeight + insets.bottom,
+            paddingBottom: Math.max(insets.bottom, 10),
+            paddingTop: 10,
+          },
+        ],
       }}
       screenListeners={{
         tabPress: () => {
@@ -66,3 +62,12 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: colors.surface,
+    borderTopColor: colors.borderSubtle,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    ...shadows.raised,
+  },
+});

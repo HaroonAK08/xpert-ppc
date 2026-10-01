@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
 import { useAuthStore } from '@/store/auth';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
@@ -33,15 +34,16 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
     void hydrate();
   }, [hydrate]);
 
+  const onLoginScreen = segments[0] === 'login';
+
   useEffect(() => {
     if (!hydrated) return;
-    const onLoginScreen = segments[0] === 'login';
     if (!token && !onLoginScreen) {
       router.replace('/login');
     } else if (token && onLoginScreen) {
       router.replace('/(tabs)/dashboard');
     }
-  }, [hydrated, token, segments, router]);
+  }, [hydrated, token, onLoginScreen, router]);
 
   useEffect(() => {
     if (!token) return;
@@ -80,25 +82,39 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <StatusBar style={onLoginScreen ? 'light' : 'dark'} animated />
+      {children}
+    </>
+  );
 }
+
+const headerOptions = {
+  headerShadowVisible: false,
+  headerStyle: { backgroundColor: colors.background },
+  headerTitleStyle: { color: colors.text, fontWeight: '700' as const, fontSize: 17 },
+  headerTintColor: colors.brand,
+};
 
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <AppBootstrap>
-          <StatusBar style="dark" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="login" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="leads/[id]" options={{ headerShown: true, title: 'Lead' }} />
-            <Stack.Screen name="leads/edit" options={{ headerShown: true, title: 'Edit lead' }} />
-            <Stack.Screen name="leads/notes" options={{ headerShown: true, title: 'Notes' }} />
-          </Stack>
-        </AppBootstrap>
-      </QueryClientProvider>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <AppBootstrap>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="login" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="leads/[id]" options={{ ...headerOptions, headerShown: true, title: 'Lead' }} />
+              <Stack.Screen name="leads/new" options={{ ...headerOptions, headerShown: true, title: 'Add lead' }} />
+              <Stack.Screen name="leads/edit" options={{ ...headerOptions, headerShown: true, title: 'Edit lead' }} />
+              <Stack.Screen name="leads/notes" options={{ ...headerOptions, headerShown: true, title: 'Notes' }} />
+            </Stack>
+          </AppBootstrap>
+        </QueryClientProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

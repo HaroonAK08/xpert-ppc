@@ -24,7 +24,7 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "com.xpertppc.leads",
-      "versionCode": 1,
+      "versionCode": 2,
       "permissions": [
         "INTERNET",
         "VIBRATE",

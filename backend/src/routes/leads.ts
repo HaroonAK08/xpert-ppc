@@ -8,6 +8,7 @@ import { requireAuth } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import { sendLeadNotification } from '../utils/mail';
 import { runLeadCreatedAutomations } from '../utils/automations';
+import { notifyNewLead } from '../utils/push';
 import { createLeadSchema, updateLeadSchema, LEAD_STATUSES } from '../validation/lead';
 import { normalizeEmail } from '../../../shared/crm/normalize';
 import mongoose from 'mongoose';
@@ -73,25 +74,37 @@ router.post(
     let resolvedFormId: mongoose.Types.ObjectId | null = null;
     let resolvedFormName = '';
     let resolvedFormTags: string[] = [];
+    let resolvedFieldId: mongoose.Types.ObjectId | null = null;
+    let resolvedOwnerUserId: mongoose.Types.ObjectId | null = null;
     if (formId) {
       if (!mongoose.Types.ObjectId.isValid(formId)) {
         throw new ApiError(400, 'Invalid form.');
       }
       const form = await LeadFormDefinition.findOne({ _id: formId, enabled: true })
-        .select('name tags')
+        .select('name tags fieldId createdBy')
         .lean();
       if (!form) throw new ApiError(404, 'This form is not available.');
       resolvedFormId = form._id as mongoose.Types.ObjectId;
       resolvedFormName = String(form.name || '');
       resolvedFormTags = Array.isArray(form.tags) ? form.tags.map((t) => String(t)).filter(Boolean) : [];
+      if (form.fieldId) {
+        resolvedFieldId = form.fieldId as mongoose.Types.ObjectId;
+        // Attribute to form creator when present so ownership is clear within the company.
+        if (form.createdBy) resolvedOwnerUserId = form.createdBy as mongoose.Types.ObjectId;
+      }
     }
 
+    const company = String(data.company || '').trim();
     const lead = await Lead.create({
       ...data,
+      company,
+      businessName: company,
       contactId,
       formId: resolvedFormId,
       formName: resolvedFormName,
       formTags: resolvedFormTags,
+      fieldId: resolvedFieldId,
+      ownerUserId: resolvedOwnerUserId,
       meta: {
         ip: req.ip ?? '',
         userAgent: req.get('user-agent') ?? '',
@@ -104,17 +117,20 @@ router.post(
     }
 
     await runLeadCreatedAutomations(lead.toObject());
+    void notifyNewLead(lead);
 
-    // Notify inbox — never fail the form if mail delivery has a hiccup.
-    try {
-      await sendLeadNotification({
-        ...data,
-        id: String(lead._id),
-        formId: resolvedFormId ? String(resolvedFormId) : undefined,
-        formName: resolvedFormName || undefined,
-      });
-    } catch (err) {
-      console.error('[mail] Failed to send lead notification:', err);
+    // Company/field form leads stay in that team's CRM — don't ping the main inbox.
+    if (!resolvedFieldId) {
+      try {
+        await sendLeadNotification({
+          ...data,
+          id: String(lead._id),
+          formId: resolvedFormId ? String(resolvedFormId) : undefined,
+          formName: resolvedFormName || undefined,
+        });
+      } catch (err) {
+        console.error('[mail] Failed to send lead notification:', err);
+      }
     }
 
     res.status(201).json({ ok: true, id: String(lead._id) });

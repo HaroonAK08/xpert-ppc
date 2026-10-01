@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Plus, Search, Trash2, X } from 'lucide-react';
 
 import { api } from '@/lib/api';
-import { StatusBadge } from '@/components/status-badge';
-import { QualificationBadge } from '@/components/qualification-badge';
 import { Button } from '@/components/ui/button';
-import { Input, Select } from '@/components/ui/input';
+import { Input, Select, Textarea } from '@/components/ui/input';
 import { PageHeader } from '@/components/ui/page-header';
+import { useCurrentUser } from '@/lib/user-context';
 import { cn, initials } from '@/lib/utils';
 import {
   CRM_LEAD_STATUSES,
@@ -31,6 +30,8 @@ const SECTION_LABELS: Record<Section, string> = {
 
 export default function LeadsPage() {
   const router = useRouter();
+  const user = useCurrentUser();
+  const isTeamUser = user.role === 'client';
   const [items, setItems] = useState<CrmLead[] | null>(null);
   const [meta, setMeta] = useState<PaginatedMeta | null>(null);
   const [sectionCounts, setSectionCounts] = useState<Record<Section, number> | null>(null);
@@ -41,12 +42,25 @@ export default function LeadsPage() {
   const [forms, setForms] = useState<Array<{ id: string; name: string }>>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-
+  const [showCreate, setShowCreate] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    businessName: '',
+    source: 'manual',
+    message: '',
+  });
+  const [listVersion, setListVersion] = useState(0);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   useEffect(() => {
+    if (isTeamUser) return;
     api.get<Array<{ id: string; name: string }>>('/api/v1/forms').then((res) => {
       if (res.ok) setForms(res.data.map((f) => ({ id: f.id, name: f.name })));
     });
-  }, []);
+  }, [isTeamUser]);
 
   // Counts per quality section, independent of the current filters/search —
   // this is what makes the section tabs a stable "where do leads live" view.
@@ -71,7 +85,7 @@ export default function LeadsPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [listVersion]);
 
   useEffect(() => {
     let active = true;
@@ -95,15 +109,154 @@ export default function LeadsPage() {
     return () => {
       active = false;
     };
-  }, [status, section, formId, search, page]);
+  }, [status, section, formId, search, page, listVersion]);
+
+  async function createLead() {
+    if (!createForm.name.trim()) {
+      setError('Name is required.');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    const res = await api.post<CrmLead>('/api/v1/leads', {
+      name: createForm.name.trim(),
+      email: createForm.email.trim(),
+      phone: createForm.phone.trim(),
+      businessName: createForm.businessName.trim(),
+      source: createForm.source.trim() || 'manual',
+      message: createForm.message.trim(),
+    });
+    setSaving(false);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setShowCreate(false);
+    setCreateForm({ name: '', email: '', phone: '', businessName: '', source: 'manual', message: '' });
+    setPage(1);
+    setSection('all');
+    setStatus('');
+    setFormId('');
+    setSearch('');
+    setListVersion((v) => v + 1);
+    router.replace('/leads');
+  }
+
+  async function deleteLead(lead: CrmLead, e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!window.confirm(`Delete “${lead.name}”? This can’t be undone.`)) return;
+    setDeletingId(lead.id);
+    setError('');
+    const res = await api.delete(`/api/v1/leads/${lead.id}`);
+    setDeletingId(null);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setListVersion((v) => v + 1);
+  }
+
+  async function patchLead(leadId: string, patch: { status?: string; qualification?: string }) {
+    setUpdatingId(leadId);
+    setError('');
+    const res = await api.patch<CrmLead>(`/api/v1/leads/${leadId}`, patch);
+    setUpdatingId(null);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setItems((prev) =>
+      prev
+        ? prev.map((l) =>
+            l.id === leadId
+              ? {
+                  ...l,
+                  ...(patch.status !== undefined ? { status: res.data.status } : {}),
+                  ...(patch.qualification !== undefined
+                    ? { qualification: res.data.qualification }
+                    : {}),
+                }
+              : l
+          )
+        : prev
+    );
+    if (patch.qualification) setListVersion((v) => v + 1);
+  }
 
   return (
     <div className="page">
       <PageHeader
         title="Leads"
-        description={meta ? `${meta.total.toLocaleString()} in this view` : 'Everyone who asked to talk.'}
-      />
-
+        description={
+          meta
+            ? `${meta.total.toLocaleString()} in this view`
+            : isTeamUser
+              ? 'Leads you add — form and main-team leads stay separate.'
+              : 'Main pipeline leads from forms, ads, and your team.'
+        }
+      >
+        <Button size="sm" onClick={() => setShowCreate(true)}>
+          <Plus className="h-3.5 w-3.5" /> Add lead
+        </Button>
+      </PageHeader>
+      {showCreate ? (
+        <div className="panel mb-4 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-sm font-semibold text-ink">New lead</p>
+            <button
+              type="button"
+              onClick={() => setShowCreate(false)}
+              className="rounded-lg p-1 text-muted hover:bg-canvas hover:text-ink"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Input
+              value={createForm.name}
+              onChange={(e) => setCreateForm((p) => ({ ...p, name: e.target.value }))}
+              placeholder="Full name *"
+              className="bg-canvas"
+            />
+            <Input
+              type="email"
+              value={createForm.email}
+              onChange={(e) => setCreateForm((p) => ({ ...p, email: e.target.value }))}
+              placeholder="Email"
+              className="bg-canvas"
+            />
+            <Input
+              value={createForm.phone}
+              onChange={(e) => setCreateForm((p) => ({ ...p, phone: e.target.value }))}
+              placeholder="Phone"
+              className="bg-canvas"
+            />
+            <Input
+              value={createForm.businessName}
+              onChange={(e) => setCreateForm((p) => ({ ...p, businessName: e.target.value }))}
+              placeholder="Company"
+              className="bg-canvas"
+            />
+            <Textarea
+              value={createForm.message}
+              onChange={(e) => setCreateForm((p) => ({ ...p, message: e.target.value }))}
+              placeholder="Notes / message"
+              rows={3}
+              className="bg-canvas sm:col-span-2"
+            />
+          </div>
+          <div className="mt-3 flex gap-2">
+            <Button disabled={saving || !createForm.name.trim()} onClick={() => void createLead()}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Save lead
+            </Button>
+            <Button variant="outline" disabled={saving} onClick={() => setShowCreate(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      ) : null}
       <div className="mb-4 flex flex-wrap gap-2">
         {SECTIONS.map((s) => (
           <button
@@ -196,6 +349,9 @@ export default function LeadsPage() {
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 font-semibold">Quality</th>
                 <th className="px-5 py-3 font-semibold">Created</th>
+                <th className="w-12 px-3 py-3 font-semibold">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -250,11 +406,33 @@ export default function LeadsPage() {
                       <span className="text-muted">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3.5">
-                    <StatusBadge status={lead.status} />
+                  <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
+                    <Select
+                      value={lead.status}
+                      disabled={updatingId === lead.id}
+                      onChange={(e) => void patchLead(lead.id, { status: e.target.value })}
+                      className="min-w-[8.5rem] py-1.5 text-xs shadow-none"
+                    >
+                      {CRM_LEAD_STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {LEAD_STATUS_LABELS[s]}
+                        </option>
+                      ))}
+                    </Select>
                   </td>
-                  <td className="px-4 py-3.5">
-                    <QualificationBadge qualification={lead.qualification} />
+                  <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
+                    <Select
+                      value={lead.qualification}
+                      disabled={updatingId === lead.id}
+                      onChange={(e) => void patchLead(lead.id, { qualification: e.target.value })}
+                      className="min-w-[8.5rem] py-1.5 text-xs shadow-none"
+                    >
+                      {LEAD_QUALIFICATIONS.map((q) => (
+                        <option key={q} value={q}>
+                          {LEAD_QUALIFICATION_LABELS[q]}
+                        </option>
+                      ))}
+                    </Select>
                   </td>
                   <td className="px-5 py-3.5 tabular-nums text-muted">
                     {new Date(lead.createdAt).toLocaleDateString(undefined, {
@@ -262,6 +440,22 @@ export default function LeadsPage() {
                       day: 'numeric',
                       year: 'numeric',
                     })}
+                  </td>
+                  <td className="px-3 py-3.5">
+                    <button
+                      type="button"
+                      disabled={deletingId === lead.id}
+                      onClick={(e) => void deleteLead(lead, e)}
+                      className="rounded-lg p-1.5 text-muted transition-colors hover:bg-surface hover:text-red-600 disabled:opacity-50"
+                      aria-label={`Delete ${lead.name}`}
+                      title="Delete lead"
+                    >
+                      {deletingId === lead.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </button>
                   </td>
                 </tr>
               ))}

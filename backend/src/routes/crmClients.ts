@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { AdminUser } from '../models/AdminUser';
+import { ClientField } from '../models/ClientField';
 import { GoogleSheetConnection } from '../models/GoogleSheetConnection';
 import { Lead } from '../models/Lead';
 import { requireAuth, requireRole } from '../middleware/auth';
@@ -21,27 +22,41 @@ const router = Router();
 // Only the main admin manages clients and their sheet assignments.
 router.use(requireAuth, requireRole('admin'));
 
+async function resolveFieldId(raw: string | null | undefined) {
+  if (raw === undefined) return undefined;
+  if (raw === null || raw === '') return null;
+  const field = await ClientField.findById(raw).lean();
+  if (!field) throw new ApiError(400, 'Company/field not found.');
+  return field._id;
+}
+
 router.get(
   '/',
   asyncHandler(async (_req, res) => {
     const clients = await AdminUser.find({ role: 'client' }).sort({ createdAt: -1 }).lean();
     const ids = clients.map((u) => u._id);
+    const fieldIds = [...new Set(clients.map((u) => u.fieldId).filter(Boolean).map(String))];
 
-    const [connections, leadCounts] = await Promise.all([
+    const [connections, leadCounts, fields] = await Promise.all([
       GoogleSheetConnection.find({ ownerUserId: { $in: ids } }).lean(),
       Lead.aggregate<{ _id: string; n: number }>([
         { $match: { ownerUserId: { $in: ids } } },
         { $group: { _id: '$ownerUserId', n: { $sum: 1 } } },
       ]),
+      fieldIds.length
+        ? ClientField.find({ _id: { $in: fieldIds } }).lean()
+        : Promise.resolve([]),
     ]);
 
     const connectionByOwner = new Map(connections.map((c) => [String(c.ownerUserId), c]));
     const leadCountByOwner = new Map(leadCounts.map((l) => [String(l._id), l.n]));
+    const fieldNameById = new Map(fields.map((f) => [String(f._id), f.name]));
 
     res.json(
       ok(
         clients.map((u) => {
           const connection = connectionByOwner.get(String(u._id));
+          const fieldId = u.fieldId ? String(u.fieldId) : null;
           return {
             id: String(u._id),
             email: u.email,
@@ -50,6 +65,8 @@ router.get(
             createdAt: u.createdAt,
             lastLoginAt: u.lastLoginAt,
             leadCount: leadCountByOwner.get(String(u._id)) || 0,
+            fieldId,
+            fieldName: fieldId ? fieldNameById.get(fieldId) || null : null,
             sheet: connection ? serializeSheetConnection(connection) : null,
           };
         })
@@ -69,6 +86,7 @@ router.post(
     const existing = await AdminUser.findOne({ email: parsed.data.email });
     if (existing) throw new ApiError(409, 'A user with this email already exists.');
 
+    const fieldId = await resolveFieldId(parsed.data.fieldId ?? null);
     const passwordHash = await hashPassword(parsed.data.password);
     const client = await AdminUser.create({
       email: parsed.data.email,
@@ -76,7 +94,12 @@ router.post(
       passwordHash,
       role: 'client',
       active: true,
+      fieldId: fieldId ?? null,
     });
+
+    const fieldName = fieldId
+      ? (await ClientField.findById(fieldId).select('name').lean())?.name || null
+      : null;
 
     res.status(201).json(
       ok({
@@ -86,6 +109,8 @@ router.post(
         active: client.active,
         createdAt: client.createdAt,
         leadCount: 0,
+        fieldId: fieldId ? String(fieldId) : null,
+        fieldName,
         sheet: null,
       })
     );
@@ -104,10 +129,24 @@ router.patch(
     if (parsed.data.name !== undefined) client.name = parsed.data.name;
     if (parsed.data.active !== undefined) client.active = parsed.data.active;
     if (parsed.data.password) client.passwordHash = await hashPassword(parsed.data.password);
+    if (parsed.data.fieldId !== undefined) {
+      client.fieldId = (await resolveFieldId(parsed.data.fieldId)) ?? null;
+    }
 
     await client.save();
+    const fieldName = client.fieldId
+      ? (await ClientField.findById(client.fieldId).select('name').lean())?.name || null
+      : null;
+
     res.json(
-      ok({ id: String(client._id), email: client.email, name: client.name, active: client.active })
+      ok({
+        id: String(client._id),
+        email: client.email,
+        name: client.name,
+        active: client.active,
+        fieldId: client.fieldId ? String(client.fieldId) : null,
+        fieldName,
+      })
     );
   })
 );

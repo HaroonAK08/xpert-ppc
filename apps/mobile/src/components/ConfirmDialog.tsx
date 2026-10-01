@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from './Button';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, radius, shadows, spacing, typography } from '@/theme';
 
 type Props = {
   visible: boolean;
@@ -54,9 +54,10 @@ const styles = StyleSheet.create({
   },
   sheet: {
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     padding: spacing.xl,
     gap: spacing.md,
+    ...shadows.floating,
   },
   title: { ...typography.subtitle, color: colors.text },
   message: { ...typography.body, color: colors.textSecondary },

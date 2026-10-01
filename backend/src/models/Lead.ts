@@ -70,6 +70,8 @@ const LeadSchema = new Schema(
     },
     // The team member this lead belongs to. null = admin-only / unassigned.
     ownerUserId: { type: Schema.Types.ObjectId, ref: 'AdminUser', default: null, index: true },
+    // Company/field bucket for client-team leads — users in the same field share these.
+    fieldId: { type: Schema.Types.ObjectId, ref: 'ClientField', default: null, index: true },
     // Which Google Sheet connection this lead was synced from, if any.
     sheetConnectionId: {
       type: Schema.Types.ObjectId,

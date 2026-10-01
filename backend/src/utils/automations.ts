@@ -13,6 +13,7 @@ type LeadLean = {
   platform?: string;
   status?: string;
   sourcePath?: string;
+  fieldId?: unknown;
 };
 
 function matchesConditions(lead: LeadLean, conditions: AutomationRuleDoc['conditions']): boolean {
@@ -21,6 +22,11 @@ function matchesConditions(lead: LeadLean, conditions: AutomationRuleDoc['condit
       c.field === 'source' ? lead.source : c.field === 'platform' ? lead.platform : lead.sourcePath;
     return String(fieldValue || '').toLowerCase() === c.value.toLowerCase();
   });
+}
+
+function ruleFieldMatch(lead: LeadLean) {
+  // Admin rules (fieldId null) only run on main-pool leads; company rules only on that company.
+  return { fieldId: lead.fieldId ?? null };
 }
 
 async function applyActions(leadId: string, actions: AutomationRuleDoc['actions']): Promise<void> {
@@ -82,7 +88,13 @@ async function applyActions(leadId: string, actions: AutomationRuleDoc['actions'
 
 /** Runs every enabled `lead_created` rule whose conditions match this lead. */
 export async function runLeadCreatedAutomations(lead: LeadLean & { _id: { toString(): string } }): Promise<void> {
-  const rules = await AutomationRule.find({ trigger: 'lead_created', enabled: true }).sort({ order: 1 }).lean();
+  const rules = await AutomationRule.find({
+    trigger: 'lead_created',
+    enabled: true,
+    ...ruleFieldMatch(lead),
+  })
+    .sort({ order: 1 })
+    .lean();
   for (const rule of rules) {
     if (!matchesConditions(lead, rule.conditions)) continue;
     await applyActions(String(lead._id), rule.actions);
@@ -95,7 +107,13 @@ export async function runStatusChangedAutomations(
   fromStatus: string,
   toStatus: string
 ): Promise<void> {
-  const rules = await AutomationRule.find({ trigger: 'status_changed', enabled: true }).sort({ order: 1 }).lean();
+  const rules = await AutomationRule.find({
+    trigger: 'status_changed',
+    enabled: true,
+    ...ruleFieldMatch(lead),
+  })
+    .sort({ order: 1 })
+    .lean();
   for (const rule of rules) {
     if (rule.fromStatus && rule.fromStatus !== fromStatus) continue;
     if (rule.toStatus && rule.toStatus !== toStatus) continue;

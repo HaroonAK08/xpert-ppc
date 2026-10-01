@@ -74,5 +74,14 @@ export type CrmClient = {
   createdAt: string;
   lastLoginAt: string | null;
   leadCount: number;
+  fieldId: string | null;
+  fieldName: string | null;
   sheet: CrmSheetConnection | null;
+};
+
+export type ClientField = {
+  id: string;
+  name: string;
+  userCount: number;
+  createdAt?: string;
 };

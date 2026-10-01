@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, motion, radius, shadows, spacing, typography } from '@/theme';
 
 type Props = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -27,10 +27,10 @@ export function ActionButton({ icon, label, onPress, color = colors.brand }: Pro
   return (
     <AnimatedPressable
       onPressIn={() => {
-        scale.value = withSpring(0.92, { damping: 14, stiffness: 300 });
+        scale.value = withSpring(0.92, motion.press);
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, { damping: 10, stiffness: 220 });
+        scale.value = withSpring(1, motion.release);
       }}
       onPress={() => {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -57,11 +57,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   iconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.md,
+    width: 52,
+    height: 52,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.xs,
   },
   label: { ...typography.caption, color: colors.text },
 });

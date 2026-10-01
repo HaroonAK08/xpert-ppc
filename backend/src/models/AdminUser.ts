@@ -7,6 +7,8 @@ const AdminUserSchema = new Schema(
     // scrypt hash — see src/utils/password.ts
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, enum: ['admin', 'editor', 'client'], default: 'admin' },
+    /** Company/field this client user belongs to — leads are shared within the field. */
+    fieldId: { type: Schema.Types.ObjectId, ref: 'ClientField', default: null, index: true },
     lastLoginAt: { type: Date, default: null },
     active: { type: Boolean, default: true },
   },
