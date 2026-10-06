@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { CheckCircle2, Loader2, Send } from 'lucide-react';
 
 import { Field, Label } from '@/components/ui/input';
-import { API_URL, api } from '@/lib/api';
+import { api, clientApiUrl } from '@/lib/api';
 import { getVisitorId } from '@/lib/visitor';
 import { cn } from '@/lib/utils';
 
@@ -58,7 +58,7 @@ export function DynamicLeadForm({ formId, className }: { formId: string; classNa
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`${API_URL}/api/forms/${formId}`)
+    fetch(`${clientApiUrl()}/api/forms/${formId}`)
       .then((r) => r.json())
       .then((body) => {
         if (body?.data) setForm(body.data);

@@ -1,3 +1,16 @@
+const PRODUCTION_ORIGIN = 'https://xpertppc.com';
+const PRODUCTION_BUILD = 'phase-production-build';
+
+function isDeviceLocalUrl(value) {
+  if (!value) return true;
+  try {
+    const host = new URL(value).hostname.toLowerCase();
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host.endsWith('.localhost');
+  } catch {
+    return true;
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -56,4 +69,17 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default function nextConfigExport(phase) {
+  if (phase !== PRODUCTION_BUILD) return nextConfig;
+
+  // frontend/.env.local is for `next dev`. A production build on that machine
+  // must not publish localhost URLs: the tracker then calls the visitor's computer.
+  const env = { ...nextConfig.env };
+  if (isDeviceLocalUrl(process.env.NEXT_PUBLIC_SITE_URL)) {
+    env.NEXT_PUBLIC_SITE_URL = PRODUCTION_ORIGIN;
+  }
+  if (isDeviceLocalUrl(process.env.NEXT_PUBLIC_API_URL)) {
+    env.NEXT_PUBLIC_API_URL = PRODUCTION_ORIGIN;
+  }
+  return { ...nextConfig, env };
+};

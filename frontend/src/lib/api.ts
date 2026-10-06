@@ -8,6 +8,43 @@ export const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '');
 
+function hostOf(value: string): string {
+  try {
+    return new URL(value).hostname.replace(/^\[|\]$/g, '').toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
+function isDeviceLocal(hostname: string): boolean {
+  if (!hostname) return true;
+  if (hostname === 'localhost' || hostname === '::1' || hostname.endsWith('.localhost')) return true;
+  if (hostname.startsWith('127.')) return true;
+  if (hostname.startsWith('10.')) return true;
+  if (hostname.startsWith('192.168.')) return true;
+  if (hostname.startsWith('169.254.')) return true;
+  const parts = hostname.split('.');
+  if (parts.length === 4 && parts[0] === '172') {
+    const second = Number(parts[1]);
+    if (second >= 16 && second <= 31) return true;
+  }
+  return false;
+}
+
+/** Browser calls must not target the visitor's own machine. That is what makes Chrome ask to access apps on the device. */
+export function clientApiUrl(): string {
+  if (typeof window === 'undefined') return API_URL;
+  const apiHost = hostOf(API_URL);
+  const pageHost = window.location.hostname.toLowerCase();
+  if (!isDeviceLocal(apiHost) || isDeviceLocal(pageHost)) return API_URL;
+  const firstParty =
+    pageHost === 'xpertppc.com' ||
+    pageHost === 'www.xpertppc.com' ||
+    pageHost === 'xpertppc.net' ||
+    pageHost === 'www.xpertppc.net';
+  return firstParty ? window.location.origin : API_URL;
+}
+
 export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
 async function request<T>(
@@ -22,7 +59,7 @@ async function request<T>(
       ...(init.headers ?? {}),
     };
 
-    const res = await fetch(`${API_URL}${path}`, {
+    const res = await fetch(`${clientApiUrl()}${path}`, {
       ...init,
       credentials: 'include',
       headers,
