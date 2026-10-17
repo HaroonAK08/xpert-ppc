@@ -79,17 +79,17 @@ export default function DashboardPage() {
         }
       />
 
-      <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-8 grid grid-cols-2 gap-2.5 sm:gap-3 sm:grid-cols-3 xl:grid-cols-6">
         {STAT_CARDS.map((card) => {
           const Icon = card.icon;
           const value = data.stats[card.key] ?? 0;
           return (
-            <div key={card.key} className="panel p-4">
-              <div className={`mb-3 flex h-8 w-8 items-center justify-center rounded-lg ${card.chip}`}>
+            <div key={card.key} className="panel p-3.5 sm:p-4">
+              <div className={`mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg sm:mb-3 ${card.chip}`}>
                 <Icon className="h-4 w-4" />
               </div>
-              <p className="text-2xl font-semibold tracking-tight text-ink tabular-nums">{value}</p>
-              <p className="mt-1 text-xs font-medium text-muted">{card.label}</p>
+              <p className="text-xl font-semibold tracking-tight text-ink tabular-nums sm:text-2xl">{value}</p>
+              <p className="mt-1 text-[11px] font-medium leading-snug text-muted sm:text-xs">{card.label}</p>
             </div>
           );
         })}
@@ -106,7 +106,7 @@ export default function DashboardPage() {
           <ul className="divide-y divide-border">
             {data.recentLeads.map((lead) => (
               <li key={lead.id}>
-                <Link href={`/leads/${lead.id}`} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 hover:bg-canvas">
+                <Link href={`/leads/${lead.id}`} className="-mx-2 flex items-center gap-2.5 rounded-xl px-2 py-3 hover:bg-canvas sm:gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-canvas text-xs font-semibold text-ink">
                     {initials(lead.name)}
                   </span>
@@ -114,7 +114,7 @@ export default function DashboardPage() {
                     <p className="truncate text-sm font-semibold text-ink">{lead.name}</p>
                     <p className="truncate text-xs text-muted">{lead.email || lead.phone || 'No contact'}</p>
                   </div>
-                  <StatusBadge status={lead.status} />
+                  <StatusBadge status={lead.status} className="max-w-[7.5rem] truncate sm:max-w-none" />
                 </Link>
               </li>
             ))}

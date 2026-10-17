@@ -37,6 +37,9 @@ const PortalCourseSchema = new Schema(
     thumbnailUrl: { type: String, default: '', trim: true },
     level: { type: String, default: 'Beginner', trim: true },
     published: { type: Boolean, default: false },
+    meetLink: { type: String, default: '', trim: true },
+    timezone: { type: String, default: 'Asia/Karachi', trim: true },
+    nextClassAt: { type: Date, default: null },
     modules: { type: [ModuleSchema], default: [] },
   },
   { timestamps: true }

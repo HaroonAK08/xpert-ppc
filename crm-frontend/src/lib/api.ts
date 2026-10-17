@@ -1,29 +1,56 @@
 /**
  * Thin client for the existing xpertppc-backend API — same backend the
- * marketing site's /admin and the mobile app already use. The session lives
- * in an httpOnly cookie set by the API (a different origin from this app),
- * so every call needs `credentials: 'include'`.
+ * marketing site's /admin and the mobile app already use.
+ *
+ * Auth: the CRM runs on a different origin (xpertppc.net) than the API
+ * (xpertppc.com). Cross-site cookies are blocked on many mobile browsers,
+ * so we keep the JWT from /api/auth/login and send it as Bearer — same
+ * pattern as the Expo app. Cookies still work where the browser allows them.
  */
 export const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 ).replace(/\/$/, '');
 
+const TOKEN_KEY = 'xpertppc-crm-token';
+
+export function getAuthToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setAuthToken(token: string | null) {
+  try {
+    if (!token) localStorage.removeItem(TOKEN_KEY);
+    else localStorage.setItem(TOKEN_KEY, token);
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
 export type ApiResult<T> = { ok: true; data: T; meta?: Record<string, unknown> } | { ok: false; error: string };
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<ApiResult<T>> {
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(init.headers as Record<string, string> | undefined),
+    };
+    const token = typeof window !== 'undefined' ? getAuthToken() : null;
+    if (token) headers.Authorization = `Bearer ${token}`;
+
     const res = await fetch(`${API_URL}${path}`, {
       ...init,
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(init.headers ?? {}),
-      },
+      headers,
     });
 
     const body = await res.json().catch(() => null);
 
     if (!res.ok) {
+      if (res.status === 401) setAuthToken(null);
       const message =
         (body && typeof body === 'object' && 'error' in body
           ? typeof body.error === 'string'

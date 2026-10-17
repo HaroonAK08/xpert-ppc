@@ -187,14 +187,14 @@ export default function FormsListPage() {
                   </div>
                 </div>
 
-                <div className="mb-3 flex items-center gap-2 rounded-xl border border-border bg-canvas p-2.5">
-                  <code className="flex-1 overflow-x-auto whitespace-nowrap text-[11px] text-ink">
+                <div className="mb-3 flex flex-col gap-2 rounded-xl border border-border bg-canvas p-2.5 sm:flex-row sm:items-center">
+                  <code className="min-w-0 flex-1 overflow-x-auto break-all whitespace-pre-wrap text-[11px] text-ink sm:whitespace-nowrap sm:break-normal">
                     {snippetFor(form.id)}
                   </code>
                   <button
                     type="button"
                     onClick={() => void copy(form.id)}
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-brand px-2.5 py-1.5 text-[11px] font-bold text-brand-foreground"
+                    className="inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 rounded-lg bg-brand px-2.5 text-[11px] font-bold text-brand-foreground sm:h-auto sm:w-auto sm:py-1.5"
                   >
                     {copiedId === form.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                     {copiedId === form.id ? 'Copied' : 'Copy'}

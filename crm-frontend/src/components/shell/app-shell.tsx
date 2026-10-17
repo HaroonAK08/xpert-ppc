@@ -18,7 +18,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { api } from '@/lib/api';
+import { api, setAuthToken } from '@/lib/api';
 import type { CurrentUser } from '@/lib/api';
 import { BrandLogo } from '@/components/brand-logo';
 import { NavProgress } from '@/components/nav-progress';
@@ -137,7 +137,7 @@ function Sidebar({
                       /* prefetch is handled in shell; hover keeps intent warm */
                     }}
                     className={cn(
-                      'relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors',
+                      'relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors',
                       active
                         ? 'bg-brand/20 text-white'
                         : 'text-white/60 hover:bg-white/5 hover:text-white'
@@ -212,6 +212,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       if (!active) return;
       if (!res.ok) {
         writeCachedUser(null);
+        setAuthToken(null);
         setUser(null);
         router.replace('/login');
         return;
@@ -241,6 +242,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     setNavOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    if (!navOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [navOpen]);
+
   function navigate(href: string) {
     if (href === pathname) {
       setNavOpen(false);
@@ -259,13 +269,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   async function signOut() {
     writeCachedUser(null);
+    setAuthToken(null);
     await api.post('/api/auth/logout');
     router.replace('/login');
   }
 
   if ((checking && !user) || !user) {
     return (
-      <div className="relative flex min-h-screen flex-col items-center justify-center gap-4 overflow-hidden bg-sidebar">
+      <div className="relative flex min-h-dvh flex-col items-center justify-center gap-4 overflow-hidden bg-sidebar">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(29,111,242,0.28),transparent_55%)]" />
         <BrandLogo size={56} showWordmark={false} href={null} />
         <Loader2 className="relative h-4 w-4 animate-spin text-brand" />
@@ -276,8 +287,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <CurrentUserContext.Provider value={user}>
       <NavProgress active={isPending || pendingHref !== null} />
-      <div className="flex min-h-screen bg-transparent">
-        <aside className="sticky top-0 hidden h-screen w-[248px] shrink-0 lg:block">
+      <div className="flex min-h-dvh bg-transparent">
+        <aside className="sticky top-0 hidden h-dvh w-[248px] shrink-0 lg:block">
           <Sidebar
             user={user}
             pathname={pathname}
@@ -291,15 +302,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="fixed inset-0 z-40 lg:hidden">
             <button
               type="button"
-              className="absolute inset-0 bg-ink/50"
+              className="absolute inset-0 bg-ink/50 backdrop-blur-[2px]"
               aria-label="Close menu"
               onClick={() => setNavOpen(false)}
             />
-            <aside className="relative h-full w-[248px] shadow-pop">
+            <aside className="relative flex h-full w-[min(18rem,88vw)] max-w-full shadow-pop">
               <button
                 type="button"
                 onClick={() => setNavOpen(false)}
-                className="absolute right-3 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white"
+                className="absolute right-3 top-[max(1rem,env(safe-area-inset-top))] z-10 flex h-10 w-10 items-center justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white"
                 aria-label="Close menu"
               >
                 <X className="h-4 w-4" />
@@ -316,11 +327,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : null}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border/80 bg-canvas/85 px-4 py-3 backdrop-blur lg:hidden">
+          <header
+            className="sticky top-0 z-20 flex items-center gap-3 border-b border-border/80 bg-canvas/90 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3 lg:hidden"
+            style={{ paddingTop: 'max(0.625rem, env(safe-area-inset-top))' }}
+          >
             <button
               type="button"
               onClick={() => setNavOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-ink shadow-sm"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-ink shadow-sm"
               aria-label="Open menu"
             >
               <Menu className="h-4 w-4" />

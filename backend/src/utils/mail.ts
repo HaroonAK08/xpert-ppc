@@ -230,8 +230,9 @@ export async function sendCourseApplicationEmail(opts: {
         ${row('Country', opts.country)}
         ${row('Wants to learn', opts.interest)}
       </table>
-      <p style="margin:24px 0 8px;color:#475569">Accept this person so they can sign in with the password they chose.</p>
+      <p style="margin:24px 0 8px;color:#475569">Accept this person so they can sign in with the password they chose. You can also review all applications in the admin panel.</p>
       <p>${btn(opts.acceptUrl, 'Accept', '#16a34a')}${btn(opts.rejectUrl, 'Reject', '#dc2626')}</p>
+      <p style="margin:16px 0 0;font-size:13px;color:#64748b"><a href="${escapeHtml(env.coursesSiteUrl + '/admin/applications')}" style="color:#1a6ef0">Open applications admin</a></p>
     </div>
   `;
 

@@ -4,7 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
-import { api } from '@/lib/api';
+import { api, setAuthToken } from '@/lib/api';
 import { BrandLogo } from '@/components/brand-logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,7 @@ export default function LoginPage() {
     setStatus('loading');
     setError('');
 
-    const res = await api.post<{ ok: boolean }>('/api/auth/login', {
+    const res = await api.post<{ ok: boolean; token?: string }>('/api/auth/login', {
       email: email.trim(),
       password,
     });
@@ -35,11 +35,13 @@ export default function LoginPage() {
       return;
     }
 
+    // Persist JWT — cross-site cookies from xpertppc.com are unreliable on mobile.
+    if (res.data.token) setAuthToken(res.data.token);
     router.replace('/');
   }
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="grid min-h-dvh lg:grid-cols-2">
       <section className="relative hidden overflow-hidden bg-sidebar px-12 py-12 text-white lg:flex lg:flex-col lg:justify-between">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(29,111,242,0.35),transparent_45%),radial-gradient(circle_at_85%_80%,rgba(255,92,53,0.22),transparent_40%)]" />
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-px w-[70%] -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-brand to-transparent opacity-60" />
@@ -63,7 +65,13 @@ export default function LoginPage() {
         <p className="relative text-xs text-white/35">Internal CRM · not indexed</p>
       </section>
 
-      <section className="flex items-center justify-center px-5 py-12">
+      <section
+        className="flex items-center justify-center px-5 py-10 sm:py-12"
+        style={{
+          paddingTop: 'max(2.5rem, env(safe-area-inset-top))',
+          paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom))',
+        }}
+      >
         <div className="w-full max-w-sm">
           <div className="mb-8 lg:hidden">
             <BrandLogo size={40} href={null} />
@@ -83,9 +91,13 @@ export default function LoginPage() {
                 type="email"
                 required
                 autoComplete="off"
+                inputMode="email"
+                autoCapitalize="none"
+                autoCorrect="off"
                 placeholder="you@xpertppc.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="h-11 text-base sm:h-auto sm:text-sm"
               />
             </div>
 
@@ -102,6 +114,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="h-11 text-base sm:h-auto sm:text-sm"
               />
             </div>
 

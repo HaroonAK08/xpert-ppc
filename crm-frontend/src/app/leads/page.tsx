@@ -195,7 +195,7 @@ export default function LeadsPage() {
               : 'Main pipeline leads from forms, ads, and your team.'
         }
       >
-        <Button size="sm" onClick={() => setShowCreate(true)}>
+        <Button size="sm" className="w-full sm:w-auto" onClick={() => setShowCreate(true)}>
           <Plus className="h-3.5 w-3.5" /> Add lead
         </Button>
       </PageHeader>
@@ -257,7 +257,7 @@ export default function LeadsPage() {
           </div>
         </div>
       ) : null}
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="chip-scroll mb-4">
         {SECTIONS.map((s) => (
           <button
             key={s}
@@ -267,7 +267,7 @@ export default function LeadsPage() {
               setSection(s);
             }}
             className={cn(
-              'flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors',
+              'flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors',
               section === s
                 ? 'border-brand bg-brand/10 text-brand'
                 : 'border-border bg-surface text-muted hover:text-ink'
@@ -286,8 +286,8 @@ export default function LeadsPage() {
         ))}
       </div>
 
-      <div className="panel mb-4 flex flex-wrap items-center gap-3 p-3">
-        <div className="relative min-w-[16rem] flex-1">
+      <div className="panel mb-4 flex flex-col gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+        <div className="relative min-w-0 w-full flex-1 sm:min-w-[12rem]">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <Input
             value={search}
@@ -300,44 +300,155 @@ export default function LeadsPage() {
           />
         </div>
 
-        <Select
-          value={status}
-          onChange={(e) => {
-            setPage(1);
-            setStatus(e.target.value);
-          }}
-          className="w-auto shadow-none"
-        >
-          <option value="">All statuses</option>
-          {CRM_LEAD_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {LEAD_STATUS_LABELS[s]}
-            </option>
-          ))}
-        </Select>
-
-        {forms.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2 sm:contents">
           <Select
-            value={formId}
+            value={status}
             onChange={(e) => {
               setPage(1);
-              setFormId(e.target.value);
+              setStatus(e.target.value);
             }}
-            className="w-auto max-w-[14rem] shadow-none"
+            className="w-full shadow-none sm:w-auto"
           >
-            <option value="">All forms</option>
-            {forms.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.name}
+            <option value="">All statuses</option>
+            {CRM_LEAD_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {LEAD_STATUS_LABELS[s]}
               </option>
             ))}
           </Select>
-        ) : null}
+
+          {forms.length > 0 ? (
+            <Select
+              value={formId}
+              onChange={(e) => {
+                setPage(1);
+                setFormId(e.target.value);
+              }}
+              className="w-full max-w-none shadow-none sm:w-auto sm:max-w-[14rem]"
+            >
+              <option value="">All forms</option>
+              {forms.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
+              ))}
+            </Select>
+          ) : null}
+        </div>
       </div>
 
       {error ? <p className="mb-4 text-sm font-medium text-red-600">{error}</p> : null}
 
-      <div className="panel overflow-hidden">
+      {/* Mobile: stacked cards */}
+      <div className="space-y-3 md:hidden">
+        {items?.map((lead) => (
+          <article
+            key={lead.id}
+            className="panel p-3.5"
+            onClick={() => router.push(`/leads/${lead.id}`)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                router.push(`/leads/${lead.id}`);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-canvas text-xs font-semibold text-ink">
+                {initials(lead.name)}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-ink">{lead.name}</p>
+                    <p className="mt-0.5 truncate text-xs text-muted">
+                      {lead.email || lead.phone || 'No contact'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={deletingId === lead.id}
+                    onClick={(e) => void deleteLead(lead, e)}
+                    className="shrink-0 rounded-lg p-2 text-muted hover:bg-canvas hover:text-red-600 disabled:opacity-50"
+                    aria-label={`Delete ${lead.name}`}
+                  >
+                    {deletingId === lead.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <span className="rounded-md bg-canvas px-2 py-0.5 text-[11px] font-medium text-ink">
+                    {lead.source || '—'}
+                  </span>
+                  {lead.formName ? (
+                    <span className="rounded-md bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand">
+                      {lead.formName}
+                    </span>
+                  ) : null}
+                  <span className="ml-auto text-[11px] tabular-nums text-muted">
+                    {new Date(lead.createdAt).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
+                </div>
+
+                <div
+                  className="mt-3 grid grid-cols-2 gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
+                  <Select
+                    value={lead.status}
+                    disabled={updatingId === lead.id}
+                    onChange={(e) => void patchLead(lead.id, { status: e.target.value })}
+                    className="py-2 text-xs shadow-none"
+                    aria-label="Status"
+                  >
+                    {CRM_LEAD_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {LEAD_STATUS_LABELS[s]}
+                      </option>
+                    ))}
+                  </Select>
+                  <Select
+                    value={lead.qualification}
+                    disabled={updatingId === lead.id}
+                    onChange={(e) => void patchLead(lead.id, { qualification: e.target.value })}
+                    className="py-2 text-xs shadow-none"
+                    aria-label="Quality"
+                  >
+                    {LEAD_QUALIFICATIONS.map((q) => (
+                      <option key={q} value={q}>
+                        {LEAD_QUALIFICATION_LABELS[q]}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+
+        {items && items.length === 0 ? (
+          <p className="panel p-8 text-center text-sm text-muted">No leads match these filters.</p>
+        ) : null}
+
+        {!items ? (
+          <div className="flex justify-center p-10">
+            <Loader2 className="h-5 w-5 animate-spin text-brand" />
+          </div>
+        ) : null}
+      </div>
+
+      {/* Desktop: table */}
+      <div className="panel hidden overflow-hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-border bg-canvas/70 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">
@@ -475,7 +586,7 @@ export default function LeadsPage() {
       </div>
 
       {meta && meta.totalPages > 1 ? (
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-xs text-muted">
             Page {meta.page} of {meta.totalPages}
           </p>

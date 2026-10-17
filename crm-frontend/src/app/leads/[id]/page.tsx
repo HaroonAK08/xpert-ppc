@@ -216,14 +216,31 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               </div>
             </div>
 
-            <dl className="mt-4 space-y-2 text-sm">
+            <dl className="mt-4 space-y-2.5 text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-muted">Email</dt>
-                <dd className="min-w-0 truncate text-right font-medium text-ink">{lead.email || '—'}</dd>
+                <dt className="shrink-0 text-muted">Email</dt>
+                <dd className="min-w-0 truncate text-right font-medium text-ink">
+                  {lead.email ? (
+                    <a href={`mailto:${lead.email}`} className="hover:text-brand hover:underline">
+                      {lead.email}
+                    </a>
+                  ) : (
+                    '—'
+                  )}
+                </dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-muted">Phone</dt>
-                <dd className="font-medium text-ink">{lead.phone || '—'}</dd>
+              <div className="flex justify-between gap-4">
+                <dt className="shrink-0 text-muted">Phone</dt>
+                <dd className="min-w-0 truncate text-right font-medium text-ink">
+                  {lead.phone ? (
+                    <a href={`tel:${lead.phone}`} className="inline-flex items-center gap-1.5 hover:text-brand hover:underline">
+                      <Phone className="h-3.5 w-3.5 shrink-0 sm:hidden" />
+                      {lead.phone}
+                    </a>
+                  ) : (
+                    '—'
+                  )}
+                </dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-muted">Clinic name</dt>

@@ -106,30 +106,32 @@ export default function ReportsPage() {
       </div>
 
       {data.teamPerformance.length > 0 ? (
-        <section className="panel mt-5 p-5">
+        <section className="panel mt-5 overflow-hidden p-4 sm:p-5">
           <h2 className="mb-4 text-sm font-semibold text-ink">Team performance</h2>
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border text-xs font-bold uppercase tracking-wide text-muted">
-              <tr>
-                <th className="pb-2">Team member</th>
-                <th className="pb-2 text-right">Total leads</th>
-                <th className="pb-2 text-right">Converted</th>
-                <th className="pb-2 text-right">Rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.teamPerformance.map((row) => (
-                <tr key={row.userId} className="border-b border-border last:border-0">
-                  <td className="py-2 font-medium text-ink">{row.name}</td>
-                  <td className="py-2 text-right tabular-nums text-ink">{row.total}</td>
-                  <td className="py-2 text-right tabular-nums text-ink">{row.converted}</td>
-                  <td className="py-2 text-right tabular-nums text-muted">
-                    {row.total ? Math.round((row.converted / row.total) * 100) : 0}%
-                  </td>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <table className="w-full min-w-[28rem] text-left text-sm">
+              <thead className="border-b border-border text-xs font-bold uppercase tracking-wide text-muted">
+                <tr>
+                  <th className="pb-2">Team member</th>
+                  <th className="pb-2 text-right">Total</th>
+                  <th className="pb-2 text-right">Converted</th>
+                  <th className="pb-2 text-right">Rate</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.teamPerformance.map((row) => (
+                  <tr key={row.userId} className="border-b border-border last:border-0">
+                    <td className="py-2.5 pr-3 font-medium text-ink">{row.name}</td>
+                    <td className="py-2.5 text-right tabular-nums text-ink">{row.total}</td>
+                    <td className="py-2.5 text-right tabular-nums text-ink">{row.converted}</td>
+                    <td className="py-2.5 text-right tabular-nums text-muted">
+                      {row.total ? Math.round((row.converted / row.total) * 100) : 0}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       ) : null}
     </div>

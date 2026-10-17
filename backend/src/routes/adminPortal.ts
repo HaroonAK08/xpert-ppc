@@ -67,6 +67,9 @@ router.get(
         thumbnailUrl: c.thumbnailUrl,
         level: c.level,
         published: c.published,
+        meetLink: c.meetLink || '',
+        timezone: c.timezone || 'Asia/Karachi',
+        nextClassAt: c.nextClassAt,
         moduleCount: c.modules.length,
         lessonCount: c.modules.reduce((n, m) => n + m.lessons.length, 0),
         updatedAt: c.updatedAt,
@@ -112,7 +115,11 @@ router.patch(
       if (clash) throw new ApiError(409, 'A course with this slug already exists.');
     }
 
-    Object.assign(course, parsed.data);
+    const { nextClassAt, ...rest } = parsed.data;
+    Object.assign(course, rest);
+    if (nextClassAt !== undefined) {
+      course.nextClassAt = nextClassAt ? new Date(nextClassAt) : null;
+    }
     await course.save();
     res.json({ course });
   })

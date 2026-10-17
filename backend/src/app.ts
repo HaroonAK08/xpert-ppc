@@ -15,7 +15,9 @@ import authRouter from './routes/auth';
 import contentRouter from './routes/content';
 import studentAuthRouter from './routes/studentAuth';
 import studentPortalRouter from './routes/studentPortal';
+import studentHubRouter from './routes/studentHub';
 import adminPortalRouter from './routes/adminPortal';
+import adminAcademyRouter from './routes/adminAcademy';
 import crmV1Router from './routes/crmV1';
 import metaWebhookRouter from './routes/metaWebhook';
 import trackRouter from './routes/track';
@@ -60,6 +62,7 @@ export function createApp() {
         cb(new Error(`Origin ${origin} is not allowed by CORS.`));
       },
       credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization'],
     })(req, res, next);
   });
   app.use('/api/track', cors({ origin: true }));
@@ -84,7 +87,9 @@ export function createApp() {
   app.use('/api/content', contentRouter);
   app.use('/api/student/auth', studentAuthRouter);
   app.use('/api/student/courses', studentPortalRouter);
+  app.use('/api/student/hub', studentHubRouter);
   app.use('/api/admin/portal', adminPortalRouter);
+  app.use('/api/admin/academy', adminAcademyRouter);
   app.use('/api/v1', crmV1Router);
 
   app.use(notFound);

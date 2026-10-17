@@ -295,10 +295,10 @@ export function FormBuilderStudio({
   return (
     <div className="flex min-h-[calc(100vh-1px)] flex-col">
       <header className="sticky top-0 z-30 border-b border-border/80 bg-canvas/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center gap-3 px-5 py-3 sm:px-8">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-8 sm:py-3">
           <Link
             href="/forms"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-muted hover:bg-surface hover:text-ink"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-muted hover:bg-surface hover:text-ink"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Forms
           </Link>

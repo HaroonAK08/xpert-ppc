@@ -5,7 +5,7 @@ import { env } from '../config/env';
 import { Student } from '../models/Student';
 import { requireStudent } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
-import { studentLoginSchema, studentSignupSchema } from '../validation/portal';
+import { studentLoginSchema, studentProfileSchema, studentSignupSchema } from '../validation/portal';
 import { sendCourseApplicationEmail } from '../utils/mail';
 import { hashPassword, verifyPassword } from '../utils/password';
 import {
@@ -27,15 +27,23 @@ const authLimiter = rateLimit({
   message: { error: 'Too many requests. Try again later.' },
 });
 
-function sessionPayload(student: { _id: unknown; email: string; name: string }, token: string) {
+function publicStudent(student: { _id: unknown; email: string; name: string; avatarUrl?: string | null }) {
+  return {
+    id: String(student._id),
+    email: student.email,
+    name: student.name,
+    avatarUrl: student.avatarUrl || '',
+  };
+}
+
+function sessionPayload(
+  student: { _id: unknown; email: string; name: string; avatarUrl?: string | null },
+  token: string
+) {
   return {
     ok: true,
     token,
-    user: {
-      id: String(student._id),
-      email: student.email,
-      name: student.name,
-    },
+    user: publicStudent(student),
   };
 }
 
@@ -54,6 +62,7 @@ router.post(
     const email = parsed.data.email.toLowerCase();
     const name = parsed.data.name.trim();
     const interest = parsed.data.interest.trim();
+    const courseSlug = (parsed.data.courseSlug || '').trim().toLowerCase();
     const country = parsed.data.country.trim();
     const passwordHash = await hashPassword(parsed.data.password);
 
@@ -68,6 +77,7 @@ router.post(
         name,
         passwordHash,
         interest,
+        courseSlug,
         country,
         status: 'pending',
         emailVerified: false,
@@ -76,6 +86,7 @@ router.post(
       student.name = name;
       student.passwordHash = passwordHash;
       student.interest = interest;
+      student.courseSlug = courseSlug;
       student.country = country;
       student.status = 'pending';
       student.emailVerified = false;
@@ -176,13 +187,26 @@ router.get(
     if (!student || !student.active || !isStudentApproved(student)) {
       throw new ApiError(401, 'Session invalid. Please sign in again.');
     }
-    res.json({
-      user: {
-        id: String(student._id),
-        email: student.email,
-        name: student.name,
-      },
-    });
+    res.json({ user: publicStudent(student) });
+  })
+);
+
+router.patch(
+  '/profile',
+  requireStudent,
+  asyncHandler(async (req, res) => {
+    const parsed = studentProfileSchema.safeParse(req.body);
+    if (!parsed.success) throw new ApiError(400, 'Enter a valid profile photo URL.');
+
+    const student = await Student.findById(req.student!.sub);
+    if (!student || !student.active || !isStudentApproved(student)) {
+      throw new ApiError(401, 'Session invalid. Please sign in again.');
+    }
+
+    student.avatarUrl = parsed.data.avatarUrl;
+    await student.save();
+
+    res.json({ ok: true, user: publicStudent(student) });
   })
 );
 

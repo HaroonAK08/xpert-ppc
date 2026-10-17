@@ -5,7 +5,8 @@ export const studentSignupSchema = z.object({
   email: z.string().trim().email().max(160),
   password: z.string().min(6).max(100),
   country: z.string().trim().min(2).max(80),
-  interest: z.string().trim().min(8).max(500),
+  interest: z.string().trim().min(8).max(4000),
+  courseSlug: z.string().trim().min(1).max(120).optional().default(''),
 });
 
 export const studentDecisionSchema = z.object({
@@ -15,6 +16,14 @@ export const studentDecisionSchema = z.object({
 export const studentLoginSchema = z.object({
   email: z.string().trim().email().max(160),
   password: z.string().min(1).max(100),
+});
+
+export const studentProfileSchema = z.object({
+  avatarUrl: z
+    .string()
+    .trim()
+    .max(1000)
+    .refine((v) => v === '' || /^https?:\/\//i.test(v), 'Enter a valid image URL.'),
 });
 
 export const studentVerifySchema = z.object({
@@ -35,6 +44,47 @@ export const portalCourseSchema = z.object({
   thumbnailUrl: z.string().trim().max(500).optional().default(''),
   level: z.string().trim().max(60).optional().default('Beginner'),
   published: z.boolean().optional().default(false),
+  meetLink: z.string().trim().max(1000).optional().default(''),
+  timezone: z.string().trim().max(80).optional().default('Asia/Karachi'),
+  nextClassAt: z.union([z.string(), z.null()]).optional().nullable(),
+});
+
+export const classSessionSchema = z.object({
+  courseId: z.string().trim().min(1),
+  title: z.string().trim().min(2).max(160),
+  startsAt: z.string().min(1),
+  endsAt: z.string().optional().nullable(),
+  meetLink: z.string().trim().max(1000).optional().default(''),
+  timezone: z.string().trim().max(80).optional().default('Asia/Karachi'),
+  notes: z.string().trim().max(2000).optional().default(''),
+  published: z.boolean().optional().default(true),
+});
+
+export const classRecordingSchema = z.object({
+  courseId: z.string().trim().min(1),
+  title: z.string().trim().min(2).max(160),
+  videoUrl: z.string().trim().min(4).max(1000),
+  durationMinutes: z.number().int().min(0).optional().default(0),
+  recordedAt: z.string().optional().nullable(),
+  published: z.boolean().optional().default(true),
+});
+
+export const learningResourceSchema = z.object({
+  courseId: z.string().trim().min(1),
+  title: z.string().trim().min(2).max(160),
+  kind: z.enum(['notes', 'assignment', 'template', 'other']).optional().default('notes'),
+  description: z.string().trim().max(2000).optional().default(''),
+  fileUrl: z.string().trim().max(1000).optional().default(''),
+  published: z.boolean().optional().default(true),
+});
+
+export const academySettingsSchema = z.object({
+  whatsappUrl: z.string().trim().max(1000).optional().default(''),
+  youtubeUrl: z.string().trim().max(1000).optional().default(''),
+  linkedinUrl: z.string().trim().max(1000).optional().default(''),
+  instagramUrl: z.string().trim().max(1000).optional().default(''),
+  announcementTitle: z.string().trim().max(160).optional().default(''),
+  announcementBody: z.string().trim().max(2000).optional().default(''),
 });
 
 export const portalModuleSchema = z.object({
