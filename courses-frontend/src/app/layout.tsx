@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import { WhatsAppFab } from '@/components/site/whatsapp-fab';
 import './globals.css';
 
 const sans = Inter({
@@ -35,7 +36,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={sans.variable}>
-      <body className="flex min-h-dvh flex-col bg-canvas font-sans text-ink antialiased">{children}</body>
+      <body className="flex min-h-dvh flex-col bg-canvas font-sans text-ink antialiased">
+        {children}
+        <WhatsAppFab />
+      </body>
     </html>
   );
 }

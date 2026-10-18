@@ -7,7 +7,7 @@ const LINKS = [
   { href: '/', label: 'Home' },
   { href: '/courses', label: 'Courses' },
   { href: '/about', label: 'About Me' },
-  { href: '/#student-showcase', label: 'Student Showcase' },
+  { href: '/#my-team', label: 'My Team' },
   { href: '/login', label: 'Login' },
 ];
 

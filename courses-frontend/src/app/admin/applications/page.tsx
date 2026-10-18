@@ -12,6 +12,7 @@ type Applicant = {
   email: string;
   country: string;
   interest: string;
+  couponCode?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
 };
@@ -111,8 +112,8 @@ export default function AdminApplicationsPage() {
         </div>
 
         <p className="mt-4 max-w-2xl text-sm text-muted">
-          New signups stay pending until you verify payment. After you approve, they can sign in with the
-          password they chose. Student email notification will send when SMTP is configured.
+          New signups stay pending until you verify payment (or review coupon applications). After you
+          approve, they can sign in with the password they chose.
         </p>
 
         {error ? (
@@ -144,6 +145,11 @@ export default function AdminApplicationsPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-base font-extrabold text-ink">{applicant.name}</h2>
                         <StatusBadge status={applicant.status} />
+                        {applicant.couponCode ? (
+                          <span className="rounded-full bg-[#eef5ff] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand">
+                            Coupon {applicant.couponCode}
+                          </span>
+                        ) : null}
                       </div>
                       <p className="mt-1 text-sm text-muted">
                         {applicant.email}
@@ -183,12 +189,20 @@ export default function AdminApplicationsPage() {
                       <Detail label="WhatsApp" value={details.whatsapp || '—'} />
                       <Detail label="Timezone" value={details.timezone || '—'} />
                       <Detail label="Registration fee" value={details.fee || '—'} />
+                      <Detail
+                        label="Coupon"
+                        value={applicant.couponCode || details.coupon || '—'}
+                      />
                       <Detail label="Transaction ID" value={details.transactionId || '—'} />
                     </dl>
 
                     <div>
                       <p className="text-xs font-semibold text-muted">Payment receipt</p>
-                      {details.receiptUrl ? (
+                      {applicant.couponCode || details.coupon ? (
+                        <p className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-8 text-center text-xs font-semibold text-emerald-700">
+                          Fee waived with coupon {applicant.couponCode || details.coupon}. No receipt required.
+                        </p>
+                      ) : details.receiptUrl ? (
                         <a
                           href={details.receiptUrl}
                           target="_blank"

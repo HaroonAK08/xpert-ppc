@@ -61,6 +61,11 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<'accountNumber' | 'iban' | null>(null);
+  const [couponInput, setCouponInput] = useState(searchParams.get('coupon') ?? '');
+  const [appliedCoupon, setAppliedCoupon] = useState('');
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [couponMessage, setCouponMessage] = useState('');
+  const feeWaived = Boolean(appliedCoupon);
 
   async function copyBankValue(field: 'accountNumber' | 'iban', value: string) {
     try {
@@ -116,6 +121,29 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
     return data.url;
   }
 
+  async function applyCoupon() {
+    const code = couponInput.trim();
+    if (!code) {
+      setCouponMessage('Enter a coupon code.');
+      setAppliedCoupon('');
+      return;
+    }
+    setCouponBusy(true);
+    setCouponMessage('');
+    const res = await api.get<{ ok: boolean; code: string }>(
+      `/api/student/auth/coupon/${encodeURIComponent(code)}`
+    );
+    setCouponBusy(false);
+    if (!res.ok) {
+      setAppliedCoupon('');
+      setCouponMessage(res.error || 'Invalid coupon code.');
+      return;
+    }
+    setAppliedCoupon(res.data.code);
+    setCouponInput(res.data.code);
+    setCouponMessage(`Coupon ${res.data.code} applied — registration fee waived.`);
+  }
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
@@ -130,6 +158,7 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
     const password = String(form.get('password') || '');
     const confirmPassword = String(form.get('confirmPassword') || '');
     const transactionId = String(form.get('transactionId') || '').trim();
+    const waived = Boolean(appliedCoupon);
 
     if (!name) {
       setError('Please enter your full name.');
@@ -166,12 +195,12 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
       setStatus('error');
       return;
     }
-    if (!transactionId) {
+    if (!waived && !transactionId) {
       setError('Please enter your transaction ID.');
       setStatus('error');
       return;
     }
-    if (!receiptFile) {
+    if (!waived && !receiptFile) {
       setError('Please upload an image of your payment transaction.');
       setStatus('error');
       return;
@@ -198,24 +227,32 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
     setError('');
 
     try {
-      const receiptUrl = await uploadReceipt(receiptFile);
-      const interest = [
+      const interestParts = [
         `Course: ${courseName}.`,
         `Experience level: ${experience}.`,
         `WhatsApp: +92 ${whatsapp}.`,
         `Timezone: ${timezone}.`,
-        `Registration fee: PKR ${REGISTRATION_FEE}.`,
-        `Transaction ID: ${transactionId}.`,
-        `Transaction image: ${receiptUrl}.`,
-      ].join(' ');
+      ];
+
+      if (waived) {
+        interestParts.push(`Coupon: ${appliedCoupon}.`, 'Registration fee: Waived (coupon).');
+      } else {
+        const receiptUrl = await uploadReceipt(receiptFile!);
+        interestParts.push(
+          `Registration fee: PKR ${REGISTRATION_FEE}.`,
+          `Transaction ID: ${transactionId}.`,
+          `Transaction image: ${receiptUrl}.`
+        );
+      }
 
       const res = await api.post<{ ok: boolean; pending?: boolean }>('/api/student/auth/signup', {
         name,
         email: emailValue,
         password,
         country,
-        interest,
+        interest: interestParts.join(' '),
         courseSlug,
+        couponCode: waived ? appliedCoupon : '',
       });
 
       if (!res.ok) {
@@ -356,111 +393,172 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
                   </Field>
 
                   <div className="rounded-[14px] border border-[#d7e6ff] bg-[#f3f8ff] px-4 py-3.5">
-                    <p className="text-[13px] font-bold text-ink">Registration fee</p>
+                    <p className="text-[13px] font-bold text-ink">Coupon code</p>
                     <p className="mt-1 text-[13px] leading-relaxed text-muted">
-                      A one-time fee of <span className="font-bold text-brand">PKR {REGISTRATION_FEE.toLocaleString()}</span>{' '}
-                      is required. Transfer to the account below, then enter your transaction ID and upload a screenshot.
+                      Have a coupon? Apply it to skip the registration fee. Admin still needs to approve your application.
                     </p>
+                    <div className="mt-3 flex gap-2">
+                      <Input
+                        id="couponCode"
+                        name="couponCode"
+                        value={couponInput}
+                        onChange={(e) => {
+                          setCouponInput(e.target.value);
+                          if (appliedCoupon) {
+                            setAppliedCoupon('');
+                            setCouponMessage('');
+                          }
+                        }}
+                        placeholder="e.g. umer001"
+                        className="uppercase"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={couponBusy || status === 'loading'}
+                        onClick={() => void applyCoupon()}
+                        className="h-11 shrink-0 px-4"
+                      >
+                        {couponBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Apply'}
+                      </Button>
+                    </div>
+                    {couponMessage ? (
+                      <p
+                        className={`mt-2 text-[12px] font-semibold ${
+                          feeWaived ? 'text-emerald-600' : 'text-red-600'
+                        }`}
+                      >
+                        {couponMessage}
+                      </p>
+                    ) : null}
                   </div>
 
-                  <div className="overflow-hidden rounded-[14px] border border-border bg-white">
-                    <div className="border-b border-border px-4 py-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Account Title</p>
-                      <p className="mt-1 text-[15px] font-extrabold tracking-tight text-ink">
-                        {BANK_DETAILS.accountTitle}
+                  {feeWaived ? (
+                    <div className="rounded-[14px] border border-emerald-200 bg-emerald-50 px-4 py-3.5">
+                      <p className="text-[13px] font-bold text-emerald-800">Registration fee waived</p>
+                      <p className="mt-1 text-[13px] leading-relaxed text-emerald-700/90">
+                        Coupon <span className="font-extrabold">{appliedCoupon}</span> applied. No bank transfer,
+                        transaction ID, or payment slip needed.
                       </p>
                     </div>
-                    <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Account Number</p>
-                        <p className="mt-1 break-all text-[15px] font-extrabold tracking-tight text-ink">
-                          {BANK_DETAILS.accountNumber}
+                  ) : (
+                    <>
+                      <div className="rounded-[14px] border border-[#d7e6ff] bg-[#f3f8ff] px-4 py-3.5">
+                        <p className="text-[13px] font-bold text-ink">Registration fee</p>
+                        <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                          A one-time fee of{' '}
+                          <span className="font-bold text-brand">PKR {REGISTRATION_FEE.toLocaleString()}</span> is
+                          required. Transfer to the account below, then enter your transaction ID and upload a
+                          screenshot.
                         </p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => copyBankValue('accountNumber', BANK_DETAILS.accountNumber)}
-                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-brand transition hover:bg-brand-soft"
-                        aria-label="Copy account number"
-                      >
-                        {copiedField === 'accountNumber' ? (
-                          <Check className="h-4 w-4 text-emerald-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                    <div className="flex items-center justify-between gap-3 px-4 py-3">
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">IBAN</p>
-                        <p className="mt-1 break-all text-[15px] font-extrabold tracking-tight text-ink">
-                          {BANK_DETAILS.iban}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => copyBankValue('iban', BANK_DETAILS.iban)}
-                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-brand transition hover:bg-brand-soft"
-                        aria-label="Copy IBAN"
-                      >
-                        {copiedField === 'iban' ? (
-                          <Check className="h-4 w-4 text-emerald-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
 
-                  <Field label="Transaction ID" htmlFor="transactionId" required>
-                    <Input
-                      id="transactionId"
-                      name="transactionId"
-                      required
-                      placeholder="e.g. JazzCash / bank transfer reference"
-                    />
-                  </Field>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="transactionImage">
-                      Transaction image <span className="text-brand">*</span>
-                    </Label>
-                    {receiptPreview ? (
-                      <div className="relative overflow-hidden rounded-[14px] border border-border bg-[#f8fafc]">
-                        <img src={receiptPreview} alt="Transaction preview" className="max-h-48 w-full object-contain" />
-                        <button
-                          type="button"
-                          onClick={() => setReceiptFile(null)}
-                          className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink shadow-sm ring-1 ring-border"
-                          aria-label="Remove transaction image"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                        <p className="truncate px-3 py-2 text-[11px] text-muted">{receiptFile?.name}</p>
+                      <div className="overflow-hidden rounded-[14px] border border-border bg-white">
+                        <div className="border-b border-border px-4 py-3">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Account Title</p>
+                          <p className="mt-1 text-[15px] font-extrabold tracking-tight text-ink">
+                            {BANK_DETAILS.accountTitle}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                              Account Number
+                            </p>
+                            <p className="mt-1 break-all text-[15px] font-extrabold tracking-tight text-ink">
+                              {BANK_DETAILS.accountNumber}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyBankValue('accountNumber', BANK_DETAILS.accountNumber)}
+                            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-brand transition hover:bg-brand-soft"
+                            aria-label="Copy account number"
+                          >
+                            {copiedField === 'accountNumber' ? (
+                              <Check className="h-4 w-4 text-emerald-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 px-4 py-3">
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">IBAN</p>
+                            <p className="mt-1 break-all text-[15px] font-extrabold tracking-tight text-ink">
+                              {BANK_DETAILS.iban}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyBankValue('iban', BANK_DETAILS.iban)}
+                            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-brand transition hover:bg-brand-soft"
+                            aria-label="Copy IBAN"
+                          >
+                            {copiedField === 'iban' ? (
+                              <Check className="h-4 w-4 text-emerald-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
-                    ) : (
-                      <label
-                        htmlFor="transactionImage"
-                        className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-[#b9d2f7] bg-[#f8fbff] px-4 py-7 text-center transition hover:border-brand hover:bg-[#eef5ff]"
-                      >
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-soft text-brand">
-                          <Upload className="h-4 w-4" strokeWidth={2.25} />
-                        </span>
-                        <span className="text-[13px] font-semibold text-ink">Upload payment screenshot</span>
-                        <span className="text-[11px] text-muted">PNG, JPG or WebP · max 10 MB · required</span>
-                      </label>
-                    )}
-                    <input
-                      key={receiptFile ? receiptFile.name : 'empty-receipt'}
-                      id="transactionImage"
-                      name="transactionImage"
-                      type="file"
-                      accept="image/*"
-                      required={!receiptFile}
-                      className="sr-only"
-                      onChange={onReceiptChange}
-                    />
-                  </div>
+
+                      <Field label="Transaction ID" htmlFor="transactionId" required>
+                        <Input
+                          id="transactionId"
+                          name="transactionId"
+                          required={!feeWaived}
+                          placeholder="e.g. JazzCash / bank transfer reference"
+                        />
+                      </Field>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="transactionImage">
+                          Transaction image <span className="text-brand">*</span>
+                        </Label>
+                        {receiptPreview ? (
+                          <div className="relative overflow-hidden rounded-[14px] border border-border bg-[#f8fafc]">
+                            <img
+                              src={receiptPreview}
+                              alt="Transaction preview"
+                              className="max-h-48 w-full object-contain"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setReceiptFile(null)}
+                              className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink shadow-sm ring-1 ring-border"
+                              aria-label="Remove transaction image"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                            <p className="truncate px-3 py-2 text-[11px] text-muted">{receiptFile?.name}</p>
+                          </div>
+                        ) : (
+                          <label
+                            htmlFor="transactionImage"
+                            className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-[#b9d2f7] bg-[#f8fbff] px-4 py-7 text-center transition hover:border-brand hover:bg-[#eef5ff]"
+                          >
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-soft text-brand">
+                              <Upload className="h-4 w-4" strokeWidth={2.25} />
+                            </span>
+                            <span className="text-[13px] font-semibold text-ink">Upload payment screenshot</span>
+                            <span className="text-[11px] text-muted">PNG, JPG or WebP · max 10 MB · required</span>
+                          </label>
+                        )}
+                        <input
+                          key={receiptFile ? receiptFile.name : 'empty-receipt'}
+                          id="transactionImage"
+                          name="transactionImage"
+                          type="file"
+                          accept="image/*"
+                          required={!feeWaived && !receiptFile}
+                          className="sr-only"
+                          onChange={onReceiptChange}
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <Field label="Password" htmlFor="password" required>
                     <div className="relative">

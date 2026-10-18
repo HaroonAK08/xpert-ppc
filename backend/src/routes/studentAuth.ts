@@ -16,6 +16,7 @@ import {
   verifyApplicationToken,
 } from '../utils/jwt';
 import { applyStudentDecision, isStudentApproved } from '../utils/studentApplication';
+import { consumeCoupon, findValidCoupon, normalizeCouponCode } from '../utils/coupon';
 
 const router = Router();
 
@@ -47,6 +48,20 @@ function sessionPayload(
   };
 }
 
+router.get(
+  '/coupon/:code',
+  authLimiter,
+  asyncHandler(async (req, res) => {
+    const coupon = await findValidCoupon(req.params.code || '');
+    if (!coupon) throw new ApiError(404, 'This coupon code is not valid.');
+    res.json({
+      ok: true,
+      code: coupon.code,
+      waivesFee: true,
+    });
+  })
+);
+
 router.post(
   '/signup',
   authLimiter,
@@ -64,12 +79,22 @@ router.post(
     const interest = parsed.data.interest.trim();
     const courseSlug = (parsed.data.courseSlug || '').trim().toLowerCase();
     const country = parsed.data.country.trim();
+    const couponRaw = parsed.data.couponCode || '';
     const passwordHash = await hashPassword(parsed.data.password);
+
+    let couponCode = '';
+    if (couponRaw.trim()) {
+      const coupon = await findValidCoupon(couponRaw);
+      if (!coupon) throw new ApiError(400, 'This coupon code is not valid or has expired.');
+      couponCode = coupon.code;
+    }
 
     let student = await Student.findOne({ email }).select('+passwordHash');
     if (student && isStudentApproved(student)) {
       throw new ApiError(409, 'An account with this email already exists. Please sign in.');
     }
+
+    const previousCoupon = student?.couponCode || '';
 
     if (!student) {
       student = await Student.create({
@@ -78,19 +103,25 @@ router.post(
         passwordHash,
         interest,
         courseSlug,
+        couponCode,
         country,
         status: 'pending',
         emailVerified: false,
       });
+      if (couponCode) await consumeCoupon(couponCode);
     } else {
       student.name = name;
       student.passwordHash = passwordHash;
       student.interest = interest;
       student.courseSlug = courseSlug;
+      student.couponCode = couponCode;
       student.country = country;
       student.status = 'pending';
       student.emailVerified = false;
       await student.save();
+      if (couponCode && normalizeCouponCode(previousCoupon) !== couponCode) {
+        await consumeCoupon(couponCode);
+      }
     }
 
     const acceptUrl = `${env.coursesSiteUrl}/courses/application?token=${signApplicationToken(String(student._id), 'approved')}`;
@@ -113,6 +144,7 @@ router.post(
       ok: true,
       pending: true,
       email,
+      couponCode: couponCode || undefined,
       message:
         'Application received. We’ll email you if you’re accepted. Then you can sign in with this password.',
     });

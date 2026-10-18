@@ -13,6 +13,7 @@ const StudentSchema = new Schema(
     },
     interest: { type: String, default: '', trim: true },
     courseSlug: { type: String, default: '', trim: true, lowercase: true },
+    couponCode: { type: String, default: '', trim: true, uppercase: true, index: true },
     country: { type: String, default: '', trim: true },
     avatarUrl: { type: String, default: '', trim: true },
     lastLoginAt: { type: Date, default: null },

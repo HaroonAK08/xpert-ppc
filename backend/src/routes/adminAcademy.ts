@@ -5,14 +5,19 @@ import { ClassSession } from '../models/ClassSession';
 import { ClassRecording } from '../models/ClassRecording';
 import { LearningResource } from '../models/LearningResource';
 import { getAcademySettings } from '../models/AcademySettings';
+import { Coupon } from '../models/Coupon';
+import { Student } from '../models/Student';
 import { requireAuth } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import {
   academySettingsSchema,
   classRecordingSchema,
   classSessionSchema,
+  couponCreateSchema,
+  couponUpdateSchema,
   learningResourceSchema,
 } from '../validation/portal';
+import { normalizeCouponCode } from '../utils/coupon';
 
 const router = Router();
 
@@ -359,6 +364,117 @@ router.delete(
   asyncHandler(async (req, res) => {
     const item = await LearningResource.findByIdAndDelete(req.params.id);
     if (!item) throw new ApiError(404, 'Resource not found.');
+    res.json({ ok: true });
+  })
+);
+
+router.get(
+  '/coupons',
+  asyncHandler(async (_req, res) => {
+    const coupons = await Coupon.find().sort({ createdAt: -1 }).limit(200);
+    const codes = coupons.map((c) => c.code);
+    const students = await Student.find({ couponCode: { $in: codes } })
+      .select('name email status couponCode createdAt')
+      .sort({ createdAt: -1 })
+      .limit(500);
+
+    const byCode = new Map<string, typeof students>();
+    for (const s of students) {
+      const code = s.couponCode || '';
+      if (!byCode.has(code)) byCode.set(code, []);
+      byCode.get(code)!.push(s);
+    }
+
+    res.json({
+      items: coupons.map((c) => {
+        const applicants = byCode.get(c.code) || [];
+        return {
+          id: String(c._id),
+          code: c.code,
+          active: c.active,
+          note: c.note || '',
+          maxUses: c.maxUses || 0,
+          usedCount: c.usedCount || 0,
+          applicantCount: applicants.length,
+          applicants: applicants.map((s) => ({
+            id: String(s._id),
+            name: s.name,
+            email: s.email,
+            status: s.status,
+            createdAt: s.createdAt,
+          })),
+          createdAt: c.createdAt,
+        };
+      }),
+    });
+  })
+);
+
+router.post(
+  '/coupons',
+  asyncHandler(async (req, res) => {
+    const parsed = couponCreateSchema.safeParse(req.body);
+    if (!parsed.success) throw new ApiError(400, 'Enter a valid coupon code.');
+
+    const code = normalizeCouponCode(parsed.data.code);
+    const existing = await Coupon.findOne({ code });
+    if (existing) throw new ApiError(409, 'That coupon code already exists.');
+
+    const coupon = await Coupon.create({
+      code,
+      note: parsed.data.note || '',
+      maxUses: parsed.data.maxUses || 0,
+      active: parsed.data.active ?? true,
+    });
+
+    res.status(201).json({
+      coupon: {
+        id: String(coupon._id),
+        code: coupon.code,
+        active: coupon.active,
+        note: coupon.note || '',
+        maxUses: coupon.maxUses || 0,
+        usedCount: coupon.usedCount || 0,
+        applicantCount: 0,
+        applicants: [],
+        createdAt: coupon.createdAt,
+      },
+    });
+  })
+);
+
+router.patch(
+  '/coupons/:id',
+  asyncHandler(async (req, res) => {
+    const parsed = couponUpdateSchema.safeParse(req.body);
+    if (!parsed.success) throw new ApiError(400, 'Invalid coupon update.');
+
+    const coupon = await Coupon.findById(req.params.id);
+    if (!coupon) throw new ApiError(404, 'Coupon not found.');
+
+    if (parsed.data.note !== undefined) coupon.note = parsed.data.note;
+    if (parsed.data.maxUses !== undefined) coupon.maxUses = parsed.data.maxUses;
+    if (parsed.data.active !== undefined) coupon.active = parsed.data.active;
+    await coupon.save();
+
+    res.json({
+      coupon: {
+        id: String(coupon._id),
+        code: coupon.code,
+        active: coupon.active,
+        note: coupon.note || '',
+        maxUses: coupon.maxUses || 0,
+        usedCount: coupon.usedCount || 0,
+      },
+    });
+  })
+);
+
+router.delete(
+  '/coupons/:id',
+  asyncHandler(async (req, res) => {
+    const coupon = await Coupon.findByIdAndDelete(req.params.id);
+    if (!coupon) throw new ApiError(404, 'Coupon not found.');
     res.json({ ok: true });
   })
 );

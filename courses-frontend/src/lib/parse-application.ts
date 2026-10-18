@@ -4,6 +4,7 @@ export type ParsedApplication = {
   whatsapp: string;
   timezone: string;
   fee: string;
+  coupon: string;
   transactionId: string;
   receiptUrl: string;
   raw: string;
@@ -24,6 +25,7 @@ export function parseApplicationInterest(interest: string): ParsedApplication {
     whatsapp: pick(raw, 'WhatsApp'),
     timezone: pick(raw, 'Timezone'),
     fee: pick(raw, 'Registration fee'),
+    coupon: pick(raw, 'Coupon'),
     transactionId: pick(raw, 'Transaction ID'),
     receiptUrl: (receiptMatch?.[1] || '').replace(/\.$/, ''),
     raw,

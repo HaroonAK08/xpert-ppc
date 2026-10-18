@@ -7,6 +7,25 @@ export const studentSignupSchema = z.object({
   country: z.string().trim().min(2).max(80),
   interest: z.string().trim().min(8).max(4000),
   courseSlug: z.string().trim().min(1).max(120).optional().default(''),
+  couponCode: z.string().trim().max(40).optional().default(''),
+});
+
+export const couponCreateSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(3)
+    .max(40)
+    .regex(/^[a-zA-Z0-9_-]+$/, 'Use letters, numbers, hyphens, or underscores only.'),
+  note: z.string().trim().max(200).optional().default(''),
+  maxUses: z.number().int().min(0).optional().default(0),
+  active: z.boolean().optional().default(true),
+});
+
+export const couponUpdateSchema = z.object({
+  note: z.string().trim().max(200).optional(),
+  maxUses: z.number().int().min(0).optional(),
+  active: z.boolean().optional(),
 });
 
 export const studentDecisionSchema = z.object({

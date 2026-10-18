@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   PlayCircle,
+  Ticket,
   Users,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
@@ -20,6 +21,7 @@ import { Logo } from '@/components/site/logo';
 const NAV = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/admin/applications', label: 'Applications', icon: ClipboardList },
+  { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
   { href: '/admin/courses', label: 'Courses', icon: BookOpen },
   { href: '/admin/schedule', label: 'Class Schedule', icon: CalendarDays },
   { href: '/admin/recordings', label: 'Recordings', icon: PlayCircle },

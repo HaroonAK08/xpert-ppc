@@ -29,6 +29,7 @@ router.get(
         email: s.email,
         interest: s.interest || '',
         country: s.country || '',
+        couponCode: s.couponCode || '',
         status: s.status || (s.emailVerified ? 'approved' : 'pending'),
         lastLoginAt: s.lastLoginAt,
         createdAt: s.createdAt,
