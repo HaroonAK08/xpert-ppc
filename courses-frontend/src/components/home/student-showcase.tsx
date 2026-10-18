@@ -17,16 +17,16 @@ type Profile = {
 
 const PROFILES: Profile[] = [
   {
-    name: 'Umer K.',
-    avatar: '/images/team/umer-k.png',
-    headline: 'Senior Growth Strategist | Paid Media & AI Automation',
-    badge: 'Top Rated',
+    name: 'Waseem Niazi',
+    avatar: '/images/team/waseem.png',
+    headline: 'Google Ads - Microsoft-Bing - Meta/Facebook Ads - GA4 & GTM Expert.',
+    badge: 'Top Rated Plus',
     rating: '4.9',
-    reviews: '252',
-    city: 'Lahore, Pakistan',
-    jobs: '363',
-    hours: '34K',
-    url: 'https://www.upwork.com/freelancers/umerkhan381',
+    reviews: '157',
+    city: 'Bahawalpur, Pakistan',
+    jobs: '229',
+    hours: '25K',
+    url: 'https://www.upwork.com/freelancers/~01f8fe5f1ed7fe4143',
   },
   {
     name: 'Hamayoun k.',
@@ -39,18 +39,6 @@ const PROFILES: Profile[] = [
     jobs: '157',
     hours: '13K',
     url: 'https://www.upwork.com/freelancers/~01104d06acd4460a03',
-  },
-  {
-    name: 'WASEEM N.',
-    avatar: '/images/team/waseem.png',
-    headline: 'Google Ads - Microsoft-Bing - Meta/Facebook Ads - GA4 & GTM Expert.',
-    badge: 'Top Rated Plus',
-    rating: '4.9',
-    reviews: '157',
-    city: 'Bahawalpur, Pakistan',
-    jobs: '229',
-    hours: '25K',
-    url: 'https://www.upwork.com/freelancers/~01f8fe5f1ed7fe4143',
   },
   {
     name: 'Ahsan A.',
@@ -66,7 +54,7 @@ const PROFILES: Profile[] = [
     ring: true,
   },
   {
-    name: 'Muhammad Umer Khan N.',
+    name: 'Muhammad Umer Khan Niazi',
     avatar: '/images/team/muhammad-umer.png',
     headline: 'Google Ads / PPC Expert | Data-Driven Search & Shopping Specialist',
     badge: 'Top Rated Plus',

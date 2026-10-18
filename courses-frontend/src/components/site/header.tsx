@@ -10,6 +10,7 @@ import { Logo } from './logo';
 const NAV = [
   { href: '/', label: 'Home', match: (p: string) => p === '/' },
   { href: '/courses', label: 'Courses', match: (p: string) => p.startsWith('/courses') },
+  { href: '/about', label: 'About Me', match: (p: string) => p === '/about' },
   { href: '/#student-showcase', label: 'Student Showcase', match: () => false },
   { href: '/login', label: 'Login', match: (p: string) => p === '/login' },
 ];

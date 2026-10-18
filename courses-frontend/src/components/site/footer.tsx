@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { Youtube, Linkedin, Instagram, MessageCircle } from 'lucide-react';
+import { Youtube, Linkedin, Facebook, MessageCircle } from 'lucide-react';
 import { Logo } from './logo';
 import { SOCIAL_LINKS } from '@/lib/socials';
 
 const LINKS = [
   { href: '/', label: 'Home' },
   { href: '/courses', label: 'Courses' },
+  { href: '/about', label: 'About Me' },
   { href: '/#student-showcase', label: 'Student Showcase' },
   { href: '/login', label: 'Login' },
 ];
@@ -13,14 +14,14 @@ const LINKS = [
 const LEGAL_LINKS = [
   { href: '#', label: 'Privacy Policy' },
   { href: '#', label: 'Terms' },
-  { href: '#', label: 'Contact' },
+  { href: `mailto:${SOCIAL_LINKS.email}`, label: 'Contact' },
 ];
 
 const SOCIALS = [
   { icon: Youtube, label: 'YouTube', color: 'bg-[#FF0000]', href: SOCIAL_LINKS.youtube },
   { icon: Linkedin, label: 'LinkedIn', color: 'bg-[#0A66C2]', href: SOCIAL_LINKS.linkedin },
-  { icon: Instagram, label: 'Instagram', color: 'bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF]', href: '#' },
-  { icon: MessageCircle, label: 'WhatsApp Community', color: 'bg-[#25D366]', href: '#' },
+  { icon: Facebook, label: 'Facebook', color: 'bg-[#1877F2]', href: SOCIAL_LINKS.facebook },
+  { icon: MessageCircle, label: 'WhatsApp', color: 'bg-[#25D366]', href: SOCIAL_LINKS.whatsapp },
 ];
 
 function SocialRow({ compact = false }: { compact?: boolean }) {

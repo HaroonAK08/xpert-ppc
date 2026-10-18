@@ -17,6 +17,8 @@ import {
   UserRound,
   Upload,
   X,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { PublicCourse } from '@/lib/courses';
@@ -27,6 +29,12 @@ import { Input, Select, Label } from '@/components/ui/input';
 
 const REGISTRATION_FEE = 2000;
 const MAX_RECEIPT_BYTES = 10 * 1024 * 1024;
+
+const BANK_DETAILS = {
+  accountTitle: 'HAFIZ MUHAMMAD UMER KHAN',
+  accountNumber: '09630010055941870015',
+  iban: 'PK19ABPA0010055941870015',
+};
 
 const BENEFITS = [
   { icon: Video, title: 'Live online classes', body: 'Learn from industry experts in real time.' },
@@ -52,6 +60,17 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<'accountNumber' | 'iban' | null>(null);
+
+  async function copyBankValue(field: 'accountNumber' | 'iban', value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(field);
+      window.setTimeout(() => setCopiedField((current) => (current === field ? null : current)), 1600);
+    } catch {
+      setError('Could not copy. Please copy the bank detail manually.');
+    }
+  }
 
   useEffect(() => {
     if (!receiptFile) {
@@ -340,8 +359,57 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
                     <p className="text-[13px] font-bold text-ink">Registration fee</p>
                     <p className="mt-1 text-[13px] leading-relaxed text-muted">
                       A one-time fee of <span className="font-bold text-brand">PKR {REGISTRATION_FEE.toLocaleString()}</span>{' '}
-                      is required. Enter your transaction ID and upload a screenshot of the payment.
+                      is required. Transfer to the account below, then enter your transaction ID and upload a screenshot.
                     </p>
+                  </div>
+
+                  <div className="overflow-hidden rounded-[14px] border border-border bg-white">
+                    <div className="border-b border-border px-4 py-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Account Title</p>
+                      <p className="mt-1 text-[15px] font-extrabold tracking-tight text-ink">
+                        {BANK_DETAILS.accountTitle}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Account Number</p>
+                        <p className="mt-1 break-all text-[15px] font-extrabold tracking-tight text-ink">
+                          {BANK_DETAILS.accountNumber}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => copyBankValue('accountNumber', BANK_DETAILS.accountNumber)}
+                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-brand transition hover:bg-brand-soft"
+                        aria-label="Copy account number"
+                      >
+                        {copiedField === 'accountNumber' ? (
+                          <Check className="h-4 w-4 text-emerald-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">IBAN</p>
+                        <p className="mt-1 break-all text-[15px] font-extrabold tracking-tight text-ink">
+                          {BANK_DETAILS.iban}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => copyBankValue('iban', BANK_DETAILS.iban)}
+                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-brand transition hover:bg-brand-soft"
+                        aria-label="Copy IBAN"
+                      >
+                        {copiedField === 'iban' ? (
+                          <Check className="h-4 w-4 text-emerald-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   <Field label="Transaction ID" htmlFor="transactionId" required>
