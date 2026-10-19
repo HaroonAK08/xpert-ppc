@@ -41,7 +41,7 @@ export const umerKhan: TeamMemberContent = {
   seo: {
     title: 'Meet Our Team | Xpert PPC - PPC Specialists',
     description:
-      'Meet Umer Khan and our team of certified PPC specialists with 8+ years of experience managing high-performing ad campaigns.',
+      'Meet Umer Khan and our team of certified PPC specialists with 20+ years of experience managing high-performing ad campaigns.',
     keywords: [
       'Umer Khan PPC',
       'Google Ads expert',
@@ -59,7 +59,7 @@ export const upworkProfile = {
   intro:
     "I engineer high-velocity ad campaigns for brands demanding aggressive growth. Let's scale your revenue through precision data and elite media buying.",
   about:
-    'With over 8 years of rigorous experience in data-driven performance marketing, I specialize in bridging the gap between deep analytics and compelling creative. I don’t just manage ads; I build sophisticated acquisition funnels tailored to the unique algorithms of each platform.',
+    'With over 20+ years of rigorous experience in data-driven performance marketing, I specialize in bridging the gap between deep analytics and compelling creative. I don’t just manage ads; I build sophisticated acquisition funnels tailored to the unique algorithms of each platform.',
   stats: [
     { value: 'Top Rated', label: 'Upwork Status' },
     { value: '100%', label: 'Job Success' },
@@ -69,8 +69,8 @@ export const upworkProfile = {
     { value: '250%+', label: 'Avg ROI' },
   ],
   highlights: [
-    { title: '8+ Years Experience', description: 'Deep expertise in performance marketing.' },
-    { title: '200+ Campaigns', description: 'Successfully scaled across various industries.' },
+    { title: '20+ Years Experience', description: 'Deep expertise in performance marketing.' },
+    { title: '$100M+ Ad Spend', description: 'Profitably managed across Google, Meta, and TikTok.' },
     { title: 'Certified Expert', description: 'Google, Meta, and TikTok certified.' },
   ],
   services: [
@@ -173,7 +173,7 @@ export const upworkProfile = {
   seo: {
     title: 'Hire Me on Upwork | Umer Khan - PPC Expert',
     description:
-      'Hire Umer Khan on Upwork. Top Rated Google Ads, Meta Ads, and TikTok Ads specialist with 8+ years of experience scaling brands.',
+      'Hire Umer Khan on Upwork. Top Rated Google Ads, Meta Ads, and TikTok Ads specialist with 20+ years of experience scaling brands.',
     keywords: [
       'hire Google Ads expert Upwork',
       'Umer Khan Upwork',
