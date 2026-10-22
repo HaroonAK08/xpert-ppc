@@ -11,7 +11,7 @@ import { COUNTRIES } from '@/lib/countries';
 
 type Mode = 'signup' | 'login';
 
-function PasswordField({
+export function PasswordField({
   id,
   autoComplete,
   minLength,
@@ -135,6 +135,14 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
         autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
         minLength={6}
       />
+
+      {mode === 'login' ? (
+        <p className="-mt-2 text-right text-xs">
+          <Link href="/courses/forgot-password" className="font-semibold text-primary hover:underline">
+            Forgot password?
+          </Link>
+        </p>
+      ) : null}
 
       {mode === 'signup' ? (
         <Field>

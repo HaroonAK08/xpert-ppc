@@ -206,7 +206,7 @@ router.post(
     const student = await Student.findOne({ email, active: true }).select('+passwordHash');
 
     if (student) {
-      const resetUrl = `${env.coursesSiteUrl}/reset-password?token=${signPasswordResetToken(
+      const resetUrl = `${env.coursesSiteUrl}/courses/reset-password?token=${signPasswordResetToken(
         String(student._id),
         student.passwordHash
       )}`;
