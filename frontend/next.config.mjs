@@ -16,6 +16,9 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // Self-hosted on Hostinger as a plain Node process, not Vercel — standalone
+  // bundles a minimal node_modules + server.js so no `next start` CLI is needed.
+  output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [

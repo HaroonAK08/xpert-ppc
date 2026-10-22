@@ -4,7 +4,7 @@ import { PortalCourse } from '../models/PortalCourse';
 import { Student } from '../models/Student';
 import { Enrollment } from '../models/Enrollment';
 import { requireAuth } from '../middleware/auth';
-import { upload, publicUploadPath } from '../middleware/upload';
+import { upload, persistUploadedFile } from '../middleware/upload';
 import { ApiError, asyncHandler } from '../middleware/error';
 import {
   portalCourseSchema,
@@ -272,9 +272,10 @@ router.post(
   handleUpload,
   asyncHandler(async (req, res) => {
     if (!req.file) throw new ApiError(400, 'No file uploaded.');
+    const url = await persistUploadedFile(req.file);
     res.json({
       ok: true,
-      url: publicUploadPath(req.file.filename),
+      url,
       fileName: req.file.originalname,
       mimeType: req.file.mimetype,
       size: req.file.size,

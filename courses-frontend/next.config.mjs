@@ -5,6 +5,9 @@ const nextConfig = {
   // This app has its own lockfile, independent from the sibling frontend/backend
   // workspaces — silences Next's "which project is this really part of" guess.
   outputFileTracingRoot: import.meta.dirname,
+  // Self-hosted on Hostinger as a plain Node process, not Vercel — standalone
+  // bundles a minimal node_modules + server.js so no `next start` CLI is needed.
+  output: 'standalone',
   async headers() {
     return [
       {

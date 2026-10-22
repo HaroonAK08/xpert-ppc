@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { env } from '../config/env';
 
@@ -87,6 +88,43 @@ export function verifyApplicationToken(
     if (payload.typ !== 'student-app' || !payload.sid) return null;
     if (payload.decision !== 'approved' && payload.decision !== 'rejected') return null;
     return { sid: payload.sid, decision: payload.decision };
+  } catch {
+    return null;
+  }
+}
+
+type PasswordResetTokenPayload = {
+  typ: 'student-reset';
+  sid: string;
+  /** Fingerprint of the password hash at issue time — changing the password invalidates the token. */
+  phv: string;
+};
+
+function passwordHashFingerprint(passwordHash: string): string {
+  return createHash('sha256').update(passwordHash).digest('hex').slice(0, 16);
+}
+
+export function signPasswordResetToken(studentId: string, currentPasswordHash: string): string {
+  return jwt.sign(
+    {
+      typ: 'student-reset',
+      sid: studentId,
+      phv: passwordHashFingerprint(currentPasswordHash),
+    } satisfies PasswordResetTokenPayload,
+    env.jwtSecret,
+    { expiresIn: '1h' }
+  );
+}
+
+export function verifyPasswordResetToken(
+  token: string,
+  currentPasswordHash: string
+): { sid: string } | null {
+  try {
+    const payload = jwt.verify(token, env.jwtSecret) as PasswordResetTokenPayload;
+    if (payload.typ !== 'student-reset' || !payload.sid) return null;
+    if (payload.phv !== passwordHashFingerprint(currentPasswordHash)) return null;
+    return { sid: payload.sid };
   } catch {
     return null;
   }

@@ -29,6 +29,9 @@ next-env.d.ts
 # course portal uploads
 backend/uploads/
 
+# local migration dumps (Mongo, env, uploads) — never commit
+backups/
+
 # expo
 apps/mobile/.expo/
 apps/mobile/dist/

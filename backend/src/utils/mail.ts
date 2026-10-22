@@ -30,6 +30,10 @@ export function isMailConfigured(): boolean {
   return Boolean(env.smtp.host && env.smtp.user && env.smtp.pass);
 }
 
+export function isAcademyMailConfigured(): boolean {
+  return Boolean(env.academySmtp.host && env.academySmtp.user && env.academySmtp.pass);
+}
+
 function createTransport() {
   return nodemailer.createTransport({
     host: env.smtp.host,
@@ -38,6 +42,18 @@ function createTransport() {
     auth: {
       user: env.smtp.user,
       pass: env.smtp.pass,
+    },
+  });
+}
+
+function createAcademyTransport() {
+  return nodemailer.createTransport({
+    host: env.academySmtp.host,
+    port: env.academySmtp.port,
+    secure: env.academySmtp.secure,
+    auth: {
+      user: env.academySmtp.user,
+      pass: env.academySmtp.pass,
     },
   });
 }
@@ -169,16 +185,58 @@ export async function sendOtpEmail(opts: {
     </div>
   `;
 
-  if (!isMailConfigured()) {
+  if (!isAcademyMailConfigured()) {
     console.warn(
-      `[mail] SMTP not configured — OTP for ${opts.to}: ${opts.code} (dev fallback)`
+      `[mail] Academy SMTP not configured — OTP for ${opts.to}: ${opts.code} (dev fallback)`
     );
     return { sent: false };
   }
 
-  const transporter = createTransport();
+  const transporter = createAcademyTransport();
   await transporter.sendMail({
-    from: env.smtp.otpFrom,
+    from: env.academySmtp.otpFrom,
+    to: opts.to,
+    subject,
+    text,
+    html,
+  });
+  return { sent: true };
+}
+
+export async function sendPasswordResetEmail(opts: {
+  to: string;
+  name: string;
+  resetUrl: string;
+}): Promise<{ sent: boolean }> {
+  if (!isAcademyMailConfigured()) {
+    console.warn(`[mail] Academy SMTP not configured — password reset for ${opts.to} not sent.`);
+    return { sent: false };
+  }
+
+  const subject = 'Reset your Xpert PPC Courses password';
+  const text = [
+    `Hi ${opts.name},`,
+    '',
+    'Click the link below to set a new password:',
+    opts.resetUrl,
+    '',
+    'This link expires in 1 hour. If you did not request this, you can ignore this email.',
+    '',
+    '— Xpert PPC Digital Academy',
+  ].join('\n');
+
+  const html = `
+    <div style="font-family:Inter,Segoe UI,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px">
+      <h2 style="margin:0 0 8px;color:#0f172a">Reset your password</h2>
+      <p style="margin:0 0 20px;color:#475569">Hi ${escapeHtml(opts.name)}, click below to set a new password:</p>
+      <p>${btn(opts.resetUrl, 'Reset password', '#0066cc')}</p>
+      <p style="margin:20px 0 0;color:#94a3b8;font-size:13px">Expires in 1 hour. If you did not request this, ignore this email.</p>
+    </div>
+  `;
+
+  const transporter = createAcademyTransport();
+  await transporter.sendMail({
+    from: env.academySmtp.otpFrom,
     to: opts.to,
     subject,
     text,
@@ -199,9 +257,9 @@ export async function sendCourseApplicationEmail(opts: {
   acceptUrl: string;
   rejectUrl: string;
 }): Promise<void> {
-  if (!isMailConfigured()) {
+  if (!isAcademyMailConfigured()) {
     console.warn(
-      `[mail] SMTP not configured — course application from ${opts.email} saved but not emailed.`
+      `[mail] Academy SMTP not configured — course application from ${opts.email} saved but not emailed.`
     );
     return;
   }
@@ -236,9 +294,9 @@ export async function sendCourseApplicationEmail(opts: {
     </div>
   `;
 
-  const transporter = createTransport();
+  const transporter = createAcademyTransport();
   await transporter.sendMail({
-    from: env.smtp.from,
+    from: env.academySmtp.from,
     to: env.coursesNotifyTo,
     replyTo: opts.email,
     subject,
@@ -253,7 +311,7 @@ export async function sendApplicationDecisionEmail(opts: {
   decision: 'approved' | 'rejected';
   loginUrl: string;
 }): Promise<void> {
-  if (!isMailConfigured()) return;
+  if (!isAcademyMailConfigured()) return;
 
   const accepted = opts.decision === 'approved';
   const subject = accepted
@@ -274,9 +332,9 @@ export async function sendApplicationDecisionEmail(opts: {
         <p style="color:#475569">Hi ${escapeHtml(opts.name)}, thanks for applying. We can’t offer a place on Xpert PPC Courses right now.</p>
       </div>`;
 
-  const transporter = createTransport();
+  const transporter = createAcademyTransport();
   await transporter.sendMail({
-    from: env.smtp.from,
+    from: env.academySmtp.from,
     to: opts.to,
     subject,
     text,

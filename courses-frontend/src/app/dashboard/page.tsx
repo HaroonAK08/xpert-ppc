@@ -79,6 +79,20 @@ export default function DashboardPage() {
         </h2>
         <p className="mt-1 text-sm text-muted">Your classes, resources and community in one place.</p>
 
+        {community && (community.announcementTitle || community.announcementBody) ? (
+          <div className="mt-6 flex items-start gap-3 rounded-2xl border border-brand/20 bg-brand-soft px-5 py-4">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand text-white">
+              <Megaphone className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-sm font-extrabold text-ink">{community.announcementTitle || 'Announcement'}</p>
+              {community.announcementBody ? (
+                <p className="mt-0.5 text-sm leading-relaxed text-ink/80">{community.announcementBody}</p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <StatCard href="/dashboard/courses" icon={BookOpen} title="My Courses" value={`${enrolled.length} enrolled`} />
           <StatCard

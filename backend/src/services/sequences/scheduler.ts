@@ -61,7 +61,7 @@ async function processEnrollment(enrollment: SequenceEnrollmentDoc & { _id: unkn
   await enrollment.save();
 }
 
-async function runDueEnrollments() {
+export async function runDueEnrollments() {
   if (running) return;
   running = true;
   try {

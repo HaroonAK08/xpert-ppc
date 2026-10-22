@@ -43,6 +43,16 @@ export const env = {
   googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '',
   /** How often every connected Google Sheet gets auto-synced, in ms. 0 disables it. */
   sheetSyncIntervalMs: Number(process.env.SHEET_SYNC_INTERVAL_MS ?? 5 * 60 * 1000),
+  /** Shared-host cron (Hostinger) hits /api/internal/cron/* with this bearer token. */
+  cronSecret: process.env.CRON_SECRET || '',
+  s3: {
+    endpoint: process.env.S3_ENDPOINT || '',
+    region: process.env.S3_REGION || 'auto',
+    bucket: process.env.S3_BUCKET || '',
+    accessKey: process.env.S3_ACCESS_KEY || '',
+    secretKey: process.env.S3_SECRET_KEY || '',
+    publicUrl: (process.env.S3_PUBLIC_URL || '').replace(/\/$/, ''),
+  },
   /** Meta (Facebook/Instagram) Lead Ads integration — all optional; feature is disabled until every value is set. */
   meta: {
     appId: process.env.META_APP_ID || '',
@@ -53,16 +63,33 @@ export const env = {
     /** Encrypts Page access tokens at rest. Generate with: openssl rand -base64 48 */
     tokenEncryptionKey: process.env.META_TOKEN_ENCRYPTION_KEY || '',
   },
+  /** Lead/contact form notifications — xpertppc.com's own mailbox (Gmail/Google Workspace). */
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT ?? 587),
     secure: process.env.SMTP_SECURE === 'true',
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
-    /** From address for lead alerts (and fallback for other mail). */
     from: process.env.SMTP_FROM || 'Xpert PPC <team@xpertppc.com>',
-    /** From address for course signup/login codes. */
+  },
+  /**
+   * Digital Academy mail (OTP codes, course applications, accept/reject) —
+   * xpertppc.io's own mailbox (Hostinger). Falls back to `smtp` above when
+   * unset, so a single-mailbox setup keeps working unchanged.
+   */
+  academySmtp: {
+    host: process.env.ACADEMY_SMTP_HOST || process.env.SMTP_HOST || '',
+    port: Number(process.env.ACADEMY_SMTP_PORT ?? process.env.SMTP_PORT ?? 587),
+    secure: (process.env.ACADEMY_SMTP_SECURE ?? process.env.SMTP_SECURE) === 'true',
+    user: process.env.ACADEMY_SMTP_USER || process.env.SMTP_USER || '',
+    pass: process.env.ACADEMY_SMTP_PASS || process.env.SMTP_PASS || '',
+    from:
+      process.env.ACADEMY_SMTP_FROM ||
+      process.env.SMTP_FROM ||
+      'Xpert PPC <team@xpertppc.com>',
     otpFrom:
+      process.env.ACADEMY_SMTP_OTP_FROM ||
+      process.env.ACADEMY_SMTP_FROM ||
       process.env.SMTP_OTP_FROM ||
       process.env.SMTP_FROM ||
       'Xpert PPC <team@xpertppc.com>',

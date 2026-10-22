@@ -10,7 +10,7 @@ let running = false;
  * connections one at a time (not in parallel) to stay well under Google
  * Sheets API rate limits regardless of how many clients are connected.
  */
-async function runAllScheduledSyncs() {
+export async function runAllScheduledSyncs() {
   if (running) return; // previous cycle still going — skip this tick
   running = true;
   try {

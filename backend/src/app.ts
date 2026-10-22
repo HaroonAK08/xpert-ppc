@@ -23,6 +23,7 @@ import metaWebhookRouter from './routes/metaWebhook';
 import trackRouter from './routes/track';
 import sequenceUnsubscribeRouter from './routes/sequenceUnsubscribe';
 import publicFormsRouter from './routes/publicForms';
+import internalCronRouter from './routes/internalCron';
 
 export function createApp() {
   const app = express();
@@ -62,7 +63,7 @@ export function createApp() {
         cb(new Error(`Origin ${origin} is not allowed by CORS.`));
       },
       credentials: true,
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret'],
     })(req, res, next);
   });
   app.use('/api/track', cors({ origin: true }));
@@ -78,6 +79,7 @@ export function createApp() {
     });
   });
 
+  app.use('/api/internal/cron', internalCronRouter);
   app.use('/api/leads', leadsRouter);
   app.use('/api/track', trackRouter);
   app.use('/api/meta/webhook', metaWebhookRouter);

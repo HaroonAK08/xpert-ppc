@@ -5,15 +5,23 @@ import { env } from '../config/env';
 import { Student } from '../models/Student';
 import { requireStudent } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
-import { studentLoginSchema, studentProfileSchema, studentSignupSchema } from '../validation/portal';
-import { sendCourseApplicationEmail } from '../utils/mail';
+import {
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  studentLoginSchema,
+  studentProfileSchema,
+  studentSignupSchema,
+} from '../validation/portal';
+import { sendCourseApplicationEmail, sendPasswordResetEmail } from '../utils/mail';
 import { hashPassword, verifyPassword } from '../utils/password';
 import {
   cookieOptions,
   signApplicationToken,
+  signPasswordResetToken,
   signStudentSession,
   STUDENT_COOKIE,
   verifyApplicationToken,
+  verifyPasswordResetToken,
 } from '../utils/jwt';
 import { applyStudentDecision, isStudentApproved } from '../utils/studentApplication';
 import { consumeCoupon, findValidCoupon, normalizeCouponCode } from '../utils/coupon';
@@ -184,6 +192,75 @@ router.post(
 
     res.cookie(STUDENT_COOKIE, token, cookieOptions());
     res.json(sessionPayload(student, token));
+  })
+);
+
+router.post(
+  '/forgot-password',
+  authLimiter,
+  asyncHandler(async (req, res) => {
+    const parsed = forgotPasswordSchema.safeParse(req.body);
+    if (!parsed.success) throw new ApiError(400, 'Enter a valid email address.');
+
+    const email = parsed.data.email.toLowerCase();
+    const student = await Student.findOne({ email, active: true }).select('+passwordHash');
+
+    if (student) {
+      const resetUrl = `${env.coursesSiteUrl}/reset-password?token=${signPasswordResetToken(
+        String(student._id),
+        student.passwordHash
+      )}`;
+      try {
+        await sendPasswordResetEmail({ to: student.email, name: student.name, resetUrl });
+      } catch (err) {
+        console.error('[mail] Failed to send password reset:', err);
+      }
+    }
+
+    // Same response whether or not the account exists, so emails can't be enumerated.
+    res.json({
+      ok: true,
+      message: 'If an account exists for that email, a reset link is on its way.',
+    });
+  })
+);
+
+router.post(
+  '/reset-password',
+  authLimiter,
+  asyncHandler(async (req, res) => {
+    const parsed = resetPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new ApiError(400, 'Enter a valid reset link and a password (min 6 characters).');
+    }
+
+    const { token, password } = parsed.data;
+
+    // The token carries no student id we can trust before verification, so every
+    // active student's current hash is checked against its fingerprint — same
+    // cost as a single lookup once a sid claim is parsed out first.
+    const unsafePayload = (() => {
+      try {
+        return JSON.parse(Buffer.from(token.split('.')[1] || '', 'base64url').toString('utf8'));
+      } catch {
+        return null;
+      }
+    })();
+    const sid = typeof unsafePayload?.sid === 'string' ? unsafePayload.sid : '';
+    if (!sid) throw new ApiError(400, 'This reset link is invalid or expired.');
+
+    const student = await Student.findOne({ _id: sid, active: true }).select('+passwordHash');
+    if (!student) throw new ApiError(400, 'This reset link is invalid or expired.');
+
+    const verified = verifyPasswordResetToken(token, student.passwordHash);
+    if (!verified || verified.sid !== String(student._id)) {
+      throw new ApiError(400, 'This reset link is invalid or expired.');
+    }
+
+    student.passwordHash = await hashPassword(password);
+    await student.save();
+
+    res.json({ ok: true, message: 'Password updated. You can now sign in.' });
   })
 );
 

@@ -2,6 +2,8 @@ import path from 'path';
 import fs from 'fs';
 import multer from 'multer';
 import { randomBytes } from 'crypto';
+import { env } from '../config/env';
+import { isObjectStorageConfigured, uploadLocalFileToObjectStorage } from '../utils/objectStorage';
 
 export const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -46,5 +48,19 @@ export const upload = multer({
 });
 
 export function publicUploadPath(filename: string): string {
-  return `/uploads/${filename}`;
+  if (env.s3.publicUrl && isObjectStorageConfigured()) {
+    return `${env.s3.publicUrl}/${filename}`;
+  }
+  return `${env.apiPublicUrl}/uploads/${filename}`;
+}
+
+export async function persistUploadedFile(file: Express.Multer.File): Promise<string> {
+  if (isObjectStorageConfigured()) {
+    return uploadLocalFileToObjectStorage({
+      localPath: file.path,
+      key: file.filename,
+      contentType: file.mimetype,
+    });
+  }
+  return publicUploadPath(file.filename);
 }

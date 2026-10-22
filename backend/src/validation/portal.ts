@@ -45,6 +45,15 @@ export const studentProfileSchema = z.object({
     .refine((v) => v === '' || /^https?:\/\//i.test(v), 'Enter a valid image URL.'),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().email().max(160),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().trim().min(1),
+  password: z.string().min(6).max(100),
+});
+
 export const studentVerifySchema = z.object({
   email: z.string().trim().email().max(160),
   code: z.string().trim().regex(/^\d{6}$/),
