@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 
 import { api } from '@/lib/api';
 
@@ -13,15 +13,25 @@ type Applicant = {
   country: string;
   interest: string;
   status: 'pending' | 'approved' | 'rejected';
+  needsCourseAssignment: boolean;
   createdAt: string;
+};
+
+type CourseOption = {
+  id: string;
+  title: string;
+  published: boolean;
 };
 
 export default function AdminStudentsPage() {
   const router = useRouter();
   const [items, setItems] = useState<Applicant[]>([]);
+  const [courses, setCourses] = useState<CourseOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [assignChoice, setAssignChoice] = useState<Record<string, string>>({});
+  const [assignNotice, setAssignNotice] = useState<Record<string, string>>({});
 
   async function load() {
     const me = await api.get('/api/auth/me');
@@ -29,13 +39,17 @@ export default function AdminStudentsPage() {
       router.replace('/admin/login');
       return;
     }
-    const res = await api.get<{ items: Applicant[] }>('/api/admin/portal/students');
-    if (!res.ok) {
-      setError(res.error);
+    const [studentsRes, coursesRes] = await Promise.all([
+      api.get<{ items: Applicant[] }>('/api/admin/portal/students'),
+      api.get<{ items: CourseOption[] }>('/api/admin/portal/courses'),
+    ]);
+    if (!studentsRes.ok) {
+      setError(studentsRes.error);
       setLoading(false);
       return;
     }
-    setItems(res.data.items);
+    setItems(studentsRes.data.items);
+    if (coursesRes.ok) setCourses(coursesRes.data.items.filter((c) => c.published));
     setLoading(false);
   }
 
@@ -46,13 +60,44 @@ export default function AdminStudentsPage() {
 
   async function decide(id: string, status: 'approved' | 'rejected') {
     setBusyId(id);
-    const res = await api.patch(`/api/admin/portal/students/${id}`, { status });
+    const res = await api.patch<{ enrolled: boolean }>(`/api/admin/portal/students/${id}`, {
+      status,
+    });
     setBusyId(null);
     if (!res.ok) {
       setError(res.error);
       return;
     }
-    setItems((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
+    setItems((prev) =>
+      prev.map((s) =>
+        s.id === id
+          ? { ...s, status, needsCourseAssignment: status === 'approved' && !res.data.enrolled }
+          : s
+      )
+    );
+  }
+
+  async function assignCourse(id: string) {
+    const courseId = assignChoice[id];
+    if (!courseId) return;
+
+    setBusyId(id);
+    const res = await api.post<{ courseTitle: string; emailed: boolean }>(
+      `/api/admin/portal/students/${id}/assign-course`,
+      { courseId }
+    );
+    setBusyId(null);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setItems((prev) => prev.map((s) => (s.id === id ? { ...s, needsCourseAssignment: false } : s)));
+    setAssignNotice((prev) => ({
+      ...prev,
+      [id]: res.data.emailed
+        ? `Assigned to ${res.data.courseTitle} — student emailed.`
+        : `Assigned to ${res.data.courseTitle}.`,
+    }));
   }
 
   if (loading) {
@@ -139,6 +184,45 @@ export default function AdminStudentsPage() {
                 </span>
               </div>
               {s.interest ? <p className="mt-2 text-sm text-foreground/90">{s.interest}</p> : null}
+
+              {s.needsCourseAssignment ? (
+                <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-400/10 p-4">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-amber-700">
+                    <AlertTriangle className="h-4 w-4" />
+                    No course matched automatically — assign one so they can sign in.
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <select
+                      value={assignChoice[s.id] || ''}
+                      onChange={(e) =>
+                        setAssignChoice((prev) => ({ ...prev, [s.id]: e.target.value }))
+                      }
+                      className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
+                    >
+                      <option value="" disabled>
+                        Choose a course…
+                      </option>
+                      {courses.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.title}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      disabled={busyId === s.id || !assignChoice[s.id]}
+                      onClick={() => void assignCourse(s.id)}
+                      className="inline-flex h-10 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+                    >
+                      Assign
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
+              {assignNotice[s.id] ? (
+                <p className="mt-3 text-xs font-semibold text-emerald-600">{assignNotice[s.id]}</p>
+              ) : null}
             </article>
           ))}
         </div>

@@ -14,10 +14,30 @@ export async function findValidCoupon(rawCode: string) {
   return coupon;
 }
 
+/** Atomically reserves one use, so two concurrent signups can't both pass a maxUses:1 coupon. */
 export async function consumeCoupon(rawCode: string) {
-  const coupon = await findValidCoupon(rawCode);
-  if (!coupon) return null;
-  coupon.usedCount = (coupon.usedCount || 0) + 1;
-  await coupon.save();
-  return coupon;
+  const code = normalizeCouponCode(rawCode);
+  if (!code) return null;
+
+  return Coupon.findOneAndUpdate(
+    {
+      code,
+      active: true,
+      $expr: { $or: [{ $eq: ['$maxUses', 0] }, { $lt: ['$usedCount', '$maxUses'] }] },
+    },
+    { $inc: { usedCount: 1 } },
+    { new: true }
+  );
+}
+
+/** Gives back a use, e.g. when the applicant who redeemed it is rejected. */
+export async function refundCoupon(rawCode: string) {
+  const code = normalizeCouponCode(rawCode);
+  if (!code) return null;
+
+  return Coupon.findOneAndUpdate(
+    { code, usedCount: { $gt: 0 } },
+    { $inc: { usedCount: -1 } },
+    { new: true }
+  );
 }

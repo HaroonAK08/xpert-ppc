@@ -2,6 +2,7 @@ import { Student } from '../models/Student';
 import { PortalCourse } from '../models/PortalCourse';
 import { Enrollment } from '../models/Enrollment';
 import { sendApplicationDecisionEmail } from './mail';
+import { refundCoupon } from './coupon';
 import { env } from '../config/env';
 import type { ApplicationDecision } from './jwt';
 
@@ -40,30 +41,77 @@ function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export async function enrollStudentInAppliedCourse(studentId: string) {
+export async function enrollStudentInAppliedCourse(
+  studentId: string
+): Promise<{ enrolled: boolean; courseTitle?: string }> {
   const student = await Student.findById(studentId);
-  if (!student) return;
+  if (!student) return { enrolled: false };
 
   const course = await resolveAppliedCourse(student);
-  if (!course) return;
+  if (!course) return { enrolled: false };
 
   await Enrollment.findOneAndUpdate(
     { studentId: student._id, courseId: course._id },
     { $setOnInsert: { studentId: student._id, courseId: course._id, completedLessonIds: [] } },
     { upsert: true, new: true }
   );
+
+  return { enrolled: true, courseTitle: course.title };
+}
+
+/** Admin picks a course by hand when auto-enroll couldn't match one on approval. */
+export async function assignStudentCourse(
+  studentId: string,
+  courseId: string
+): Promise<{ ok: true; courseTitle: string; emailed: boolean } | { ok: false; error: string }> {
+  const student = await Student.findById(studentId);
+  if (!student) return { ok: false, error: 'Student not found.' };
+
+  const course = await PortalCourse.findOne({ _id: courseId, published: true });
+  if (!course) return { ok: false, error: 'Course not found.' };
+
+  const hadEnrollment = (await Enrollment.countDocuments({ studentId: student._id })) > 0;
+
+  await Enrollment.findOneAndUpdate(
+    { studentId: student._id, courseId: course._id },
+    { $setOnInsert: { studentId: student._id, courseId: course._id, completedLessonIds: [] } },
+    { upsert: true, new: true }
+  );
+
+  // This is the first time the student actually has somewhere to sign in to — tell them now.
+  let emailed = false;
+  if (student.status === 'approved' && !hadEnrollment) {
+    try {
+      await sendApplicationDecisionEmail({
+        to: student.email,
+        name: student.name,
+        decision: 'approved',
+        loginUrl: `${env.coursesSiteUrl}/courses/login`,
+      });
+      emailed = true;
+    } catch (err) {
+      console.error('[mail] Failed to email student about course assignment:', err);
+    }
+  }
+
+  return { ok: true, courseTitle: course.title, emailed };
 }
 
 export async function applyStudentDecision(
   studentId: string,
   decision: ApplicationDecision
-): Promise<{ ok: true; already: boolean; name: string; email: string } | { ok: false; error: string }> {
+): Promise<
+  | { ok: true; already: boolean; name: string; email: string; enrolled: boolean }
+  | { ok: false; error: string }
+> {
   const student = await Student.findById(studentId);
   if (!student) return { ok: false, error: 'Application not found.' };
 
   const already =
     (decision === 'approved' && student.status === 'approved') ||
     (decision === 'rejected' && student.status === 'rejected');
+
+  let enrolled = false;
 
   if (!already) {
     student.status = decision;
@@ -72,29 +120,51 @@ export async function applyStudentDecision(
 
     if (decision === 'approved') {
       try {
-        await enrollStudentInAppliedCourse(String(student._id));
+        enrolled = (await enrollStudentInAppliedCourse(String(student._id))).enrolled;
       } catch (err) {
         console.error('[academy] Failed to enroll approved student:', err);
       }
-    }
 
-    try {
-      await sendApplicationDecisionEmail({
-        to: student.email,
-        name: student.name,
-        decision,
-        loginUrl: `${env.coursesSiteUrl}/courses/login`,
-      });
-    } catch (err) {
-      console.error('[mail] Failed to email student about application:', err);
+      // Don't tell the student they're in if nothing matched — the admin still needs
+      // to assign a course by hand on /admin/students, which sends this email itself.
+      if (enrolled) {
+        try {
+          await sendApplicationDecisionEmail({
+            to: student.email,
+            name: student.name,
+            decision,
+            loginUrl: `${env.coursesSiteUrl}/courses/login`,
+          });
+        } catch (err) {
+          console.error('[mail] Failed to email student about application:', err);
+        }
+      }
+    } else {
+      if (student.couponCode) {
+        try {
+          await refundCoupon(student.couponCode);
+        } catch (err) {
+          console.error('[academy] Failed to refund coupon on rejection:', err);
+        }
+      }
+      try {
+        await sendApplicationDecisionEmail({
+          to: student.email,
+          name: student.name,
+          decision,
+          loginUrl: `${env.coursesSiteUrl}/courses/login`,
+        });
+      } catch (err) {
+        console.error('[mail] Failed to email student about application:', err);
+      }
     }
   } else if (decision === 'approved') {
     try {
-      await enrollStudentInAppliedCourse(String(student._id));
+      enrolled = (await enrollStudentInAppliedCourse(String(student._id))).enrolled;
     } catch (err) {
       console.error('[academy] Failed to enroll approved student:', err);
     }
   }
 
-  return { ok: true, already, name: student.name, email: student.email };
+  return { ok: true, already, name: student.name, email: student.email, enrolled };
 }

@@ -90,19 +90,25 @@ router.post(
     const couponRaw = parsed.data.couponCode || '';
     const passwordHash = await hashPassword(parsed.data.password);
 
-    let couponCode = '';
-    if (couponRaw.trim()) {
-      const coupon = await findValidCoupon(couponRaw);
-      if (!coupon) throw new ApiError(400, 'This coupon code is not valid or has expired.');
-      couponCode = coupon.code;
-    }
-
     let student = await Student.findOne({ email }).select('+passwordHash');
     if (student && isStudentApproved(student)) {
       throw new ApiError(409, 'An account with this email already exists. Please sign in.');
     }
 
     const previousCoupon = student?.couponCode || '';
+
+    // A resubmitted pending application reusing its own coupon shouldn't consume a second use.
+    let couponCode = '';
+    if (couponRaw.trim()) {
+      const normalized = normalizeCouponCode(couponRaw);
+      if (normalized === normalizeCouponCode(previousCoupon)) {
+        couponCode = normalized;
+      } else {
+        const coupon = await consumeCoupon(normalized);
+        if (!coupon) throw new ApiError(400, 'This coupon code is not valid or has expired.');
+        couponCode = coupon.code;
+      }
+    }
 
     if (!student) {
       student = await Student.create({
@@ -116,7 +122,6 @@ router.post(
         status: 'pending',
         emailVerified: false,
       });
-      if (couponCode) await consumeCoupon(couponCode);
     } else {
       student.name = name;
       student.passwordHash = passwordHash;
@@ -127,9 +132,6 @@ router.post(
       student.status = 'pending';
       student.emailVerified = false;
       await student.save();
-      if (couponCode && normalizeCouponCode(previousCoupon) !== couponCode) {
-        await consumeCoupon(couponCode);
-      }
     }
 
     const acceptUrl = `${env.coursesSiteUrl}/courses/application?token=${signApplicationToken(String(student._id), 'approved')}`;

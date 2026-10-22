@@ -3,16 +3,20 @@ import { Router } from 'express';
 import { PortalCourse } from '../models/PortalCourse';
 import { Student } from '../models/Student';
 import { Enrollment } from '../models/Enrollment';
+import { ClassSession } from '../models/ClassSession';
+import { ClassRecording } from '../models/ClassRecording';
+import { LearningResource } from '../models/LearningResource';
 import { requireAuth, requireRole } from '../middleware/auth';
 import { upload, persistUploadedFile } from '../middleware/upload';
 import { ApiError, asyncHandler } from '../middleware/error';
 import {
+  assignCourseSchema,
   portalCourseSchema,
   portalLessonSchema,
   portalModuleSchema,
   studentDecisionSchema,
 } from '../validation/portal';
-import { applyStudentDecision } from '../utils/studentApplication';
+import { applyStudentDecision, assignStudentCourse } from '../utils/studentApplication';
 
 const router = Router();
 
@@ -22,18 +26,27 @@ router.get(
   '/students',
   asyncHandler(async (_req, res) => {
     const students = await Student.find().sort({ createdAt: -1 }).limit(200);
+    const enrollments = await Enrollment.find({
+      studentId: { $in: students.map((s) => s._id) },
+    }).select('studentId');
+    const enrolledIds = new Set(enrollments.map((e) => String(e.studentId)));
+
     res.json({
-      items: students.map((s) => ({
-        id: String(s._id),
-        name: s.name,
-        email: s.email,
-        interest: s.interest || '',
-        country: s.country || '',
-        couponCode: s.couponCode || '',
-        status: s.status || (s.emailVerified ? 'approved' : 'pending'),
-        lastLoginAt: s.lastLoginAt,
-        createdAt: s.createdAt,
-      })),
+      items: students.map((s) => {
+        const status = s.status || (s.emailVerified ? 'approved' : 'pending');
+        return {
+          id: String(s._id),
+          name: s.name,
+          email: s.email,
+          interest: s.interest || '',
+          country: s.country || '',
+          couponCode: s.couponCode || '',
+          status,
+          needsCourseAssignment: status === 'approved' && !enrolledIds.has(String(s._id)),
+          lastLoginAt: s.lastLoginAt,
+          createdAt: s.createdAt,
+        };
+      }),
     });
   })
 );
@@ -51,7 +64,21 @@ router.patch(
       ok: true,
       already: result.already,
       status: parsed.data.status,
+      enrolled: result.enrolled,
     });
+  })
+);
+
+router.post(
+  '/students/:id/assign-course',
+  asyncHandler(async (req, res) => {
+    const parsed = assignCourseSchema.safeParse(req.body);
+    if (!parsed.success) throw new ApiError(400, 'Choose a course to assign.');
+
+    const result = await assignStudentCourse(req.params.id, parsed.data.courseId);
+    if (!result.ok) throw new ApiError(404, result.error);
+
+    res.json({ ok: true, courseTitle: result.courseTitle, emailed: result.emailed });
   })
 );
 
@@ -131,7 +158,12 @@ router.delete(
   asyncHandler(async (req, res) => {
     const course = await PortalCourse.findByIdAndDelete(req.params.id);
     if (!course) throw new ApiError(404, 'Course not found.');
-    await Enrollment.deleteMany({ courseId: course._id });
+    await Promise.all([
+      Enrollment.deleteMany({ courseId: course._id }),
+      ClassSession.deleteMany({ courseId: course._id }),
+      ClassRecording.deleteMany({ courseId: course._id }),
+      LearningResource.deleteMany({ courseId: course._id }),
+    ]);
     res.json({ ok: true });
   })
 );

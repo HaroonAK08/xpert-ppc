@@ -88,25 +88,14 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
       password,
     });
 
+    setBusy(false);
+
     if (result.ok) {
-      setBusy(false);
       router.replace('/courses/dashboard');
       return;
     }
 
-    const adminResult = await api.post<{ user: { id: string; role?: string } }>(
-      '/api/auth/login',
-      { email, password }
-    );
-
-    setBusy(false);
-
-    if (adminResult.ok) {
-      window.location.assign('/admin');
-      return;
-    }
-
-    setError(result.error || adminResult.error || 'Invalid email or password.');
+    setError(result.error || 'Invalid email or password.');
   }
 
   return (

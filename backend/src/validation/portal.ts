@@ -32,6 +32,10 @@ export const studentDecisionSchema = z.object({
   status: z.enum(['approved', 'rejected']),
 });
 
+export const assignCourseSchema = z.object({
+  courseId: z.string().trim().min(1),
+});
+
 export const studentLoginSchema = z.object({
   email: z.string().trim().email().max(160),
   password: z.string().min(1).max(100),
