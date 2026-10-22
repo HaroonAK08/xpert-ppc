@@ -19,8 +19,8 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { href: '/admin', label: 'Website leads', icon: Inbox },
   { href: '/admin/clients', label: 'Clients', icon: Users, adminOnly: true },
-  { href: '/admin/students', label: 'Applications', icon: ClipboardList },
-  { href: '/admin/courses', label: 'Courses', icon: BookOpen },
+  { href: '/admin/students', label: 'Applications', icon: ClipboardList, adminOnly: true },
+  { href: '/admin/courses', label: 'Courses', icon: BookOpen, adminOnly: true },
 ];
 
 function isNavActive(pathname: string, href: string) {

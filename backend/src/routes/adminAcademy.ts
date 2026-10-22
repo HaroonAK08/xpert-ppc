@@ -7,7 +7,7 @@ import { LearningResource } from '../models/LearningResource';
 import { getAcademySettings } from '../models/AcademySettings';
 import { Coupon } from '../models/Coupon';
 import { Student } from '../models/Student';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireRole } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import {
   academySettingsSchema,
@@ -21,7 +21,7 @@ import { normalizeCouponCode } from '../utils/coupon';
 
 const router = Router();
 
-router.use(requireAuth);
+router.use(requireAuth, requireRole('admin'));
 
 async function courseTitleMap(ids: string[]) {
   const courses = await PortalCourse.find({ _id: { $in: ids } }).select('title slug');

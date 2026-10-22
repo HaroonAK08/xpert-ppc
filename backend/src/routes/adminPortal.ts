@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { PortalCourse } from '../models/PortalCourse';
 import { Student } from '../models/Student';
 import { Enrollment } from '../models/Enrollment';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireRole } from '../middleware/auth';
 import { upload, persistUploadedFile } from '../middleware/upload';
 import { ApiError, asyncHandler } from '../middleware/error';
 import {
@@ -16,7 +16,7 @@ import { applyStudentDecision } from '../utils/studentApplication';
 
 const router = Router();
 
-router.use(requireAuth);
+router.use(requireAuth, requireRole('admin'));
 
 router.get(
   '/students',
