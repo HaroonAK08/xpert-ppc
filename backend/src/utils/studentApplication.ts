@@ -99,7 +99,8 @@ export async function assignStudentCourse(
 
 export async function applyStudentDecision(
   studentId: string,
-  decision: ApplicationDecision
+  decision: ApplicationDecision,
+  reason?: string
 ): Promise<
   | { ok: true; already: boolean; name: string; email: string; enrolled: boolean }
   | { ok: false; error: string }
@@ -153,6 +154,7 @@ export async function applyStudentDecision(
           name: student.name,
           decision,
           loginUrl: `${env.coursesSiteUrl}/courses/login`,
+          reason,
         });
       } catch (err) {
         console.error('[mail] Failed to email student about application:', err);

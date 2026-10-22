@@ -254,8 +254,7 @@ export async function sendCourseApplicationEmail(opts: {
   email: string;
   country: string;
   interest: string;
-  acceptUrl: string;
-  rejectUrl: string;
+  reviewUrl: string;
 }): Promise<void> {
   if (!isAcademyMailConfigured()) {
     console.warn(
@@ -275,8 +274,7 @@ export async function sendCourseApplicationEmail(opts: {
     'What they want to learn:',
     opts.interest,
     '',
-    `Accept: ${opts.acceptUrl}`,
-    `Reject: ${opts.rejectUrl}`,
+    `Review: ${opts.reviewUrl}`,
   ].join('\n');
 
   const html = `
@@ -288,8 +286,8 @@ export async function sendCourseApplicationEmail(opts: {
         ${row('Country', opts.country)}
         ${row('Wants to learn', opts.interest)}
       </table>
-      <p style="margin:24px 0 8px;color:#475569">Accept this person so they can sign in with the password they chose. You can also review all applications in the admin panel.</p>
-      <p>${btn(opts.acceptUrl, 'Accept', '#16a34a')}${btn(opts.rejectUrl, 'Reject', '#dc2626')}</p>
+      <p style="margin:24px 0 8px;color:#475569">Review this application to accept or decline it. You can also review all applications in the admin panel.</p>
+      <p>${btn(opts.reviewUrl, 'Review application', '#0066cc')}</p>
       <p style="margin:16px 0 0;font-size:13px;color:#64748b"><a href="${escapeHtml(env.coursesSiteUrl + '/admin/students')}" style="color:#1a6ef0">Open applications admin</a></p>
     </div>
   `;
@@ -310,16 +308,20 @@ export async function sendApplicationDecisionEmail(opts: {
   name: string;
   decision: 'approved' | 'rejected';
   loginUrl: string;
+  reason?: string;
 }): Promise<void> {
   if (!isAcademyMailConfigured()) return;
 
   const accepted = opts.decision === 'approved';
+  const reason = (opts.reason || '').trim();
   const subject = accepted
     ? 'You’re in — sign in to Xpert PPC Courses'
     : 'Update on your Xpert PPC Courses application';
   const text = accepted
     ? `Hi ${opts.name},\n\nYour application was accepted. Sign in with the password you chose:\n${opts.loginUrl}\n\n— Xpert PPC`
-    : `Hi ${opts.name},\n\nThanks for applying to Xpert PPC Courses. We can’t offer a place right now.\n\n— Xpert PPC`;
+    : `Hi ${opts.name},\n\nThanks for applying to Xpert PPC Courses. We can’t offer a place right now.${
+        reason ? `\n\n${reason}` : ''
+      }\n\n— Xpert PPC`;
 
   const html = accepted
     ? `<div style="font-family:Inter,Segoe UI,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px">
@@ -330,6 +332,7 @@ export async function sendApplicationDecisionEmail(opts: {
     : `<div style="font-family:Inter,Segoe UI,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px">
         <h2 style="margin:0 0 12px;color:#0f172a">Application update</h2>
         <p style="color:#475569">Hi ${escapeHtml(opts.name)}, thanks for applying. We can’t offer a place on Xpert PPC Courses right now.</p>
+        ${reason ? `<p style="color:#475569">${escapeHtml(reason)}</p>` : ''}
       </div>`;
 
   const transporter = createAcademyTransport();

@@ -66,28 +66,27 @@ export function cookieOptions() {
 
 export type ApplicationDecision = 'approved' | 'rejected';
 
-type ApplicationTokenPayload = {
-  typ: 'student-app';
+// One link per application (not one per decision) — the admin picks Approve or
+// Reject on the confirmation page, which POSTs the decision. This also means a
+// mail scanner prefetching the link can no longer mutate anything by itself.
+type ApplicationReviewTokenPayload = {
+  typ: 'student-app-review';
   sid: string;
-  decision: ApplicationDecision;
 };
 
-export function signApplicationToken(studentId: string, decision: ApplicationDecision): string {
+export function signApplicationReviewToken(studentId: string): string {
   return jwt.sign(
-    { typ: 'student-app', sid: studentId, decision } satisfies ApplicationTokenPayload,
+    { typ: 'student-app-review', sid: studentId } satisfies ApplicationReviewTokenPayload,
     env.jwtSecret,
     { expiresIn: '14d' }
   );
 }
 
-export function verifyApplicationToken(
-  token: string
-): { sid: string; decision: ApplicationDecision } | null {
+export function verifyApplicationReviewToken(token: string): { sid: string } | null {
   try {
-    const payload = jwt.verify(token, env.jwtSecret) as ApplicationTokenPayload;
-    if (payload.typ !== 'student-app' || !payload.sid) return null;
-    if (payload.decision !== 'approved' && payload.decision !== 'rejected') return null;
-    return { sid: payload.sid, decision: payload.decision };
+    const payload = jwt.verify(token, env.jwtSecret) as ApplicationReviewTokenPayload;
+    if (payload.typ !== 'student-app-review' || !payload.sid) return null;
+    return { sid: payload.sid };
   } catch {
     return null;
   }

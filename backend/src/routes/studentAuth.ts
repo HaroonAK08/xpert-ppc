@@ -6,6 +6,7 @@ import { Student } from '../models/Student';
 import { requireStudent } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import {
+  applicationReviewDecisionSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   studentLoginSchema,
@@ -16,11 +17,11 @@ import { sendCourseApplicationEmail, sendPasswordResetEmail } from '../utils/mai
 import { hashPassword, verifyPassword } from '../utils/password';
 import {
   cookieOptions,
-  signApplicationToken,
+  signApplicationReviewToken,
   signPasswordResetToken,
   signStudentSession,
   STUDENT_COOKIE,
-  verifyApplicationToken,
+  verifyApplicationReviewToken,
   verifyPasswordResetToken,
 } from '../utils/jwt';
 import { applyStudentDecision, isStudentApproved } from '../utils/studentApplication';
@@ -134,8 +135,7 @@ router.post(
       await student.save();
     }
 
-    const acceptUrl = `${env.coursesSiteUrl}/courses/application?token=${signApplicationToken(String(student._id), 'approved')}`;
-    const rejectUrl = `${env.coursesSiteUrl}/courses/application?token=${signApplicationToken(String(student._id), 'rejected')}`;
+    const reviewUrl = `${env.coursesSiteUrl}/courses/application?token=${signApplicationReviewToken(String(student._id))}`;
 
     try {
       await sendCourseApplicationEmail({
@@ -143,8 +143,7 @@ router.post(
         email: student.email,
         country,
         interest,
-        acceptUrl,
-        rejectUrl,
+        reviewUrl,
       });
     } catch (err) {
       console.error('[mail] Failed to send course application:', err);
@@ -266,21 +265,48 @@ router.post(
   })
 );
 
+// Read-only: renders the confirmation page. Never changes student status, so a
+// mail scanner or link-prefetcher that fetches this on page load can't approve
+// or reject anyone — only the POST below does that, and only on a button click.
 router.get(
   '/application',
   asyncHandler(async (req, res) => {
     const token = typeof req.query.token === 'string' ? req.query.token : '';
-    const parsed = verifyApplicationToken(token);
-    if (!parsed) throw new ApiError(400, 'This accept/reject link is invalid or expired.');
+    const parsed = verifyApplicationReviewToken(token);
+    if (!parsed) throw new ApiError(400, 'This review link is invalid or expired.');
 
-    const result = await applyStudentDecision(parsed.sid, parsed.decision);
+    const student = await Student.findById(parsed.sid);
+    if (!student) throw new ApiError(404, 'Application not found.');
+
+    res.json({
+      ok: true,
+      status: student.status || (student.emailVerified ? 'approved' : 'pending'),
+      name: student.name,
+      email: student.email,
+      country: student.country || '',
+      interest: student.interest || '',
+    });
+  })
+);
+
+router.post(
+  '/application',
+  asyncHandler(async (req, res) => {
+    const parsed = applicationReviewDecisionSchema.safeParse(req.body);
+    if (!parsed.success) throw new ApiError(400, 'Choose approve or reject.');
+
+    const token = verifyApplicationReviewToken(parsed.data.token);
+    if (!token) throw new ApiError(400, 'This review link is invalid or expired.');
+
+    const result = await applyStudentDecision(token.sid, parsed.data.decision, parsed.data.reason);
     if (!result.ok) throw new ApiError(404, result.error);
 
     res.json({
       ok: true,
-      decision: parsed.decision,
+      decision: parsed.data.decision,
       already: result.already,
       name: result.name,
+      enrolled: result.enrolled,
     });
   })
 );
