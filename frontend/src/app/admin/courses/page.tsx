@@ -111,6 +111,12 @@ export default function AdminCoursesPage() {
               Upload videos, lectures, assignments, and tasks for enrolled students.
             </p>
           </div>
+          <Link
+            href="/admin/courses/academy"
+            className="inline-flex h-10 items-center rounded-xl border border-border px-4 text-sm font-semibold hover:text-primary"
+          >
+            Live sessions, recordings & coupons
+          </Link>
         </div>
 
         {error ? (
