@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { api, setAuthToken } from '@/lib/api';
+import { setAdminToken } from '@/lib/admin-api';
 import { SiteHeader } from '@/components/site/header';
 import { SiteFooter } from '@/components/site/footer';
 import { Button } from '@/components/ui/button';
@@ -23,14 +24,23 @@ export default function LoginPage() {
     setStatus('loading');
     setError('');
 
-    const res = await api.post<{ ok: boolean; token?: string }>('/api/student/auth/login', {
-      email: String(form.get('email') || '').trim(),
-      password: String(form.get('password') || ''),
-    });
+    const res = await api.post<{ ok: boolean; token?: string; admin?: boolean }>(
+      '/api/student/auth/login',
+      {
+        email: String(form.get('email') || '').trim(),
+        password: String(form.get('password') || ''),
+      }
+    );
 
     if (!res.ok) {
       setError(res.error);
       setStatus('error');
+      return;
+    }
+
+    if (res.data.admin) {
+      if (res.data.token) setAdminToken(res.data.token);
+      router.replace('/admin/applications');
       return;
     }
 

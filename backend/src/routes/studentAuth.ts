@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit';
 
 import { env } from '../config/env';
 import { Student } from '../models/Student';
+import { AdminUser } from '../models/AdminUser';
 import { requireStudent } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 import {
@@ -19,7 +20,9 @@ import {
   cookieOptions,
   signApplicationReviewToken,
   signPasswordResetToken,
+  signSession,
   signStudentSession,
+  SESSION_COOKIE,
   STUDENT_COOKIE,
   verifyApplicationReviewToken,
   verifyPasswordResetToken,
@@ -168,11 +171,38 @@ router.post(
     if (!parsed.success) throw new ApiError(400, 'Enter a valid email and password.');
 
     const email = parsed.data.email.toLowerCase();
-    const student = await Student.findOne({ email, active: true }).select('+passwordHash');
+    const found = await Student.findOne({ email, active: true }).select('+passwordHash');
+    const studentOk = found && (await verifyPassword(parsed.data.password, found.passwordHash));
 
-    if (!student || !(await verifyPassword(parsed.data.password, student.passwordHash))) {
+    // The portal and the admin/owner account share one login form. A failed
+    // student match falls back to AdminUser so the owner can sign in from the
+    // same page instead of needing a separate admin URL.
+    if (!studentOk || !found) {
+      const admin = await AdminUser.findOne({ email, active: true }).select('+passwordHash');
+      if (admin && (await verifyPassword(parsed.data.password, admin.passwordHash))) {
+        const token = signSession({
+          sub: String(admin._id),
+          email: admin.email,
+          name: admin.name,
+          role: admin.role,
+        });
+
+        admin.lastLoginAt = new Date();
+        await admin.save();
+
+        res.cookie(SESSION_COOKIE, token, cookieOptions());
+        return res.json({
+          ok: true,
+          admin: true,
+          token,
+          user: { id: String(admin._id), email: admin.email, name: admin.name, role: admin.role },
+        });
+      }
+
       throw new ApiError(401, 'Invalid email or password.');
     }
+
+    const student = found;
 
     if (student.status === 'rejected') {
       throw new ApiError(403, 'Your application was not approved.');

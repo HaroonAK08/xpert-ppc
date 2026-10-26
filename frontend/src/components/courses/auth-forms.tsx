@@ -83,15 +83,19 @@ export function CourseAuthForm({ mode }: { mode: Mode }) {
       return;
     }
 
-    const result = await api.post<{ user: { id: string } }>('/api/student/auth/login', {
-      email,
-      password,
-    });
+    const result = await api.post<{ user: { id: string }; admin?: boolean }>(
+      '/api/student/auth/login',
+      { email, password }
+    );
 
     setBusy(false);
 
     if (result.ok) {
-      router.replace('/courses/dashboard');
+      if (result.data.admin) {
+        window.location.assign('/admin');
+      } else {
+        router.replace('/courses/dashboard');
+      }
       return;
     }
 
