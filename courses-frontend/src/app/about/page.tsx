@@ -20,7 +20,7 @@ import {
 import { SiteHeader } from '@/components/site/header';
 import { SiteFooter } from '@/components/site/footer';
 import { SOCIAL_LINKS } from '@/lib/socials';
-import { umerKhan, upworkProfile } from '@shared/content/team';
+import { umerKhan, upworkProfile } from '@/lib/team-content';
 
 export const metadata: Metadata = {
   title: 'About Me | Umer Khan — XpertPPC Digital Marketing Academy',

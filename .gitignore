@@ -40,3 +40,6 @@ apps/mobile/dist/
 *.p12
 *.mobileprovision
 
+# manual Hostinger deploy zips — built locally, never committed
+deploy-zips/
+
