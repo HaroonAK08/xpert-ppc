@@ -87,7 +87,11 @@ export function organizationSchema() {
     telephone: siteConfig.contact.phonePrimary,
     address: {
       '@type': 'PostalAddress',
-      addressCountry: 'AE',
+      streetAddress: '3899 Cornerstone Blvd NE',
+      addressLocality: 'Calgary',
+      addressRegion: 'Alberta',
+      postalCode: 'T3N 1M2',
+      addressCountry: 'CA',
     },
     contactPoint: [
       {
@@ -133,7 +137,14 @@ export function professionalServiceSchema() {
     telephone: siteConfig.contact.phonePrimary,
     email: siteConfig.contact.email,
     priceRange: '$$',
-    address: { '@type': 'PostalAddress', addressCountry: 'AE' },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '3899 Cornerstone Blvd NE',
+      addressLocality: 'Calgary',
+      addressRegion: 'Alberta',
+      postalCode: 'T3N 1M2',
+      addressCountry: 'CA',
+    },
     areaServed: { '@type': 'Place', name: 'Worldwide' },
     serviceType: [
       'Google Ads Management',

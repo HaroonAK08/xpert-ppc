@@ -9,5 +9,8 @@ export const SOCIAL_LINKS = {
   email: 'umer@xpertppc.com',
   phoneDisplay: '+971 58 674 0167',
   phoneRaw: '+971586740167',
+  phoneCanadaDisplay: '+1 587-893-5511',
+  phoneCanadaRaw: '+15878935511',
+  address: '3899 Cornerstone Blvd NE, Calgary, Alberta T3N 1M2, Canada',
   whatsappDisplay: '+92 300 402 1417',
 } as const;

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Mail, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 
 import { LeadForm } from '@/components/forms/lead-form';
 import { WhatsAppNumberButton } from '@/components/layout/whatsapp-number-button';
@@ -21,7 +21,11 @@ const contactBlocks = [
   {
     title: 'Phone',
     icon: Phone,
-    details: [siteConfig.contact.phonePrimary, siteConfig.contact.phoneSecondary],
+    details: [
+      siteConfig.contact.phonePrimary,
+      siteConfig.contact.phoneSecondary,
+      siteConfig.contact.phoneCanada,
+    ],
     type: 'phone' as const,
   },
   {
@@ -104,11 +108,21 @@ export default function ContactPage() {
                       {block.details.map((detail) =>
                         block.type === 'phone' ? (
                           <p key={detail} className="mb-2 last:mb-0">
-                            <WhatsAppNumberButton
-                              size="sm"
-                              phone={detail}
-                              phoneRaw={detail.replace(/\s/g, '')}
-                            />
+                            {detail === siteConfig.contact.phoneCanada ? (
+                              <a
+                                href={`tel:${siteConfig.contact.phoneCanadaRaw}`}
+                                className="inline-flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                              >
+                                <Phone className="h-4 w-4 text-primary" />
+                                {detail}
+                              </a>
+                            ) : (
+                              <WhatsAppNumberButton
+                                size="sm"
+                                phone={detail}
+                                phoneRaw={detail.replace(/\s/g, '')}
+                              />
+                            )}
                           </p>
                         ) : (
                           <p key={detail} className="text-muted-foreground">
@@ -124,6 +138,16 @@ export default function ContactPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-6 flex items-start space-x-4">
+                <div className="rounded-xl bg-primary/10 p-3">
+                  <MapPin className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="mb-2 font-semibold text-foreground">Office</h3>
+                  <p className="text-muted-foreground">{siteConfig.contact.address}</p>
+                </div>
               </div>
 
               <div className="mt-8 rounded-2xl bg-muted p-6">

@@ -235,7 +235,8 @@ function AuditCard() {
         />
       </Suspense>
       <p className="mt-4 text-center text-xs text-muted-foreground">
-        {siteConfig.contact.phonePrimary} · {siteConfig.contact.phoneSecondary}
+        {siteConfig.contact.phonePrimary} · {siteConfig.contact.phoneSecondary} ·{' '}
+        {siteConfig.contact.phoneCanada}
       </p>
     </div>
   );

@@ -9,6 +9,7 @@ import {
   Globe,
   Linkedin,
   Mail,
+  MapPin,
   Phone,
   Youtube,
   Briefcase,
@@ -69,6 +70,13 @@ export function Footer() {
             >
               <Phone className="h-4 w-4 shrink-0" />
               {siteConfig.contact.phonePrimary}
+            </a>
+            <a
+              href={`tel:${siteConfig.contact.phoneCanadaRaw}`}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-white transition-colors hover:text-sky-300"
+            >
+              <Phone className="h-4 w-4 shrink-0" />
+              {siteConfig.contact.phoneCanada}
             </a>
             <div className="flex items-center gap-4">
               {socialLinks.map(({ href, label, Icon }) => (
@@ -226,6 +234,13 @@ export function Footer() {
                   phone={siteConfig.contact.phoneSecondary}
                   phoneRaw={siteConfig.contact.phoneSecondaryRaw}
                 />
+                <a
+                  href={`tel:${siteConfig.contact.phoneCanadaRaw}`}
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary"
+                >
+                  <Phone className="h-4 w-4 shrink-0" />
+                  <span>{siteConfig.contact.phoneCanada}</span>
+                </a>
               </div>
               <a
                 href={`mailto:${siteConfig.contact.email}`}
@@ -237,6 +252,10 @@ export function Footer() {
               <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                 <Globe className="h-4 w-4 shrink-0" />
                 <span>{siteConfig.contact.location}</span>
+              </div>
+              <div className="flex items-start space-x-3 text-sm text-muted-foreground">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{siteConfig.contact.address}</span>
               </div>
             </div>
           </div>
@@ -256,6 +275,15 @@ export function Footer() {
               >
                 <Phone className="h-5 w-5 shrink-0" />
                 <span className="text-sm font-semibold">{siteConfig.contact.phonePrimary}</span>
+              </a>
+              <a
+                href={`tel:${siteConfig.contact.phoneCanadaRaw}`}
+                aria-label={`Call ${siteConfig.contact.phoneCanada}`}
+                title={siteConfig.contact.phoneCanada}
+                className="group relative inline-flex items-center gap-2 text-foreground transition-all duration-300 hover:scale-[1.05] hover:text-primary hover:drop-shadow-[0_0_12px_rgba(0,102,204,0.6)]"
+              >
+                <Phone className="h-5 w-5 shrink-0" />
+                <span className="text-sm font-semibold">{siteConfig.contact.phoneCanada}</span>
               </a>
               {socialLinks.map(({ href, label, Icon }) => (
                 <a

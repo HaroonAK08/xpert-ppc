@@ -19,8 +19,12 @@ export const siteConfig = {
     phonePrimaryRaw: '+971586740167',
     phoneSecondary: '+92 300 683 4017',
     phoneSecondaryRaw: '+923006834017',
+    phoneCanada: '+1 587-893-5511',
+    phoneCanadaRaw: '+15878935511',
     email: 'umer@xpertppc.com',
     location: 'Global Remote Team',
+    /** Calgary office. */
+    address: '3899 Cornerstone Blvd NE, Calgary, Alberta T3N 1M2, Canada',
     /** Click-to-chat link (0300 4021417 / +92 300 402 1417). */
     whatsapp: 'https://api.whatsapp.com/message/SLXP4R7SEDWWG1?autoload=1&app_absent=0',
     whatsappDisplay: '+92 300 402 1417',

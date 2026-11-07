@@ -31,6 +31,7 @@ const REGISTRATION_FEE = 2000;
 const MAX_RECEIPT_BYTES = 10 * 1024 * 1024;
 
 const BANK_DETAILS = {
+  bankName: 'Allied Bank',
   accountTitle: 'HAFIZ MUHAMMAD UMER KHAN',
   accountNumber: '09630010055941870015',
   iban: 'PK19ABPA0010055941870015',
@@ -454,6 +455,12 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
                       </div>
 
                       <div className="overflow-hidden rounded-[14px] border border-border bg-white">
+                        <div className="border-b border-border px-4 py-3">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Bank Name</p>
+                          <p className="mt-1 text-[15px] font-extrabold tracking-tight text-ink">
+                            {BANK_DETAILS.bankName}
+                          </p>
+                        </div>
                         <div className="border-b border-border px-4 py-3">
                           <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Account Title</p>
                           <p className="mt-1 text-[15px] font-extrabold tracking-tight text-ink">

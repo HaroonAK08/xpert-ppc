@@ -121,6 +121,13 @@ export default function AboutPage() {
                     {SOCIAL_LINKS.phoneDisplay}
                   </a>
                   <a
+                    href={`tel:${SOCIAL_LINKS.phoneCanadaRaw}`}
+                    className="inline-flex items-center gap-2 font-medium transition hover:text-[#1a6ef0]"
+                  >
+                    <Phone className="h-4 w-4 text-[#1a6ef0]" />
+                    {SOCIAL_LINKS.phoneCanadaDisplay}
+                  </a>
+                  <a
                     href={SOCIAL_LINKS.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
