@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 75
     env:
-      EXPO_PUBLIC_API_URL: https://xpertppc.com
+      EXPO_PUBLIC_API_URL: https://api.xpertppc.com
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
