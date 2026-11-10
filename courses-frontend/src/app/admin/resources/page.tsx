@@ -45,6 +45,8 @@ export default function AdminResourcesPage() {
 
   async function onCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (busy) return;
+    const formElement = e.currentTarget;
     setBusy(true);
     setError('');
     const fd = new FormData(e.currentTarget);
@@ -61,7 +63,7 @@ export default function AdminResourcesPage() {
       setError(res.error);
       return;
     }
-    e.currentTarget.reset();
+    formElement.reset();
     setShowForm(false);
     await load();
   }

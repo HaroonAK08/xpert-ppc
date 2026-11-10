@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit';
 
 import { env } from '../config/env';
 import { Student } from '../models/Student';
+import { isStudentProfileComplete, type StudentProfile } from '../utils/studentProfile';
 import { AdminUser } from '../models/AdminUser';
 import { requireStudent } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
@@ -40,17 +41,25 @@ const authLimiter = rateLimit({
   message: { error: 'Too many requests. Try again later.' },
 });
 
-function publicStudent(student: { _id: unknown; email: string; name: string; avatarUrl?: string | null }) {
+type PublicStudentSource = StudentProfile & { _id: unknown; email: string; name: string; courseSlug?: string | null };
+
+function publicStudent(student: PublicStudentSource) {
   return {
     id: String(student._id),
     email: student.email,
     name: student.name,
     avatarUrl: student.avatarUrl || '',
+    coursePreference: student.coursePreference || student.courseSlug || '',
+    freelancedBefore: student.freelancedBefore ?? null,
+    freelancingExperience: student.freelancingExperience || '',
+    workPreference: student.workPreference || '',
+    gender: student.gender || '',
+    profileComplete: isStudentProfileComplete(student),
   };
 }
 
 function sessionPayload(
-  student: { _id: unknown; email: string; name: string; avatarUrl?: string | null },
+  student: PublicStudentSource,
   token: string
 ) {
   return {
@@ -363,14 +372,20 @@ router.patch(
   requireStudent,
   asyncHandler(async (req, res) => {
     const parsed = studentProfileSchema.safeParse(req.body);
-    if (!parsed.success) throw new ApiError(400, 'Enter a valid profile photo URL.');
+    if (!parsed.success) throw new ApiError(400, parsed.error.issues[0]?.message || 'Enter valid profile details.');
 
     const student = await Student.findById(req.student!.sub);
     if (!student || !student.active || !isStudentApproved(student)) {
       throw new ApiError(401, 'Session invalid. Please sign in again.');
     }
 
-    student.avatarUrl = parsed.data.avatarUrl;
+    const wasComplete = isStudentProfileComplete(student);
+    const { completeProfile, ...updates } = parsed.data;
+    student.set(updates);
+    if (student.freelancedBefore === false) student.freelancingExperience = '';
+    if ((completeProfile || wasComplete) && !isStudentProfileComplete(student)) {
+      throw new ApiError(400, 'Please answer every required question, describe your experience if you have freelanced before (at least 10 characters), and add a profile photo if you are a man.');
+    }
     await student.save();
 
     res.json({ ok: true, user: publicStudent(student) });

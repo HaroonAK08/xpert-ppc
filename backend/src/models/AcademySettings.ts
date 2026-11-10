@@ -8,6 +8,11 @@ const AcademySettingsSchema = new Schema(
     linkedinUrl: { type: String, default: '', trim: true },
     instagramUrl: { type: String, default: '', trim: true },
     announcementTitle: { type: String, default: 'Welcome to the academy', trim: true },
+    weeklyClassNotice: {
+      type: String,
+      default: 'Social Media Ads classes are held on Thursdays.\nGoogle Ads classes are held on Fridays.',
+      trim: true,
+    },
     announcementBody: {
       type: String,
       default: 'Check this dashboard for your batch schedule and learning resources.',

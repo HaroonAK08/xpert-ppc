@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { SOCIAL_LINKS } from '@/lib/socials';
+import { announcementDate, type AnnouncementMessage } from '@/lib/announcements';
 import { fetchStudentHub, type HubSession, type HubCommunity } from '@/lib/student-hub';
 import { useStudent } from '@/lib/student-context';
 import { DashboardPageHeader } from '@/components/dashboard/page-header';
@@ -53,21 +54,47 @@ export default function DashboardPage() {
   const [courses, setCourses] = useState<PortalCourseSummary[] | null>(null);
   const [nextSession, setNextSession] = useState<HubSession | null>(null);
   const [community, setCommunity] = useState<HubCommunity | null>(null);
+  const [announcements, setAnnouncements] = useState<AnnouncementMessage[] | null>(null);
+  const [announcementError, setAnnouncementError] = useState(false);
 
   useEffect(() => {
+    let active = true;
     api.get<{ items: PortalCourseSummary[] }>('/api/student/courses').then((res) => {
+      if (!active) return;
       if (res.ok) setCourses(res.data.items);
       else setCourses([]);
     });
-    fetchStudentHub().then((res) => {
-      if (!res.ok) return;
-      setNextSession(res.data.nextSession);
-      setCommunity(res.data.community);
-    });
+    let refreshing = false;
+    async function refreshHub() {
+      if (refreshing || document.visibilityState === 'hidden') return;
+      refreshing = true;
+      try {
+        const res = await fetchStudentHub();
+        if (!active) return;
+        if (!res.ok) { setAnnouncementError(true); return; }
+        setAnnouncementError(false);
+        setAnnouncements(res.data.announcements ?? []);
+        setNextSession(res.data.nextSession);
+        setCommunity(res.data.community);
+      } finally {
+        refreshing = false;
+      }
+    }
+    void refreshHub();
+    const interval = window.setInterval(() => { void refreshHub(); }, 60_000);
+    window.addEventListener('focus', refreshHub);
+    document.addEventListener('visibilitychange', refreshHub);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener('focus', refreshHub);
+      document.removeEventListener('visibilitychange', refreshHub);
+    };
   }, []);
 
   const enrolled = (courses ?? []).filter((c) => c.enrolled);
   const nextCourse = enrolled[0] ?? null;
+  const weeklyNotice = community?.weeklyClassNotice ?? 'Social Media Ads classes are held on Thursdays.\nGoogle Ads classes are held on Fridays.';
 
   return (
     <>
@@ -79,19 +106,51 @@ export default function DashboardPage() {
         </h2>
         <p className="mt-1 text-sm text-muted">Your classes, resources and community in one place.</p>
 
+        <section aria-labelledby="dashboard-announcements" className="panel mt-6 overflow-hidden">
+          <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
+            <h3 id="dashboard-announcements" className="flex items-center gap-2 text-lg font-extrabold text-ink"><Megaphone className="h-5 w-5 text-brand" />Announcements</h3>
+            <Link href="/dashboard/announcements" className="shrink-0 text-sm font-semibold text-brand">View all →</Link>
+          </div>
+          {announcementError ? <p className="p-6 text-sm text-muted">Announcements could not be refreshed. <Link href="/dashboard/announcements" className="font-semibold text-brand">Open announcements</Link></p> : announcements === null ? <p className="p-6 text-sm text-muted">Loading announcements…</p> : announcements.length === 0 ? <p className="p-6 text-sm text-muted">No announcements yet. Messages from the academy will appear here.</p> : (
+            <div className="divide-y divide-border/70">
+              {announcements.map((message) => (
+                <Link key={message.id} href={`/dashboard/announcements#message-${message.id}`} className="block px-5 py-5 transition hover:bg-brand-soft/40 sm:px-6">
+                  <p className="text-xs text-muted">{announcementDate(message.createdAt)}</p>
+                  <h4 className="mt-1 break-words text-base font-bold text-ink">{message.title}</h4>
+                  <p className="mt-2 line-clamp-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-muted">{message.body}</p>
+                  <span className="mt-2 inline-block text-xs font-semibold text-brand">Read message →</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
         {community && (community.announcementTitle || community.announcementBody) ? (
           <div className="mt-6 flex items-start gap-3 rounded-2xl border border-brand/20 bg-brand-soft px-5 py-4">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand text-white">
               <Megaphone className="h-4 w-4" />
             </span>
-            <div>
-              <p className="text-sm font-extrabold text-ink">{community.announcementTitle || 'Announcement'}</p>
+            <div className="min-w-0">
+              <p className="break-words text-sm font-extrabold text-ink">{community.announcementTitle || 'Announcement'}</p>
               {community.announcementBody ? (
-                <p className="mt-0.5 text-sm leading-relaxed text-ink/80">{community.announcementBody}</p>
+                <p className="mt-0.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-ink/80">{community.announcementBody}</p>
               ) : null}
             </div>
           </div>
         ) : null}
+
+        {weeklyNotice && (
+          <section aria-label="Weekly class schedule" className="panel mt-5 flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand"><CalendarDays className="h-5 w-5" /></span>
+              <div>
+                <h3 className="text-sm font-extrabold text-ink">Weekly class schedule</h3>
+                <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-ink/80">{weeklyNotice}</p>
+              </div>
+            </div>
+            <Link href="/dashboard/schedule" className="shrink-0 text-sm font-semibold text-brand">View class schedule →</Link>
+          </section>
+        )}
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <StatCard href="/dashboard/courses" icon={BookOpen} title="My Courses" value={`${enrolled.length} enrolled`} />
@@ -373,9 +432,9 @@ export default function DashboardPage() {
                 >
                   <Linkedin className="h-3.5 w-3.5" />
                 </a>
-                <a href="#" aria-label="Instagram" className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white">
+                {community?.instagramUrl && <a href={community.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white">
                   <Instagram className="h-3.5 w-3.5" />
-                </a>
+                </a>}
               </div>
             </div>
           </div>

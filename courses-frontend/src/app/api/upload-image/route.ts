@@ -17,8 +17,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ url });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Upload failed';
+    console.error('Image upload failed', err);
     const status =
-      message.includes('not configured') ? 503 : message.includes('Only image') || message.includes('10 MB') ? 400 : 502;
+      message.includes('Only image') || message.includes('10 MB') ? 400 : message.includes('Too many') ? 429 : 502;
     return NextResponse.json({ error: message }, { status });
   }
 }

@@ -491,6 +491,7 @@ router.get(
         instagramUrl: settings.instagramUrl || '',
         announcementTitle: settings.announcementTitle || '',
         announcementBody: settings.announcementBody || '',
+        weeklyClassNotice: settings.weeklyClassNotice || '',
       },
     });
   })
@@ -514,6 +515,7 @@ router.patch(
         instagramUrl: settings.instagramUrl || '',
         announcementTitle: settings.announcementTitle || '',
         announcementBody: settings.announcementBody || '',
+        weeklyClassNotice: settings.weeklyClassNotice || '',
       },
     });
   })

@@ -9,7 +9,9 @@ import {
   ClipboardList,
   FileText,
   Loader2,
+  Megaphone,
   PlayCircle,
+  Ticket,
   Users,
 } from 'lucide-react';
 import { adminApi } from '@/lib/admin-api';
@@ -24,6 +26,7 @@ type Overview = {
 };
 
 const LINKS = [
+  { href: '/admin/coupons', label: 'Coupons', description: 'Manage registration fee waiver codes.', icon: Ticket, key: null, suffix: '' },
   {
     href: '/admin/applications',
     label: 'Applications',
@@ -31,6 +34,22 @@ const LINKS = [
     icon: ClipboardList,
     key: 'pendingStudents' as const,
     suffix: 'waiting',
+  },
+  {
+    href: '/admin/students',
+    label: 'Students',
+    description: 'View approved students, profile details, and last login activity.',
+    icon: Users,
+    key: null,
+    suffix: '',
+  },
+  {
+    href: '/admin/announcements',
+    label: 'Announcements',
+    description: 'Write student announcements, manage message history, and update the weekly class notice.',
+    icon: Megaphone,
+    key: null,
+    suffix: '',
   },
   {
     href: '/admin/courses',
@@ -101,11 +120,11 @@ export default function AdminOverviewPage() {
           </p>
         ) : null}
 
-        {!data ? (
+        {!data && !error ? (
           <div className="flex justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-brand" />
           </div>
-        ) : (
+        ) : data ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {LINKS.map(({ href, label, description, icon: Icon, key, suffix }) => (
               <Link key={href} href={href} className="panel group flex flex-col p-5 transition hover:shadow-pop">
@@ -122,12 +141,12 @@ export default function AdminOverviewPage() {
                     {data[key]} {suffix}
                   </p>
                 ) : (
-                  <p className="mt-4 text-xs font-bold text-brand">Configure links</p>
+                  <p className="mt-4 text-xs font-bold text-brand">{href === '/admin/students' ? 'View students' : href === '/admin/announcements' ? 'Manage announcements' : 'Configure links'}</p>
                 )}
               </Link>
             ))}
           </div>
-        )}
+        ) : <button type="button" onClick={() => window.location.reload()} className="rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-ink">Try again</button>}
       </main>
     </>
   );

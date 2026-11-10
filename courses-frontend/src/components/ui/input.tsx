@@ -7,7 +7,7 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
     <input
       ref={ref}
       className={cn(
-        'h-11 w-full rounded-xl border border-border bg-white px-3.5 text-sm text-ink placeholder:text-muted/70 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20',
+        'h-11 min-w-0 max-w-full w-full rounded-xl border border-border bg-white px-3.5 text-base text-ink sm:text-sm placeholder:text-muted/70 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20',
         className
       )}
       {...props}
@@ -21,7 +21,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSel
     <select
       ref={ref}
       className={cn(
-        'h-11 w-full rounded-xl border border-border bg-white px-3.5 text-sm text-ink focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20',
+        'h-11 min-w-0 max-w-full w-full rounded-xl border border-border bg-white px-3.5 text-base text-ink sm:text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20',
         className
       )}
       {...props}
@@ -37,7 +37,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
     <textarea
       ref={ref}
       className={cn(
-        'min-h-[96px] w-full rounded-xl border border-border bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20',
+        'min-h-[96px] min-w-0 max-w-full w-full rounded-xl border border-border bg-white px-3.5 py-2.5 text-base text-ink sm:text-sm placeholder:text-muted/70 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20',
         className
       )}
       {...props}

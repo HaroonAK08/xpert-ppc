@@ -78,6 +78,8 @@ export default function AdminRecordingsPage() {
 
   async function onCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (busy) return;
+    const formElement = e.currentTarget;
     const fd = new FormData(e.currentTarget);
     const finalUrl = videoUrl.trim() || String(fd.get('videoUrl') || '').trim();
     if (!finalUrl) {
@@ -99,7 +101,7 @@ export default function AdminRecordingsPage() {
       setError(res.error);
       return;
     }
-    e.currentTarget.reset();
+    formElement.reset();
     setVideoUrl('');
     setUploadedName('');
     setSourceMode('link');

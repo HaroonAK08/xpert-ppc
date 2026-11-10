@@ -17,6 +17,7 @@ import {
   studentDecisionSchema,
 } from '../validation/portal';
 import { applyStudentDecision, assignStudentCourse } from '../utils/studentApplication';
+import { isStudentProfileComplete } from '../utils/studentProfile';
 
 const router = Router();
 
@@ -47,6 +48,58 @@ router.get(
           createdAt: s.createdAt,
         };
       }),
+    });
+  })
+);
+
+router.get(
+  '/students/approved',
+  asyncHandler(async (req, res) => {
+    const page = Number(req.query.page || 1);
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+    const login = req.query.login || 'all';
+    if (!Number.isInteger(page) || page < 1 || page > 100000 || search.length > 160 || !['all', 'signed-in', 'never'].includes(String(login))) {
+      throw new ApiError(400, 'Choose a valid page, search, and login filter.');
+    }
+    const filters: Record<string, unknown>[] = [
+      { $or: [{ status: 'approved' }, { emailVerified: true, status: { $ne: 'rejected' } }] },
+    ];
+    if (search) {
+      const pattern = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filters.push({ $or: [{ name: { $regex: pattern, $options: 'i' } }, { email: { $regex: pattern, $options: 'i' } }] });
+    }
+    if (login === 'signed-in') filters.push({ lastLoginAt: { $ne: null } });
+    if (login === 'never') filters.push({ lastLoginAt: null });
+    const filter = { $and: filters };
+    const pageSize = 25;
+    const [students, total] = await Promise.all([
+      Student.find(filter)
+        .select('name email country avatarUrl courseSlug coursePreference freelancedBefore freelancingExperience workPreference gender active lastLoginAt createdAt interest couponCode')
+        .sort({ lastLoginAt: -1, createdAt: -1, _id: -1 })
+        .skip((page - 1) * pageSize).limit(pageSize),
+      Student.countDocuments(filter),
+    ]);
+    res.json({
+      page, pageSize, total,
+      items: students.map((student) => ({
+        id: String(student._id),
+        name: student.name,
+        email: student.email,
+        country: student.country || '',
+        avatarUrl: student.avatarUrl || '',
+        courseSlug: student.courseSlug || '',
+        coursePreference: student.coursePreference || '',
+        freelancedBefore: student.freelancedBefore ?? null,
+        freelancingExperience: student.freelancingExperience || '',
+        workPreference: student.workPreference || '',
+        gender: student.gender || '',
+        active: student.active,
+        lastLoginAt: student.lastLoginAt || null,
+        createdAt: student.createdAt,
+        profileComplete: isStudentProfileComplete(student),
+        interest: student.interest || '',
+        couponCode: student.couponCode || '',
+      })),
     });
   })
 );

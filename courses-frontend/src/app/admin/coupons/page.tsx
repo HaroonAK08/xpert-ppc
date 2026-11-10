@@ -52,6 +52,8 @@ export default function AdminCouponsPage() {
 
   async function onCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (busy) return;
+    const formElement = e.currentTarget;
     const form = new FormData(e.currentTarget);
     const code = String(form.get('code') || '').trim();
     const note = String(form.get('note') || '').trim();
@@ -73,7 +75,7 @@ export default function AdminCouponsPage() {
       setError(res.error);
       return;
     }
-    e.currentTarget.reset();
+    formElement.reset();
     setItems((prev) => [res.data.coupon, ...prev]);
   }
 
@@ -113,7 +115,7 @@ export default function AdminCouponsPage() {
       />
 
       <main className="px-5 py-8 sm:px-8">
-        <form onSubmit={onCreate} className="panel grid gap-3 p-5 sm:grid-cols-[1fr_1fr_120px_auto]">
+        <form onSubmit={onCreate} className="panel grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_120px_auto]">
           <div>
             <Label htmlFor="code">Coupon code</Label>
             <Input id="code" name="code" placeholder="umer001" className="mt-1.5 uppercase" required />
@@ -160,7 +162,7 @@ export default function AdminCouponsPage() {
                   <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-base font-extrabold tracking-wide text-ink">{coupon.code}</h2>
+                        <h2 className="break-all text-base font-extrabold tracking-wide text-ink">{coupon.code}</h2>
                         <span
                           className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
                             coupon.active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
@@ -175,7 +177,7 @@ export default function AdminCouponsPage() {
                         {coupon.note ? ` · ${coupon.note}` : ''}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button
                         type="button"
                         variant="outline"
@@ -207,9 +209,9 @@ export default function AdminCouponsPage() {
                               key={a.id}
                               className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#f8fafc] px-3 py-2.5 text-sm"
                             >
-                              <div>
-                                <p className="font-bold text-ink">{a.name}</p>
-                                <p className="text-xs text-muted">{a.email}</p>
+                              <div className="min-w-0 max-w-full">
+                                <p className="break-words font-bold text-ink">{a.name}</p>
+                                <p className="text-xs text-muted [overflow-wrap:anywhere]">{a.email}</p>
                               </div>
                               <span className="text-[11px] font-bold uppercase text-muted">{a.status}</span>
                             </li>

@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { loginDestination } from '@/lib/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { adminApi, setAdminToken } from '@/lib/admin-api';
 import { SiteHeader } from '@/components/site/header';
@@ -34,7 +35,7 @@ export default function AdminLoginPage() {
     }
 
     if (res.data.token) setAdminToken(res.data.token);
-    router.replace('/admin/applications');
+    router.replace(loginDestination('/admin/applications', '/admin'));
   }
 
   return (

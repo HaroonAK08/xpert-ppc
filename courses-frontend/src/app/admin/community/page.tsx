@@ -74,11 +74,11 @@ export default function AdminCommunityPage() {
         ) : null}
         {saved ? (
           <p className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">
-            Community settings saved. Students will see these on their Community page.
+            Community settings saved. Students will see the links on their Community page and the announcement on their dashboard.
           </p>
         ) : null}
 
-        {!settings ? (
+        {!settings && error ? <button type="button" onClick={() => window.location.reload()} className="rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-ink">Try again</button> : !settings ? (
           <div className="flex justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-brand" />
           </div>

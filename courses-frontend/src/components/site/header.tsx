@@ -57,8 +57,10 @@ export function SiteHeader() {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#e3ebf7] md:hidden"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#e3ebf7] md:hidden"
           aria-label="Toggle menu"
+          aria-expanded={open}
+          aria-controls="public-mobile-menu"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -66,7 +68,7 @@ export function SiteHeader() {
 
       {open ? (
         <div className="border-t border-[#edf2f9] bg-white px-5 py-4 md:hidden">
-          <nav className="flex flex-col gap-1">
+          <nav id="public-mobile-menu" className="flex flex-col gap-1">
             {NAV.map((item) => (
               <Link
                 key={item.label}

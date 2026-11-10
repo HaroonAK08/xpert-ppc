@@ -75,6 +75,14 @@ npx expo prebuild
 # or use EAS: npx eas build -p android --profile preview
 ```
 
+## Academy image uploads
+
+Signup receipts and profile photos use the backend's `/api/student/images` endpoint through the academy's `/api/upload-image` proxy. No Search Atlas account or upload token is needed. Set the academy's `NEXT_PUBLIC_API_URL` to the backend URL and the backend's `API_PUBLIC_URL` to its publicly reachable origin.
+
+Local disk storage has no additional service fee, but consumes your hosting disk space. In production, set backend `UPLOAD_DIR` to a persistent absolute directory outside deployment/release folders, ensure the Node process can write to it, and back it up. Before changing this path, copy existing uploads there so older URLs still work. If the host cannot retain writable files across deployments, use the existing S3-compatible configuration instead; free-tier limits depend on the provider.
+
+Deploy the updated backend and academy together (backend first). Images remain available at their returned URLs under `/uploads`; existing Search Atlas images are not migrated or deleted. Treat receipt URLs as sensitive: they have random, unguessable names but are not login-protected. The pre-login endpoint accepts one JPEG, PNG, or WebP up to 10 MB, checks its signature, and limits upload attempts to 60 per 15 minutes per source IP. Server-proxied academy traffic shares the proxy's source IP limit; do not trust arbitrary forwarded IP headers to bypass it.
+
 ## Troubleshooting
 
 | Issue | Fix |

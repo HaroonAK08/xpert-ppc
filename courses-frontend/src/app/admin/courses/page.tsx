@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { adminApi } from '@/lib/admin-api';
 import { AdminPageHeader } from '@/components/admin/page-header';
@@ -29,6 +30,7 @@ function slugify(value: string) {
 }
 
 export default function AdminCoursesPage() {
+  const router = useRouter();
   const [items, setItems] = useState<CourseSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -71,7 +73,7 @@ export default function AdminCoursesPage() {
       setError(res.error);
       return;
     }
-    window.location.href = `/admin/courses/${res.data.course._id}`;
+    router.push(`/admin/courses/${res.data.course._id}`);
   }
 
   async function togglePublish(id: string, published: boolean) {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { adminApi } from '@/lib/admin-api';
 
-export type AdminCourseOption = { id: string; title: string };
+export type AdminCourseOption = { id: string; title: string; slug?: string };
 
 export function useAdminCourses() {
   const [courses, setCourses] = useState<AdminCourseOption[]>([]);
@@ -15,7 +15,7 @@ export function useAdminCourses() {
         setError(res.error);
         return;
       }
-      setCourses(res.data.items.map((c) => ({ id: c.id, title: c.title })));
+      setCourses(res.data.items.map((c) => ({ id: c.id, title: c.title, slug: c.slug })));
     });
   }, []);
 

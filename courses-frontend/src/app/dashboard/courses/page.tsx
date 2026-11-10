@@ -20,13 +20,18 @@ type PortalCourseSummary = {
 export default function MyCoursesPage() {
   const [courses, setCourses] = useState<PortalCourseSummary[] | null>(null);
 
+  const [loadError, setLoadError] = useState('');
+
   useEffect(() => {
     api.get<{ items: PortalCourseSummary[] }>('/api/student/courses').then((res) => {
+      if (!res.ok) setLoadError(res.error);
       setCourses(res.ok ? res.data.items : []);
     });
   }, []);
 
   const enrolled = (courses ?? []).filter((c) => c.enrolled);
+
+  if (loadError) return <><DashboardPageHeader title="My Courses" /><main className="space-y-4 px-5 py-8 sm:px-8"><p role="alert" className="text-sm text-red-700">{loadError}</p><button type="button" onClick={() => window.location.reload()} className="rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-ink">Try again</button></main></>;
 
   return (
     <>

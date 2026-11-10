@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { CheckCircle2, Circle, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -14,25 +14,44 @@ export default function EnrolledCoursePage() {
   const params = useParams<{ slug: string }>();
   const [data, setData] = useState<{ course: CourseDetail } | 'error' | null>(null);
 
+  const [error, setError] = useState('');
+  const [busyLesson, setBusyLesson] = useState('');
+  const pending = useRef(false);
+
   useEffect(() => {
-    api.get<{ course: CourseDetail }>(`/api/student/courses/${params.slug}`).then((res) => {
+    let active = true;
+    setData(null);
+    setError('');
+    api.get<{ course: CourseDetail }>(`/api/student/courses/${encodeURIComponent(params.slug)}`).then((res) => {
+      if (!active) return;
       setData(res.ok ? res.data : 'error');
+      if (!res.ok) setError(res.error);
     });
+    return () => { active = false; };
   }, [params.slug]);
 
   async function toggleComplete(lessonId: string) {
-    if (data === null || data === 'error') return;
-    const res = await api.post<{ ok: boolean }>(`/api/student/courses/${data.course.id}/lessons/${lessonId}/complete`);
-    if (!res.ok) return;
-    setData({
-      course: {
-        ...data.course,
-        modules: data.course.modules.map((m) => ({
-          ...m,
-          lessons: m.lessons.map((l) => (l.id === lessonId ? { ...l, completed: true } : l)),
-        })),
-      },
-    });
+    if (data === null || data === 'error' || pending.current) return;
+    const courseId = data.course.id;
+    pending.current = true;
+    setBusyLesson(lessonId);
+    setError('');
+    try {
+      const res = await api.post<{ ok: boolean; completedLessonIds: string[] }>(`/api/student/courses/${courseId}/lessons/${lessonId}/complete`);
+      if (!res.ok) { setError(res.error); return; }
+      setData((current) => !current || current === 'error' || current.course.id !== courseId ? current : ({
+        course: {
+          ...current.course,
+          modules: current.course.modules.map((module) => ({
+            ...module,
+            lessons: module.lessons.map((lesson) => ({ ...lesson, completed: res.data.completedLessonIds.includes(lesson.id) })),
+          })),
+        },
+      }));
+    } finally {
+      pending.current = false;
+      setBusyLesson('');
+    }
   }
 
   return (
@@ -50,6 +69,7 @@ export default function EnrolledCoursePage() {
       </header>
 
       <main className="px-5 py-8 sm:px-8">
+        {error && <p role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>}
         {data === null ? (
           <p className="text-sm text-muted">Loading…</p>
         ) : data === 'error' ? (
@@ -66,6 +86,8 @@ export default function EnrolledCoursePage() {
                     <button
                       key={lesson.id}
                       type="button"
+                      disabled={!!busyLesson || lesson.completed}
+                      aria-busy={busyLesson === lesson.id}
                       onClick={() => toggleComplete(lesson.id)}
                       className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 text-left transition hover:border-brand/40"
                     >

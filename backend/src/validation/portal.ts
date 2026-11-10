@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PROFILE_COURSES } from '../utils/studentProfile';
 
 export const studentSignupSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -52,7 +53,14 @@ export const studentProfileSchema = z.object({
     .string()
     .trim()
     .max(1000)
-    .refine((v) => v === '' || /^https?:\/\//i.test(v), 'Enter a valid image URL.'),
+    .refine((v) => v === '' || /^https?:\/\//i.test(v), 'Enter a valid image URL.')
+    .optional(),
+  coursePreference: z.enum(PROFILE_COURSES).optional(),
+  freelancedBefore: z.boolean().optional(),
+  freelancingExperience: z.string().trim().max(2000).optional(),
+  workPreference: z.enum(['full-time', 'part-time']).optional(),
+  gender: z.enum(['male', 'female']).optional(),
+  completeProfile: z.boolean().optional(),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -92,7 +100,10 @@ export const classSessionSchema = z.object({
   title: z.string().trim().min(2).max(160),
   startsAt: z.string().min(1),
   endsAt: z.string().optional().nullable(),
-  meetLink: z.string().trim().max(1000).optional().default(''),
+  meetLink: z.string().trim().max(1000).refine((value) => {
+    if (!value) return true;
+    try { return ['http:', 'https:'].includes(new URL(value).protocol); } catch { return false; }
+  }, 'Enter a valid HTTP or HTTPS meeting link.').optional().default(''),
   timezone: z.string().trim().max(80).optional().default('Asia/Karachi'),
   notes: z.string().trim().max(2000).optional().default(''),
   published: z.boolean().optional().default(true),
@@ -117,12 +128,13 @@ export const learningResourceSchema = z.object({
 });
 
 export const academySettingsSchema = z.object({
-  whatsappUrl: z.string().trim().max(1000).optional().default(''),
-  youtubeUrl: z.string().trim().max(1000).optional().default(''),
-  linkedinUrl: z.string().trim().max(1000).optional().default(''),
-  instagramUrl: z.string().trim().max(1000).optional().default(''),
-  announcementTitle: z.string().trim().max(160).optional().default(''),
-  announcementBody: z.string().trim().max(2000).optional().default(''),
+  whatsappUrl: z.string().trim().max(1000).optional(),
+  youtubeUrl: z.string().trim().max(1000).optional(),
+  linkedinUrl: z.string().trim().max(1000).optional(),
+  instagramUrl: z.string().trim().max(1000).optional(),
+  announcementTitle: z.string().trim().max(160).optional(),
+  announcementBody: z.string().trim().max(2000).optional(),
+  weeklyClassNotice: z.string().trim().max(1000).optional(),
 });
 
 export const portalModuleSchema = z.object({

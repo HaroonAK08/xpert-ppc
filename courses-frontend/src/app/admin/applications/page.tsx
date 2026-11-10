@@ -141,7 +141,7 @@ export default function AdminApplicationsPage() {
               return (
                 <article key={applicant.id} className="panel overflow-hidden">
                   <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/70 px-5 py-4">
-                    <div>
+                    <div className="min-w-0 max-w-full">
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-base font-extrabold text-ink">{applicant.name}</h2>
                         <StatusBadge status={applicant.status} />
@@ -151,7 +151,7 @@ export default function AdminApplicationsPage() {
                           </span>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-sm text-muted">
+                      <p className="mt-1 text-sm text-muted [overflow-wrap:anywhere]">
                         {applicant.email}
                         {applicant.country ? ` · ${applicant.country}` : ''}
                       </p>
@@ -247,7 +247,7 @@ function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <dt className="text-xs font-semibold text-muted">{label}</dt>
-      <dd className="mt-0.5 text-sm font-bold text-ink">{value}</dd>
+      <dd className="mt-0.5 text-sm font-bold text-ink [overflow-wrap:anywhere]">{value}</dd>
     </div>
   );
 }

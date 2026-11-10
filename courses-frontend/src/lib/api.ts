@@ -28,7 +28,7 @@ export function setAuthToken(token: string | null) {
   }
 }
 
-export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: string };
+export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: string; status?: number };
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<ApiResult<T>> {
   try {
@@ -42,20 +42,24 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<ApiResu
     const res = await fetch(`${API_URL}${path}`, {
       ...init,
       credentials: 'include',
+      signal: init.signal ?? AbortSignal.timeout(20_000),
       headers,
     });
 
     const body = await res.json().catch(() => null);
 
     if (!res.ok) {
-      if (res.status === 401) setAuthToken(null);
+      if (res.status === 401 && !path.endsWith('/login')) {
+        setAuthToken(null);
+        if (typeof window !== 'undefined') window.dispatchEvent(new Event('academy:student-expired'));
+      }
       const message =
         (body && typeof body === 'object' && 'error' in body
           ? typeof body.error === 'string'
             ? body.error
             : (body.error as { message?: string })?.message
           : null) ?? `Request failed (${res.status}).`;
-      return { ok: false, error: message };
+      return { ok: false, error: message, status: res.status };
     }
 
     return { ok: true, data: body as T };
@@ -72,4 +76,15 @@ export const api = {
     request<T>(path, { method: 'PATCH', body: JSON.stringify(body ?? {}) }),
 };
 
-export type CurrentStudent = { id: string; email: string; name: string; avatarUrl?: string };
+export type CurrentStudent = {
+  id: string;
+  email: string;
+  name: string;
+  avatarUrl?: string;
+  coursePreference?: string;
+  freelancedBefore?: boolean | null;
+  freelancingExperience?: string;
+  workPreference?: string;
+  gender?: string;
+  profileComplete?: boolean;
+};

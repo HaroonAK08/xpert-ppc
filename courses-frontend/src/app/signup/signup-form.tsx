@@ -94,8 +94,8 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
       setReceiptFile(null);
       return;
     }
-    if (!file.type.startsWith('image/')) {
-      setError('Transaction image must be an image file.');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setError('Transaction image must be JPG, PNG, or WebP.');
       setStatus('error');
       e.target.value = '';
       return;
@@ -114,7 +114,7 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
   async function uploadReceipt(file: File): Promise<string> {
     const body = new FormData();
     body.append('file', file);
-    const res = await fetch('/api/upload-image', { method: 'POST', body });
+    const res = await fetch('/api/upload-image', { method: 'POST', body, signal: AbortSignal.timeout(45_000) });
     const data = (await res.json()) as { url?: string; error?: string };
     if (!res.ok || !data.url) {
       throw new Error(data.error || 'Failed to upload transaction image');
@@ -558,7 +558,7 @@ export function SignupForm({ courses }: { courses: PublicCourse[] }) {
                           id="transactionImage"
                           name="transactionImage"
                           type="file"
-                          accept="image/*"
+                          accept="image/jpeg,image/png,image/webp"
                           required={!feeWaived && !receiptFile}
                           className="sr-only"
                           onChange={onReceiptChange}

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signInPath } from './navigation';
 import { api, setAuthToken, type CurrentStudent } from './api';
 
 type StudentContextValue = {
@@ -24,6 +25,8 @@ export function useUpdateStudent() {
 
 export function StudentGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const [error, setError] = useState('');
+  const [retry, setRetry] = useState(0);
   const [state, setState] = useState<{ status: 'loading' | 'ready'; user: CurrentStudent | null }>({
     status: 'loading',
     user: null,
@@ -38,7 +41,8 @@ export function StudentGuard({ children }: { children: React.ReactNode }) {
     api.get<{ user: CurrentStudent }>('/api/student/auth/me').then((res) => {
       if (!active) return;
       if (!res.ok) {
-        router.replace('/login');
+        if (res.status === 401 || res.status === 403) router.replace(signInPath('/login'));
+        else setError(res.error);
         return;
       }
       setState({ status: 'ready', user: res.data.user });
@@ -46,7 +50,18 @@ export function StudentGuard({ children }: { children: React.ReactNode }) {
     return () => {
       active = false;
     };
+  }, [router, retry]);
+
+  useEffect(() => {
+    function expired() {
+      setState({ status: 'loading', user: null });
+      router.replace(signInPath('/login'));
+    }
+    window.addEventListener('academy:student-expired', expired);
+    return () => window.removeEventListener('academy:student-expired', expired);
   }, [router]);
+
+  if (error) return <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-canvas px-5"><p role="alert" className="text-sm text-muted">{error}</p><button type="button" onClick={() => { setError(''); setRetry((value) => value + 1); }} className="rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white">Try again</button></div>;
 
   if (state.status === 'loading') {
     return (

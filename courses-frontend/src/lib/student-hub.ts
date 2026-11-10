@@ -1,4 +1,5 @@
 import { api } from './api';
+import type { AnnouncementMessage } from './announcements';
 
 export type HubSession = {
   id: string;
@@ -39,9 +40,11 @@ export type HubCommunity = {
   instagramUrl: string;
   announcementTitle: string;
   announcementBody: string;
+  weeklyClassNotice?: string;
 };
 
 export type StudentHub = {
+  announcements?: AnnouncementMessage[];
   nextSession: HubSession | null;
   sessions: HubSession[];
   recordings: HubRecording[];

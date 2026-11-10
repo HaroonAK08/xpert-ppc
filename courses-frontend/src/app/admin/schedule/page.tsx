@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState, type FormEvent } from 'react';
-import { Loader2, Plus, Trash2, Video } from 'lucide-react';
+import { CalendarDays, Loader2, Plus, RefreshCw, Trash2, Video } from 'lucide-react';
 import { adminApi } from '@/lib/admin-api';
-import { useAdminCourses } from '@/hooks/use-admin-courses';
+import { useAdminCourses, type AdminCourseOption } from '@/hooks/use-admin-courses';
 import { AdminPageHeader } from '@/components/admin/page-header';
 import { Button } from '@/components/ui/button';
 import { Input, Label, Select, Textarea } from '@/components/ui/input';
@@ -32,23 +32,124 @@ function formatWhen(value: string, timezone: string) {
   }
 }
 
+const WEEKLY_CLASSES = [
+  { day: 4, dayName: 'Thursday', name: 'Social Media Ads', slug: 'meta-ads', title: 'Social Media Ads — Thursday class' },
+  { day: 5, dayName: 'Friday', name: 'Google Ads', slug: 'google-ads', title: 'Google Ads — Friday class' },
+];
+
+function karachiDate(value = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(value);
+  return `${parts.find((part) => part.type === 'year')!.value}-${parts.find((part) => part.type === 'month')!.value}-${parts.find((part) => part.type === 'day')!.value}`;
+}
+
+function nextClassDate(day: number) {
+  const today = new Date(`${karachiDate()}T12:00:00Z`);
+  let days = (day - today.getUTCDay() + 7) % 7;
+  if (days === 0 && new Date(`${karachiDate()}T22:00:00+05:00`) <= new Date()) days = 7;
+  today.setUTCDate(today.getUTCDate() + days);
+  return today.toISOString().slice(0, 10);
+}
+
+function QuickClassCard({ preset, courses, sessions, loading, onSaved }: {
+  preset: typeof WEEKLY_CLASSES[number];
+  courses: AdminCourseOption[];
+  sessions: Session[];
+  loading: boolean;
+  onSaved: () => Promise<void>;
+}) {
+  const [courseId, setCourseId] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('22:00');
+  const [link, setLink] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [saved, setSaved] = useState(false);
+  const existing = sessions.find((session) => session.courseId === courseId && session.title === preset.title && karachiDate(new Date(session.startsAt)) === date);
+
+  useEffect(() => { setDate(nextClassDate(preset.day)); }, [preset.day]);
+
+  useEffect(() => {
+    if (courseId) return;
+    const matches = courses.filter((course) => course.slug === preset.slug || (preset.day === 4 ? /social media|meta ads|facebook ads/i.test(course.title) : /google ads/i.test(course.title)));
+    const course = matches.find((item) => item.slug === preset.slug) || (matches.length === 1 ? matches[0] : null);
+    if (course) setCourseId(course.id);
+  }, [courses, courseId, preset]);
+
+  useEffect(() => {
+    setLink(existing?.meetLink || '');
+    setTime(existing ? new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Karachi', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(existing.startsAt)) : '22:00');
+    setError('');
+  }, [existing?.id, existing?.meetLink, existing?.startsAt, date, courseId]);
+
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy || loading) return;
+    setError('');
+    setSaved(false);
+    const startsAt = new Date(`${date}T${time}:00+05:00`);
+    if (!date || !time || Number.isNaN(startsAt.getTime()) || new Date(`${date}T12:00:00Z`).getUTCDay() !== preset.day || karachiDate(startsAt) !== date) {
+      setError(`Choose a valid ${preset.dayName} date and class time.`);
+      return;
+    }
+    if (!courseId) { setError('Please select the correct course.'); return; }
+    try {
+      if (new URL(link.trim()).protocol !== 'https:') throw new Error();
+    } catch { setError('Please enter a valid HTTPS meeting link.'); return; }
+    setBusy(true);
+    try {
+      const payload = { courseId, title: preset.title, startsAt: startsAt.toISOString(), meetLink: link.trim(), timezone: 'Asia/Karachi', published: true };
+      const res = existing
+        ? await adminApi.patch(`/api/admin/academy/sessions/${existing.id}`, payload)
+        : await adminApi.post('/api/admin/academy/sessions', payload);
+      if (!res.ok) throw new Error(res.error);
+      await onSaved();
+      setSaved(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save the class. Please try again.');
+    } finally { setBusy(false); }
+  }
+
+  return (
+    <form onSubmit={save} className="panel p-6">
+      <div className="flex items-start gap-3"><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand"><CalendarDays className="h-5 w-5" /></span><div><h3 className="text-lg font-extrabold text-ink">{preset.dayName} class</h3><p className="text-sm text-muted">{preset.name}</p></div></div>
+      <p className="mt-4 text-sm font-semibold text-ink">{date ? new Intl.DateTimeFormat('en-PK', { dateStyle: 'full', timeZone: 'Asia/Karachi' }).format(new Date(`${date}T12:00:00+05:00`)) : 'Choose a date'}</p>
+      <fieldset disabled={busy || loading} className="mt-4 space-y-4">
+        <div className="space-y-1.5"><Label htmlFor={`course-${preset.day}`}>Course</Label><Select id={`course-${preset.day}`} required value={courseId} onChange={(event) => { setCourseId(event.target.value); setSaved(false); }}><option value="" disabled>Select the {preset.name} course</option>{courses.map((course) => <option key={course.id} value={course.id}>{course.title}</option>)}</Select></div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5"><Label htmlFor={`date-${preset.day}`}>{preset.dayName} date</Label><Input id={`date-${preset.day}`} type="date" required value={date} onChange={(event) => { setDate(event.target.value); setSaved(false); }} /></div>
+          <div className="space-y-1.5"><Label htmlFor={`time-${preset.day}`}>Time (Pakistan)</Label><Input id={`time-${preset.day}`} type="time" required value={time} onChange={(event) => { setTime(event.target.value); setSaved(false); }} /></div>
+        </div>
+        <div className="space-y-1.5"><Label htmlFor={`link-${preset.day}`}>{preset.dayName} meeting link *</Label><Input id={`link-${preset.day}`} type="url" required maxLength={1000} placeholder="https://meet.google.com/..." value={link} onChange={(event) => { setLink(event.target.value); setSaved(false); }} /></div>
+        <p className="text-xs leading-relaxed text-muted">All times are Asia/Karachi (UTC+05:00). {existing ? 'This class is already scheduled. Save to update its link or time.' : 'Date and time are prefilled—confirm the course, paste the link, and save.'}</p>
+        <Button type="submit" disabled={!courses.length}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}{existing ? `Update ${preset.dayName} class` : `Save ${preset.dayName} class`}</Button>
+      </fieldset>
+      {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
+      {saved && <p role="status" className="mt-4 text-sm font-semibold text-emerald-700">Class saved. Enrolled students can see its date, time, and meeting link.</p>}
+    </form>
+  );
+}
+
 export default function AdminSchedulePage() {
-  const { courses } = useAdminCourses();
+  const { courses, error: coursesError } = useAdminCourses();
   const [items, setItems] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
   async function load() {
     setLoading(true);
+    setError('');
     const res = await adminApi.get<{ items: Session[] }>('/api/admin/academy/sessions');
     if (!res.ok) {
       setError(res.error);
+      setLoaded(false);
       setLoading(false);
       return;
     }
     setItems(res.data.items);
+    setLoaded(true);
     setLoading(false);
   }
 
@@ -58,27 +159,30 @@ export default function AdminSchedulePage() {
 
   async function onCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (busy) return;
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const startsAt = new Date(String(fd.get('startsAt') || ''));
+    if (Number.isNaN(startsAt.getTime())) { setError('Please choose a valid date and start time.'); return; }
     setBusy(true);
     setError('');
-    const fd = new FormData(e.currentTarget);
-    const startsLocal = String(fd.get('startsAt') || '');
-    const res = await adminApi.post<{ item: Session }>('/api/admin/academy/sessions', {
-      courseId: String(fd.get('courseId') || ''),
-      title: String(fd.get('title') || ''),
-      startsAt: new Date(startsLocal).toISOString(),
-      meetLink: String(fd.get('meetLink') || ''),
-      timezone: String(fd.get('timezone') || 'Asia/Karachi'),
-      notes: String(fd.get('notes') || ''),
-      published: true,
-    });
-    setBusy(false);
-    if (!res.ok) {
-      setError(res.error);
-      return;
-    }
-    e.currentTarget.reset();
-    setShowForm(false);
-    await load();
+    try {
+      const res = await adminApi.post<{ item: Session }>('/api/admin/academy/sessions', {
+        courseId: String(fd.get('courseId') || ''),
+        title: String(fd.get('title') || ''),
+        startsAt: startsAt.toISOString(),
+        meetLink: String(fd.get('meetLink') || ''),
+        timezone: String(fd.get('timezone') || 'Asia/Karachi'),
+        notes: String(fd.get('notes') || ''),
+        published: true,
+      });
+      if (!res.ok) throw new Error(res.error);
+      form.reset();
+      setShowForm(false);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not create the class.');
+    } finally { setBusy(false); }
   }
 
   async function remove(id: string) {
@@ -97,10 +201,13 @@ export default function AdminSchedulePage() {
         title="Class Schedule"
         subtitle="Add live class times and Google Meet links for students."
         actions={
+          <>
+          <Button type="button" variant="outline" className="h-10" disabled={loading} onClick={() => void load()}><RefreshCw className="h-4 w-4" />Refresh</Button>
           <Button type="button" className="h-10" onClick={() => setShowForm((v) => !v)}>
             <Plus className="h-4 w-4" />
-            Add class
+            Add custom class
           </Button>
+          </>
         }
       />
       <main className="px-5 py-8 sm:px-8">
@@ -109,6 +216,14 @@ export default function AdminSchedulePage() {
             {error}
           </p>
         ) : null}
+
+        {coursesError && <p role="alert" className="mb-4 text-sm text-red-700">{coursesError}</p>}
+        <section aria-labelledby="weekly-scheduling" className="mb-8 space-y-5">
+          <div><h2 id="weekly-scheduling" className="text-2xl font-extrabold tracking-tight text-ink">Thursday & Friday class links</h2><p className="mt-1 text-sm text-muted">Your regular classes, ready to schedule. Review the date and time, then paste each meeting link.</p></div>
+          <div className="grid items-start gap-5 xl:grid-cols-2">
+            {WEEKLY_CLASSES.map((preset) => <QuickClassCard key={preset.day} preset={preset} courses={courses} sessions={items} loading={loading || !loaded} onSaved={load} />)}
+          </div>
+        </section>
 
         {showForm ? (
           <form onSubmit={onCreate} className="panel mb-6 grid gap-3 p-5 sm:grid-cols-2">

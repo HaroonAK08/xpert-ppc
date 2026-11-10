@@ -9,6 +9,7 @@ import {
   FileText,
   LayoutDashboard,
   LogOut,
+  Megaphone,
   PlayCircle,
   Ticket,
   Users,
@@ -17,10 +18,13 @@ import { cn } from '@/lib/cn';
 import { logoutAdmin } from '@/lib/admin-api';
 import { useAdmin } from '@/lib/admin-context';
 import { Logo } from '@/components/site/logo';
+import { MobileNavigation } from '@/components/ui/mobile-navigation';
 
 const NAV = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/admin/applications', label: 'Applications', icon: ClipboardList },
+  { href: '/admin/students', label: 'Students', icon: Users },
+  { href: '/admin/announcements', label: 'Announcements', icon: Megaphone },
   { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
   { href: '/admin/courses', label: 'Courses', icon: BookOpen },
   { href: '/admin/schedule', label: 'Class Schedule', icon: CalendarDays },
@@ -35,7 +39,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const admin = useAdmin();
 
   return (
-    <div className="flex min-h-dvh bg-canvas">
+    <div className="flex min-h-dvh flex-col bg-canvas lg:flex-row">
+      <MobileNavigation items={NAV} home="/admin" onLogout={async () => { await logoutAdmin(); router.replace('/admin/login'); }} />
       <aside className="relative hidden w-[260px] shrink-0 flex-col overflow-hidden bg-gradient-to-b from-[#0f2347] via-[#12305f] to-[#0a1b3f] text-white lg:flex">
         <div className="relative px-5 py-6">
           <Logo dark href="/admin" />

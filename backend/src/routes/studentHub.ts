@@ -2,16 +2,17 @@ import { Router } from 'express';
 
 import { PortalCourse } from '../models/PortalCourse';
 import { Enrollment } from '../models/Enrollment';
+import { Announcement, serializeAnnouncement } from '../models/Announcement';
 import { ClassSession } from '../models/ClassSession';
 import { ClassRecording } from '../models/ClassRecording';
 import { LearningResource } from '../models/LearningResource';
 import { getAcademySettings } from '../models/AcademySettings';
-import { requireStudent } from '../middleware/auth';
+import { requireApprovedStudent } from '../middleware/auth';
 import { asyncHandler } from '../middleware/error';
 
 const router = Router();
 
-router.use(requireStudent);
+router.use(requireApprovedStudent);
 
 async function enrolledCourseIds(studentId: string) {
   const enrollments = await Enrollment.find({ studentId }).select('courseId');
@@ -24,7 +25,7 @@ router.get(
     const courseIds = await enrolledCourseIds(req.student!.sub);
     const now = new Date();
 
-    const [nextSession, sessions, recordings, resources, settings, courses] = await Promise.all([
+    const [nextSession, sessions, recordings, resources, settings, courses, announcements] = await Promise.all([
       ClassSession.findOne({
         courseId: { $in: courseIds },
         published: true,
@@ -50,11 +51,13 @@ router.get(
         .limit(50),
       getAcademySettings(),
       PortalCourse.find({ _id: { $in: courseIds } }).select('title slug meetLink timezone nextClassAt'),
+      Announcement.find({ published: true }).sort({ createdAt: -1, _id: -1 }).limit(3),
     ]);
 
     const courseMap = new Map(courses.map((c) => [String(c._id), c]));
 
     res.json({
+      announcements: announcements.map(serializeAnnouncement),
       nextSession: nextSession
         ? {
             id: String(nextSession._id),
@@ -103,6 +106,7 @@ router.get(
         instagramUrl: settings.instagramUrl || '',
         announcementTitle: settings.announcementTitle || '',
         announcementBody: settings.announcementBody || '',
+        weeklyClassNotice: settings.weeklyClassNotice || '',
       },
     });
   })

@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { PortalCourse } from '../models/PortalCourse';
 import { Enrollment } from '../models/Enrollment';
-import { requireStudent } from '../middleware/auth';
+import { requireApprovedStudent } from '../middleware/auth';
 import { ApiError, asyncHandler } from '../middleware/error';
 
 const router = Router();
@@ -25,7 +25,7 @@ function serializeCourse(course: InstanceType<typeof PortalCourse>, enrolled: bo
 
 router.get(
   '/',
-  requireStudent,
+  requireApprovedStudent,
   asyncHandler(async (req, res) => {
     const courses = await PortalCourse.find({ published: true }).sort({ title: 1 });
     const enrollments = await Enrollment.find({ studentId: req.student!.sub }).select('courseId');
@@ -39,7 +39,7 @@ router.get(
 
 router.post(
   '/:courseId/enroll',
-  requireStudent,
+  requireApprovedStudent,
   asyncHandler(async (req, res) => {
     const course = await PortalCourse.findOne({
       _id: req.params.courseId,
@@ -59,7 +59,7 @@ router.post(
 
 router.get(
   '/:slug',
-  requireStudent,
+  requireApprovedStudent,
   asyncHandler(async (req, res) => {
     const course = await PortalCourse.findOne({
       slug: req.params.slug,
@@ -118,7 +118,7 @@ router.get(
 
 router.post(
   '/:courseId/lessons/:lessonId/complete',
-  requireStudent,
+  requireApprovedStudent,
   asyncHandler(async (req, res) => {
     const enrollment = await Enrollment.findOne({
       studentId: req.student!.sub,

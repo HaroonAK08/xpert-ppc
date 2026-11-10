@@ -1,5 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { SESSION_COOKIE, verifySession, type SessionPayload } from '../utils/jwt';
+import { Student } from '../models/Student';
+import { isStudentApproved } from '../utils/studentApplication';
 import {
   STUDENT_COOKIE,
   verifyStudentSession,
@@ -62,4 +64,16 @@ export function requireStudent(req: Request, res: Response, next: NextFunction) 
 
   req.student = session;
   next();
+}
+
+export function requireApprovedStudent(req: Request, res: Response, next: NextFunction) {
+  requireStudent(req, res, () => {
+    void Student.findById(req.student!.sub).then((student) => {
+      if (!student || !student.active || !isStudentApproved(student)) {
+        res.status(401).json({ error: 'Session invalid. Please sign in again.' });
+        return;
+      }
+      next();
+    }).catch(next);
+  });
 }

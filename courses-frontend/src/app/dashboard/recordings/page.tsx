@@ -15,11 +15,16 @@ function recordingUrl(url: string) {
 export default function RecordingsPage() {
   const [items, setItems] = useState<HubRecording[] | null>(null);
 
+  const [loadError, setLoadError] = useState('');
+
   useEffect(() => {
     fetchStudentHub().then((res) => {
+      if (!res.ok) setLoadError(res.error);
       setItems(res.ok ? res.data.recordings : []);
     });
   }, []);
+
+  if (loadError) return <><DashboardPageHeader title="Recordings" /><main className="space-y-4 px-5 py-8 sm:px-8"><p role="alert" className="text-sm text-red-700">{loadError}</p><button type="button" onClick={() => window.location.reload()} className="rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-ink">Try again</button></main></>;
 
   return (
     <>

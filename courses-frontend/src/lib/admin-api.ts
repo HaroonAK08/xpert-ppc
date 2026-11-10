@@ -23,7 +23,7 @@ export function setAdminToken(token: string | null) {
   }
 }
 
-export type AdminApiResult<T> = { ok: true; data: T } | { ok: false; error: string };
+export type AdminApiResult<T> = { ok: true; data: T } | { ok: false; error: string; status?: number };
 
 export type AdminUser = {
   sub?: string;
@@ -51,20 +51,24 @@ async function request<T>(
     const res = await fetch(`${API_URL}${path}`, {
       ...init,
       credentials: 'include',
+      signal: init.signal ?? AbortSignal.timeout(opts.json === false ? 120_000 : 20_000),
       headers,
     });
 
     const body = await res.json().catch(() => null);
 
     if (!res.ok) {
-      if (res.status === 401) setAdminToken(null);
+      if (res.status === 401 && !path.endsWith('/login')) {
+        setAdminToken(null);
+        if (typeof window !== 'undefined') window.dispatchEvent(new Event('academy:admin-expired'));
+      }
       const message =
         (body && typeof body === 'object' && 'error' in body
           ? typeof body.error === 'string'
             ? body.error
             : (body.error as { message?: string })?.message
           : null) ?? `Request failed (${res.status}).`;
-      return { ok: false, error: message };
+      return { ok: false, error: message, status: res.status };
     }
 
     return { ok: true, data: body as T };
@@ -94,6 +98,6 @@ export const adminApi = {
 };
 
 export async function logoutAdmin() {
-  await adminApi.post('/api/auth/logout');
+  await request('/api/auth/logout', { method: 'POST', body: '{}', signal: AbortSignal.timeout(5_000) });
   setAdminToken(null);
 }

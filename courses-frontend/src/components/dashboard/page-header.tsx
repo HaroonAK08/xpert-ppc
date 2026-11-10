@@ -9,15 +9,15 @@ export function DashboardPageHeader({ title }: { title: string }) {
   const avatarUrl = student?.avatarUrl;
 
   return (
-    <header className="flex h-[72px] items-center gap-4 border-b border-border/70 bg-white px-5 sm:px-8">
-      <h1 className="shrink-0 text-lg font-extrabold tracking-tight text-ink">{title}</h1>
-      <div className="mx-auto hidden max-w-md flex-1 items-center gap-2 rounded-full border border-border bg-[#f8fafc] px-4 py-2.5 sm:flex">
+    <header className="flex min-h-[72px] items-center gap-3 py-3 border-b border-border/70 bg-white px-5 sm:px-8">
+      <h1 className="min-w-0 flex-1 break-words text-base sm:flex-none sm:text-lg font-extrabold tracking-tight text-ink">{title}</h1>
+      <Link href="/dashboard/courses" className="mx-auto hidden max-w-md flex-1 items-center gap-2 rounded-full border border-border bg-[#f8fafc] px-4 py-2.5 sm:flex">
         <Search className="h-4 w-4 text-muted" />
-        <span className="text-sm text-muted">Search courses, resources or topics…</span>
-      </div>
+        <span className="text-sm text-muted">Browse your courses</span>
+      </Link>
       <Link
         href="/dashboard/profile"
-        className="ml-auto flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#e8edf5] text-muted"
+        className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#e8edf5] text-muted"
         aria-label="My profile"
       >
         {avatarUrl ? (

@@ -5,7 +5,7 @@ import { randomBytes } from 'crypto';
 import { env } from '../config/env';
 import { isObjectStorageConfigured, uploadLocalFileToObjectStorage } from '../utils/objectStorage';
 
-export const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
+export const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads'));
 
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
