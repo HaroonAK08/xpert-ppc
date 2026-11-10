@@ -51,5 +51,5 @@ export function SyncIndicator({
 const styles = StyleSheet.create({
   wrap: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  text: { ...typography.caption, color: colors.textSecondary },
+  text: { ...typography.caption, color: colors.textSecondary, flexShrink: 1 },
 });

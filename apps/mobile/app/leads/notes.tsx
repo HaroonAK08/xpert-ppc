@@ -8,7 +8,7 @@ import { Input } from '@/components/Input';
 import { NoteItem } from '@/components/NoteItem';
 import { LoadingState, ErrorState, EmptyState } from '@/components/EmptyState';
 import { ApiClientError } from '@/api/client';
-import { colors, shadows, spacing } from '@/theme';
+import { colors, spacing } from '@/theme';
 
 export default function NotesScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -76,10 +76,11 @@ export default function NotesScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   composer: {
-    padding: spacing.lg,
+    padding: spacing.screen,
     gap: spacing.md,
-    backgroundColor: colors.surface,
-    ...shadows.xs,
+    backgroundColor: colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-  list: { padding: spacing.lg, gap: spacing.md, flexGrow: 1 },
+  list: { padding: spacing.screen, gap: spacing.md, flexGrow: 1 },
 });

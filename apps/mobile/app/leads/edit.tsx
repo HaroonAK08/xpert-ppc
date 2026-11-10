@@ -117,7 +117,7 @@ export default function EditLeadScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg, gap: spacing.lg, paddingBottom: spacing.xxl },
+  content: { padding: spacing.screen, gap: spacing.lg, paddingBottom: spacing.xxxl },
   error: {
     ...typography.caption,
     color: colors.danger,

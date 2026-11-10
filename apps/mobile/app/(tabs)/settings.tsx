@@ -9,7 +9,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import {
   connectSheet,
   fetchSheetConnection,
@@ -21,12 +20,12 @@ import { registerForPushNotificationsAsync } from '@/services/notifications';
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import { GradientHeader } from '@/components/GradientHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SyncIndicator } from '@/components/SyncIndicator';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { LoadingState, ErrorState } from '@/components/EmptyState';
 import { ApiClientError } from '@/api/client';
-import { colors, radius, shadows, spacing, typography } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 
 function initials(name?: string | null) {
   if (!name) return '?';
@@ -105,10 +104,10 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.screen}>
-      <GradientHeader eyebrow="Account" title="Settings" subtitle="Manage your profile & integrations" />
+      <ScreenHeader title="Settings" subtitle="Your account and integrations" />
 
       <ScrollView style={styles.flex} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.duration(360).springify().damping(18)} style={styles.profileCard}>
+        <View style={styles.profileCard}>
           <View style={styles.profileRow}>
             <View style={styles.profileAvatar}>
               <Text style={styles.profileAvatarText}>{initials(user?.name)}</Text>
@@ -118,15 +117,9 @@ export default function SettingsScreen() {
               <Text style={styles.meta}>{user?.email}</Text>
             </View>
           </View>
-          <Button
-            title="Sign out"
-            variant="danger"
-            loading={signingOut}
-            onPress={() => setConfirmSignOut(true)}
-          />
-        </Animated.View>
+        </View>
 
-        <Animated.View entering={FadeInDown.delay(60).duration(360).springify().damping(18)} style={styles.card}>
+        <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.cardIcon, { backgroundColor: colors.successSoft }]}>
               <Ionicons name="grid-outline" size={18} color={colors.success} />
@@ -140,10 +133,11 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          <Text style={styles.help}>
-            Credentials stay on the backend. Share your spreadsheet with the Google service account
-            (Editor), then paste the spreadsheet ID below.
-          </Text>
+          {!connected ? (
+            <Text style={styles.help}>
+              Share your spreadsheet with the Google service account as an Editor, then enter its ID below. Credentials stay on the server.
+            </Text>
+          ) : null}
 
           {!configured ? (
             <View style={styles.warningBox}>
@@ -214,8 +208,14 @@ export default function SettingsScreen() {
               ) : null}
             </View>
           )}
-        </Animated.View>
+        </View>
 
+        <Button
+          title="Sign out"
+          variant="ghost"
+          loading={signingOut}
+          onPress={() => setConfirmSignOut(true)}
+        />
         <Text style={styles.footer}>XpertPPC CRM · v1.0.0</Text>
       </ScrollView>
 
@@ -235,53 +235,47 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
-  content: { padding: spacing.lg, paddingTop: 0, marginTop: -spacing.xl, gap: spacing.lg, paddingBottom: spacing.xxl },
+  content: { paddingHorizontal: spacing.screen, gap: spacing.xl, paddingBottom: spacing.xxl },
   profileCard: {
     backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
     padding: spacing.lg,
-    gap: spacing.md,
-    ...shadows.floating,
   },
   profileRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   profileAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: colors.brand,
+    width: 44,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.card,
   },
-  profileAvatarText: { ...typography.title, color: colors.white, fontSize: 20 },
+  profileAvatarText: { ...typography.subtitle, color: colors.textSecondary },
   card: {
     backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: radius.lg,
     padding: spacing.lg,
-    gap: spacing.sm,
-    ...shadows.card,
+    gap: spacing.lg,
   },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  cardIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  cardHeader: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm },
+  cardIcon: { width: 28, height: 28, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    borderRadius: radius.pill,
+    gap: spacing.xs,
+    borderRadius: radius.sm,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
+    paddingVertical: spacing.xs,
   },
   statusPillOn: { backgroundColor: colors.successSoft },
   statusPillOff: { backgroundColor: colors.surfaceMuted },
   statusDot: { width: 6, height: 6, borderRadius: 3 },
-  statusPillText: { ...typography.small, fontWeight: '700' },
-  section: { ...typography.subtitle, color: colors.text, flex: 1 },
+  statusPillText: { ...typography.small },
+  section: { ...typography.subtitle, color: colors.text, flexGrow: 1 },
   name: { ...typography.body, color: colors.text, fontWeight: '600' },
   meta: { ...typography.caption, color: colors.textSecondary },
   help: { ...typography.body, color: colors.textSecondary, fontSize: 14 },
@@ -290,10 +284,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: spacing.sm,
     backgroundColor: colors.warningSoft,
-    padding: spacing.sm,
-    borderRadius: radius.sm,
+    padding: spacing.md,
+    borderRadius: radius.md,
   },
   warning: { ...typography.caption, color: colors.warning, flex: 1 },
   error: { ...typography.caption, color: colors.danger },
-  footer: { ...typography.small, color: colors.textMuted, textAlign: 'center', marginTop: spacing.sm },
+  footer: { ...typography.small, color: colors.textMuted, textAlign: 'center' },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radius, shadows, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 
 type Props = {
   value: string;
@@ -35,8 +35,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    minHeight: 46,
-    ...shadows.xs,
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   input: {
     flex: 1,

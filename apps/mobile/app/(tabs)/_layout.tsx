@@ -2,9 +2,8 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, layout, shadows } from '@/theme';
+import { colors, layout } from '@/theme';
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
@@ -15,21 +14,16 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.brand,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarLabelStyle: { fontWeight: '600', fontSize: 11, marginTop: -2 },
-        tabBarItemStyle: { paddingVertical: 4 },
+        tabBarLabelStyle: { fontWeight: '500', fontSize: 12, lineHeight: 16, marginTop: 2, flexShrink: 0 },
+        tabBarItemStyle: { paddingVertical: 0 },
         tabBarStyle: [
           styles.tabBar,
           {
             height: layout.tabBarHeight + insets.bottom,
-            paddingBottom: Math.max(insets.bottom, 10),
-            paddingTop: 10,
+            paddingBottom: Math.max(insets.bottom, 4),
+            paddingTop: 4,
           },
         ],
-      }}
-      screenListeners={{
-        tabPress: () => {
-          void Haptics.selectionAsync();
-        },
       }}
     >
       <Tabs.Screen
@@ -66,8 +60,8 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: colors.surface,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
     borderTopWidth: StyleSheet.hairlineWidth,
-    ...shadows.raised,
+    elevation: 0,
   },
 });

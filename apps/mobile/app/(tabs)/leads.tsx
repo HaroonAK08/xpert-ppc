@@ -15,12 +15,12 @@ import { fetchLeads } from '@/api/leads';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { LeadCard } from '@/components/LeadCard';
 import { SearchBar } from '@/components/SearchBar';
-import { GradientHeader } from '@/components/GradientHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { FilterSheet, type LeadFilters } from '@/components/FilterSheet';
 import { EmptyState, ErrorState, LoadingState } from '@/components/EmptyState';
 import { LEAD_STATUS_LABELS, type CrmLeadStatus } from '@/types/crm';
 import { ApiClientError } from '@/api/client';
-import { colors, radius, shadows, spacing, typography } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 
 const FOLLOW_UP_LABELS: Record<string, string> = {
   due: 'Follow-up due',
@@ -56,7 +56,7 @@ export default function LeadsScreen() {
     setFilters({
       sort: 'newest',
       status: status || '',
-      follow_up: followUp || '',
+      follow_up: followUp === 'due' || followUp === 'upcoming' || followUp === 'set' ? followUp : '',
       replied: '',
     });
   }, [params.view, params.status, params.follow_up]);
@@ -96,30 +96,15 @@ export default function LeadsScreen() {
   if (filters.follow_up) activeFilters.push({ key: 'follow_up', label: FOLLOW_UP_LABELS[filters.follow_up] });
   const activeCount = activeFilters.length;
 
-  if (query.isLoading && !query.data) {
-    return <LoadingState label="Loading leads…" />;
-  }
-
-  if (query.isError && !query.data) {
-    return (
-      <ErrorState
-        title="Unable to load leads"
-        message={query.error instanceof ApiClientError ? query.error.message : 'Please try again.'}
-        onRetry={() => void query.refetch()}
-      />
-    );
-  }
-
   return (
     <View style={styles.screen}>
-      <GradientHeader
-        eyebrow="Pipeline"
+      <ScreenHeader
         title="Leads"
         subtitle={typeof total === 'number' ? `${total.toLocaleString()} total leads` : undefined}
         right={
           <Pressable
             onPress={() => router.push('/leads/new')}
-            style={styles.addBtn}
+            style={({ pressed }) => [styles.addBtn, pressed && styles.pressed]}
             accessibilityRole="button"
             accessibilityLabel="Add lead"
           >
@@ -133,11 +118,12 @@ export default function LeadsScreen() {
           </View>
           <Pressable
             onPress={() => setFilterOpen(true)}
-            style={[styles.filterBtn, activeCount > 0 && styles.filterBtnActive]}
+            style={({ pressed }) => [styles.filterBtn, activeCount > 0 && styles.filterBtnActive, pressed && styles.pressed]}
             accessibilityRole="button"
             accessibilityLabel="Open filters"
+            accessibilityState={{ selected: activeCount > 0 }}
           >
-            <Ionicons name="options-outline" size={20} color={activeCount > 0 ? colors.white : colors.brandDark} />
+            <Ionicons name="options-outline" size={20} color={activeCount > 0 ? colors.brand : colors.textSecondary} />
             {activeCount > 0 ? (
               <View style={styles.filterCountDot}>
                 <Text style={styles.filterCountText}>{activeCount}</Text>
@@ -145,7 +131,7 @@ export default function LeadsScreen() {
             ) : null}
           </Pressable>
         </View>
-      </GradientHeader>
+      </ScreenHeader>
 
       {activeCount > 0 ? (
         <View style={styles.chipsRow}>
@@ -187,10 +173,20 @@ export default function LeadsScreen() {
         }}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
-          <EmptyState
-            title="No leads found"
-            message="Try adjusting search or filters, or sync from Google Sheets."
-          />
+          query.isLoading ? (
+            <LoadingState label="Loading leads…" />
+          ) : query.isError ? (
+            <ErrorState
+              title="Unable to load leads"
+              message={query.error instanceof ApiClientError ? query.error.message : 'Please try again.'}
+              onRetry={() => void query.refetch()}
+            />
+          ) : (
+            <EmptyState
+              title="No leads found"
+              message="Try adjusting search or filters, or sync from Google Sheets."
+            />
+          )
         }
         ListFooterComponent={
           query.isFetchingNextPage ? (
@@ -214,66 +210,58 @@ const styles = StyleSheet.create({
   addBtn: {
     width: 44,
     height: 44,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.28)',
+    borderRadius: radius.md,
+    backgroundColor: colors.brand,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  toolbar: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    alignItems: 'center',
-  },
+  pressed: { opacity: 0.7 },
+  toolbar: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
   filterBtn: {
-    width: 46,
-    height: 46,
-    borderRadius: 14,
+    width: 48,
+    height: 48,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.xs,
   },
-  filterBtnActive: { backgroundColor: colors.brand },
+  filterBtnActive: { backgroundColor: colors.brandSoft, borderColor: colors.brand },
   filterCountDot: {
     position: 'absolute',
-    top: -4,
-    right: -4,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
+    top: -6,
+    right: -6,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
     paddingHorizontal: 4,
-    backgroundColor: colors.danger,
+    backgroundColor: colors.brand,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: colors.background,
   },
-  filterCountText: { ...typography.small, color: colors.white, fontSize: 10, fontWeight: '700' },
+  filterCountText: { ...typography.small, color: colors.white, fontSize: 11, lineHeight: 14 },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
+    paddingHorizontal: spacing.screen,
+    paddingBottom: spacing.lg,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: spacing.sm,
+    minHeight: 44,
     backgroundColor: colors.brandSoft,
-    borderRadius: radius.pill,
+    borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: 6,
+    paddingVertical: spacing.sm,
   },
-  chipText: { ...typography.caption, color: colors.brandDark, fontWeight: '600' },
-  clearAll: { justifyContent: 'center', paddingHorizontal: spacing.sm },
-  clearAllText: { ...typography.caption, color: colors.textSecondary, textDecorationLine: 'underline' },
-  list: {
-    padding: spacing.lg,
-    paddingTop: spacing.md,
-    gap: spacing.md,
-    flexGrow: 1,
-  },
+  chipText: { ...typography.caption, color: colors.brand },
+  clearAll: { minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing.sm },
+  clearAllText: { ...typography.caption, color: colors.textSecondary },
+  list: { paddingHorizontal: spacing.screen, paddingBottom: spacing.xl, gap: spacing.md, flexGrow: 1 },
 });

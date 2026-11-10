@@ -1,42 +1,36 @@
 export const colors = {
-  background: '#F4F6FB',
+  background: '#F7F8FA',
   surface: '#FFFFFF',
-  surfaceMuted: '#EEF2F9',
-  border: '#E7EBF2',
-  borderSubtle: '#F0F3F8',
-  text: '#0B1220',
-  textSecondary: '#5B6472',
-  textMuted: '#939BA8',
-  brand: '#1476FF',
-  brandDark: '#001833',
-  brandDeep: '#06142B',
-  brandSoft: '#E6F0FF',
-  accent: '#06B6D4',
-  danger: '#DC2626',
-  dangerSoft: '#FDE8E8',
-  warning: '#D97706',
-  warningSoft: '#FDF1DD',
-  success: '#16A34A',
-  successSoft: '#E4F7EA',
+  surfaceMuted: '#F2F4F7',
+  border: '#E2E6EC',
+  borderSubtle: '#EDF0F3',
+  text: '#182230',
+  textSecondary: '#526071',
+  textMuted: '#667085',
+  brand: '#2563EB',
+  brandDark: '#182230',
+  brandDeep: '#182230',
+  brandSoft: '#EFF4FF',
+  accent: '#0891B2',
+  danger: '#B42318',
+  dangerSoft: '#FEF3F2',
+  warning: '#A15C07',
+  warningSoft: '#FFFAEB',
+  success: '#23764B',
+  successSoft: '#EDF8F1',
   white: '#FFFFFF',
-  overlay: 'rgba(3, 12, 27, 0.55)',
+  overlay: 'rgba(16, 24, 40, 0.32)',
   status: {
-    new: '#1476FF',
-    contacted: '#6366F1',
-    replied: '#06B6D4',
-    interested: '#16A34A',
-    follow_up: '#D97706',
-    converted: '#15803D',
-    not_interested: '#64748B',
-    closed: '#475569',
+    new: '#2563EB',
+    contacted: '#635BB5',
+    replied: '#087E91',
+    interested: '#23764B',
+    follow_up: '#A15C07',
+    converted: '#23764B',
+    not_interested: '#667085',
+    closed: '#526071',
   },
 } as const;
-
-export const gradients = {
-  hero: ['#001833', '#062A52', '#0E4D9C'] as const,
-  brandButton: ['#2E8CFF', '#1476FF', '#0C5FDB'] as const,
-  sheen: ['rgba(255,255,255,0.14)', 'rgba(255,255,255,0)'] as const,
-};
 
 export const spacing = {
   xs: 4,
@@ -46,31 +40,33 @@ export const spacing = {
   xl: 24,
   xxl: 32,
   xxxl: 48,
+  screen: 20,
 } as const;
 
 export const radius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-  xxl: 32,
+  sm: 6,
+  md: 10,
+  lg: 12,
+  xl: 16,
+  xxl: 20,
   pill: 999,
 } as const;
 
 export const typography = {
   display: {
-    fontSize: 30,
-    fontWeight: '800' as const,
-    letterSpacing: 0.2,
-  },
-  brand: {
     fontSize: 28,
     fontWeight: '700' as const,
-    letterSpacing: 0.4,
+    letterSpacing: -0.6,
+  },
+  brand: {
+    fontSize: 22,
+    fontWeight: '700' as const,
+    letterSpacing: -0.4,
   },
   title: {
     fontSize: 22,
-    fontWeight: '700' as const,
+    fontWeight: '600' as const,
+    letterSpacing: -0.4,
   },
   subtitle: {
     fontSize: 16,
@@ -78,61 +74,54 @@ export const typography = {
   },
   body: {
     fontSize: 15,
+    lineHeight: 22,
     fontWeight: '400' as const,
   },
   caption: {
     fontSize: 13,
+    lineHeight: 19,
     fontWeight: '500' as const,
   },
   small: {
     fontSize: 12,
+    lineHeight: 17,
     fontWeight: '500' as const,
   },
 };
 
 export const shadows = {
   xs: {
-    shadowColor: '#001833',
-    shadowOpacity: 0.05,
+    shadowColor: '#182230',
+    shadowOpacity: 0.025,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 0,
+  },
+  card: {
+    shadowColor: '#182230',
+    shadowOpacity: 0.03,
     shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 0,
+  },
+  raised: {
+    shadowColor: '#182230',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     elevation: 1,
   },
-  card: {
-    shadowColor: '#001833',
+  floating: {
+    shadowColor: '#182230',
     shadowOpacity: 0.08,
     shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
-  raised: {
-    shadowColor: '#001833',
-    shadowOpacity: 0.12,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 6,
-  },
-  floating: {
-    shadowColor: '#001833',
-    shadowOpacity: 0.18,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 14 },
-    elevation: 12,
-  },
-};
-
-export const motion = {
-  press: { damping: 16, stiffness: 320 },
-  release: { damping: 12, stiffness: 220 },
-  fast: 160,
-  base: 240,
-  slow: 420,
 };
 
 export const layout = {
-  tabBarHeight: 60,
-  tabBarSideMargin: 16,
-  tabBarBottomMargin: 14,
+  tabBarHeight: 68,
 };
 
-export const theme = { colors, gradients, spacing, radius, typography, shadows, motion, layout };
+export const theme = { colors, spacing, radius, typography, shadows, layout };

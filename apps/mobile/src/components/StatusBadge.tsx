@@ -7,7 +7,7 @@ export function StatusBadge({ status }: { status: CrmLeadStatus }) {
   const color = colors.status[status] || colors.textMuted;
   return (
     <View
-      style={[styles.badge, { backgroundColor: `${color}22`, borderColor: color }]}
+      style={[styles.badge, { backgroundColor: `${color}12` }]}
       accessibilityLabel={`Status ${LEAD_STATUS_LABELS[status]}`}
     >
       <Text style={[styles.text, { color }]}>{LEAD_STATUS_LABELS[status]}</Text>
@@ -17,15 +17,12 @@ export function StatusBadge({ status }: { status: CrmLeadStatus }) {
 
 const styles = StyleSheet.create({
   badge: {
-    borderWidth: 1,
     borderRadius: radius.sm,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: spacing.xs,
     alignSelf: 'flex-start',
   },
   text: {
     ...typography.small,
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
   },
 });

@@ -57,6 +57,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: spacing.xl,
     gap: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
     ...shadows.floating,
   },
   title: { ...typography.subtitle, color: colors.text },

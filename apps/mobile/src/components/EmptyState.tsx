@@ -70,9 +70,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   iconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     backgroundColor: colors.brandSoft,
     alignItems: 'center',
     justifyContent: 'center',

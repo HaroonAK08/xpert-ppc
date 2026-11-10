@@ -11,17 +11,16 @@ import {
 import { useRouter } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { fetchDashboard } from '@/api/dashboard';
 import { syncSheet } from '@/api/googleSheets';
 import { useAuthStore } from '@/store/auth';
 import { useOfflineStore } from '@/store/offline';
 import { StatCard } from '@/components/StatCard';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { GradientHeader } from '@/components/GradientHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { LoadingState, ErrorState } from '@/components/EmptyState';
 import { StatusBadge } from '@/components/StatusBadge';
-import { colors, radius, shadows, spacing, typography } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 import { ApiClientError } from '@/api/client';
 
 function greeting() {
@@ -148,7 +147,7 @@ export default function DashboardScreen() {
 
   return (
     <View style={styles.screen}>
-      <GradientHeader
+      <ScreenHeader
         eyebrow={greeting()}
         title={user?.name?.split(' ')[0] || 'Welcome back'}
         right={
@@ -159,11 +158,11 @@ export default function DashboardScreen() {
       >
         {!isOnline ? (
           <View style={styles.offlineBadge}>
-            <Ionicons name="cloud-offline-outline" size={14} color={colors.white} />
+            <Ionicons name="cloud-offline-outline" size={14} color={colors.warning} />
             <Text style={styles.offline}>Offline — showing cached data</Text>
           </View>
         ) : null}
-      </GradientHeader>
+      </ScreenHeader>
 
       <ScrollView
         style={styles.flex}
@@ -178,7 +177,7 @@ export default function DashboardScreen() {
           />
         }
       >
-        <Animated.View entering={FadeInDown.duration(360).springify().damping(18)} style={styles.syncCard}>
+        <View style={styles.syncCard}>
           <View style={styles.syncRow}>
             <View style={styles.syncCopy}>
               <Text style={styles.syncTitle}>Google Sheets sync</Text>
@@ -218,18 +217,17 @@ export default function DashboardScreen() {
                 : 'Google Sheet synchronization failed'}
             </Text>
           ) : null}
-        </Animated.View>
+        </View>
 
         <SectionTitle label="Overview" />
         <View style={styles.grid}>
-          {statItems.map((s, i) => (
+          {statItems.map((s) => (
             <StatCard
               key={s.label}
               label={s.label}
               value={s.value}
               icon={s.icon}
               color={s.color}
-              index={i}
               onPress={s.href ? () => router.push(s.href!) : undefined}
             />
           ))}
@@ -239,10 +237,9 @@ export default function DashboardScreen() {
         {data.followUpsToday.length === 0 ? (
           <Text style={styles.emptyInline}>No follow-ups scheduled for today.</Text>
         ) : (
-          data.followUpsToday.map((lead, i) => (
+          data.followUpsToday.map((lead) => (
             <LeadRow
               key={lead.id}
-              index={i}
               title={lead.name}
               subtitle={lead.businessName || lead.phone || lead.email}
               meta={
@@ -257,10 +254,9 @@ export default function DashboardScreen() {
         )}
 
         <SectionTitle label="Recent leads" />
-        {data.recentLeads.map((lead, i) => (
+        {data.recentLeads.map((lead) => (
           <LeadRow
             key={lead.id}
-            index={i}
             title={lead.name}
             subtitle={lead.businessName || '—'}
             status={lead.status}
@@ -275,7 +271,6 @@ export default function DashboardScreen() {
 function SectionTitle({ label, count }: { label: string; count?: number }) {
   return (
     <View style={styles.sectionRow}>
-      <View style={styles.sectionBar} />
       <Text style={styles.section}>{label}</Text>
       {typeof count === 'number' ? (
         <View style={styles.countPill}>
@@ -287,124 +282,119 @@ function SectionTitle({ label, count }: { label: string; count?: number }) {
 }
 
 function LeadRow({
-  index,
   title,
   subtitle,
   meta,
   status,
   onPress,
 }: {
-  index: number;
   title: string;
   subtitle?: string | null;
   meta?: string;
   status: Parameters<typeof StatusBadge>[0]['status'];
   onPress: () => void;
 }) {
-  const color = colors.status[status] || colors.textMuted;
   return (
-    <Animated.View entering={FadeInDown.delay(index * 40).duration(320).springify().damping(18)}>
-      <Pressable style={styles.listItem} onPress={onPress}>
-        <View style={[styles.rowAvatar, { backgroundColor: `${color}1A` }]}>
-          <Text style={[styles.rowAvatarText, { color }]}>{initials(title)}</Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.itemTitle}>{title}</Text>
-          {subtitle ? <Text style={styles.itemSub}>{subtitle}</Text> : null}
-          {meta ? <Text style={styles.itemMeta}>{meta}</Text> : null}
-        </View>
+    <Pressable
+      style={({ pressed }) => [styles.listItem, pressed && styles.listItemPressed]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Lead ${title}`}
+    >
+      <View style={styles.rowAvatar}>
+        <Text style={styles.rowAvatarText}>{initials(title)}</Text>
+      </View>
+      <View style={styles.itemCopy}>
+        <Text style={styles.itemTitle}>{title}</Text>
+        {subtitle ? <Text style={styles.itemSub}>{subtitle}</Text> : null}
+        {meta ? <Text style={styles.itemMeta}>{meta}</Text> : null}
         <StatusBadge status={status} />
-        <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
-      </Pressable>
-    </Animated.View>
+      </View>
+      <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
-  content: { padding: spacing.lg, paddingTop: 0, marginTop: -spacing.xl, gap: spacing.md, paddingBottom: spacing.xxl },
+  content: { paddingHorizontal: spacing.screen, gap: spacing.md, paddingBottom: spacing.xxl },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    width: 44,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.28)',
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { ...typography.subtitle, color: colors.white },
+  avatarText: { ...typography.caption, color: colors.textSecondary },
   offlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: spacing.sm,
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(217, 119, 6, 0.3)',
+    backgroundColor: colors.warningSoft,
     borderRadius: radius.sm,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
+    paddingVertical: spacing.xs,
   },
-  offline: { ...typography.caption, color: colors.white },
+  offline: { ...typography.caption, color: colors.warning },
   syncCard: {
     backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
     padding: spacing.lg,
     gap: spacing.sm,
-    ...shadows.floating,
   },
-  syncRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-  },
-  syncCopy: { flex: 1, minWidth: 0, paddingTop: 2, gap: 4 },
-  syncTitle: { ...typography.subtitle, color: colors.text, fontSize: 15 },
+  syncRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
+  syncCopy: { flex: 1, minWidth: 0, gap: spacing.xs },
+  syncTitle: { ...typography.caption, color: colors.text, fontWeight: '600' },
   syncBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    alignSelf: 'flex-start',
-    backgroundColor: colors.brandSoft,
-    borderRadius: radius.pill,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    justifyContent: 'center',
+    gap: spacing.sm,
+    minHeight: 44,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
-  syncBtnPressed: { opacity: 0.85 },
-  syncBtnDisabled: { opacity: 0.55 },
-  syncBtnText: { ...typography.caption, color: colors.brandDark, fontWeight: '700' },
+  syncBtnPressed: { backgroundColor: colors.border },
+  syncBtnDisabled: { opacity: 0.5 },
+  syncBtnText: { ...typography.caption, color: colors.text, fontWeight: '600' },
   syncError: { ...typography.caption, color: colors.danger },
-  sectionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.sm },
-  sectionBar: { width: 4, height: 16, borderRadius: 2, backgroundColor: colors.brand },
+  sectionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.lg },
   section: { ...typography.subtitle, color: colors.text },
-  countPill: {
-    backgroundColor: colors.brandSoft,
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 1,
-  },
-  countPillText: { ...typography.small, color: colors.brandDark, fontWeight: '700' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  countPill: { backgroundColor: colors.surfaceMuted, borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: 2 },
+  countPillText: { ...typography.small, color: colors.textSecondary },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: radius.lg,
-    padding: spacing.md,
-    ...shadows.xs,
+    padding: spacing.lg,
   },
+  listItemPressed: { backgroundColor: colors.surfaceMuted },
   rowAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 13,
+    width: 36,
+    height: 36,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rowAvatarText: { ...typography.caption, fontWeight: '700' },
+  rowAvatarText: { ...typography.small, color: colors.textSecondary },
+  itemCopy: { flex: 1, gap: spacing.xs },
   itemTitle: { ...typography.subtitle, color: colors.text, fontSize: 15 },
   itemSub: { ...typography.caption, color: colors.textSecondary },
-  itemMeta: { ...typography.small, color: colors.warning, marginTop: 2 },
-  emptyInline: { ...typography.body, color: colors.textMuted },
+  itemMeta: { ...typography.small, color: colors.warning },
+  emptyInline: { ...typography.body, color: colors.textMuted, paddingVertical: spacing.md },
 });

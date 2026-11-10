@@ -76,15 +76,15 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
 
   if (!hydrated) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.brandDark }}>
-        <ActivityIndicator color={colors.white} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator color={colors.brand} />
       </View>
     );
   }
 
   return (
     <>
-      <StatusBar style={onLoginScreen ? 'light' : 'dark'} animated />
+      <StatusBar style="dark" />
       {children}
     </>
   );
@@ -93,8 +93,8 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
 const headerOptions = {
   headerShadowVisible: false,
   headerStyle: { backgroundColor: colors.background },
-  headerTitleStyle: { color: colors.text, fontWeight: '700' as const, fontSize: 17 },
-  headerTintColor: colors.brand,
+  headerTitleStyle: { color: colors.text, fontWeight: '600' as const, fontSize: 17 },
+  headerTintColor: colors.text,
 };
 
 export default function RootLayout() {

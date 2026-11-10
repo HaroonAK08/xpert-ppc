@@ -5,8 +5,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Modal,
-  Pressable,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -21,6 +19,7 @@ import {
 import { openEmailComposer, openPhoneDialer, openWhatsApp } from '@/services/comms';
 import { scheduleFollowUpReminder } from '@/services/notifications';
 import { ActionButton } from '@/components/ActionButton';
+import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { NoteItem } from '@/components/NoteItem';
@@ -28,7 +27,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { LoadingState, ErrorState } from '@/components/EmptyState';
 import { CRM_LEAD_STATUSES, LEAD_STATUS_LABELS, type CrmLeadStatus } from '@/types/crm';
 import { ApiClientError } from '@/api/client';
-import { colors, radius, shadows, spacing, typography } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 
 function formatDate(iso: string | null) {
   if (!iso) return '—';
@@ -156,7 +155,7 @@ export default function LeadDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: lead.name }} />
+      <Stack.Screen options={{ title: 'Lead details' }} />
       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.name}>{lead.name}</Text>
@@ -193,19 +192,15 @@ export default function LeadDetailScreen() {
           <ActionButton icon="chatbubble-ellipses-outline" label="Reply" onPress={() => setReplyOpen(true)} />
         </View>
 
+        <Text style={styles.section}>Contact details</Text>
         <View style={styles.card}>
           <Row label="Phone" value={lead.phone || '—'} />
           <Row label="Email" value={lead.email || '—'} />
           <Row label="Source" value={lead.source || '—'} />
           <Row label="Message" value={lead.message || '—'} />
-          <Row label="Replied" value={lead.replied ? 'Yes' : 'No'} />
-          <Row label="Contacted" value={formatDate(lead.contactedAt)} />
-          <Row label="Replied at" value={formatDate(lead.repliedAt)} />
-          <Row label="Follow-up" value={formatDate(lead.followUpAt)} />
-          <Row label="Created" value={formatDate(lead.createdAt)} />
-          <Row label="Last synced" value={formatDate(lead.lastSyncedAt)} />
         </View>
 
+        <Text style={styles.section}>Manage lead</Text>
         <View style={styles.rowBtns}>
           <Button title="Mark contacted" variant="secondary" onPress={() => setMarkOpen('contacted')} style={{ flex: 1 }} />
           <Button title="Mark replied" onPress={() => setMarkOpen('replied')} style={{ flex: 1 }} />
@@ -244,6 +239,16 @@ export default function LeadDetailScreen() {
           onPress={() => router.push({ pathname: '/leads/notes', params: { id: lead.id } })}
         />
 
+        <Text style={styles.section}>Activity & follow-up</Text>
+        <View style={styles.card}>
+          <Row label="Replied" value={lead.replied ? 'Yes' : 'No'} />
+          <Row label="Contacted" value={formatDate(lead.contactedAt)} />
+          <Row label="Replied at" value={formatDate(lead.repliedAt)} />
+          <Row label="Follow-up" value={formatDate(lead.followUpAt)} />
+          <Row label="Created" value={formatDate(lead.createdAt)} />
+          <Row label="Last synced" value={formatDate(lead.lastSyncedAt)} />
+        </View>
+
         <Text style={styles.section}>Recent notes</Text>
         {notes.length === 0 ? (
           <Text style={styles.muted}>No notes yet.</Text>
@@ -252,112 +257,95 @@ export default function LeadDetailScreen() {
         )}
       </ScrollView>
 
-      <Modal visible={replyOpen} transparent animationType="slide" onRequestClose={() => setReplyOpen(false)}>
-        <Pressable style={styles.modalOverlay} onPress={() => setReplyOpen(false)}>
-          <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.handle} />
-            <Text style={styles.sheetTitle}>Reply via</Text>
-            <Button
-              title="Phone"
-              onPress={async () => {
-                const ok = await openPhoneDialer(lead.phone);
-                if (ok) await afterOpenChannel('phone');
-              }}
-            />
-            <Button
-              title="WhatsApp"
-              onPress={async () => {
-                const ok = await openWhatsApp(lead.phone, lead.name);
-                if (ok) await afterOpenChannel('whatsapp');
-              }}
-            />
-            <Button
-              title="Email"
-              onPress={async () => {
-                const ok = await openEmailComposer(lead.email, lead.name);
-                if (ok) await afterOpenChannel('email');
-              }}
-            />
-            <Button title="Cancel" variant="ghost" onPress={() => setReplyOpen(false)} />
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <BottomSheet visible={replyOpen} onClose={() => setReplyOpen(false)}>
+        <Text style={styles.sheetTitle}>Reply via</Text>
+        <Button
+          title="Phone"
+          variant="ghost"
+          onPress={async () => {
+            const ok = await openPhoneDialer(lead.phone);
+            if (ok) await afterOpenChannel('phone');
+          }}
+        />
+        <Button
+          title="WhatsApp"
+          variant="ghost"
+          onPress={async () => {
+            const ok = await openWhatsApp(lead.phone, lead.name);
+            if (ok) await afterOpenChannel('whatsapp');
+          }}
+        />
+        <Button
+          title="Email"
+          variant="ghost"
+          onPress={async () => {
+            const ok = await openEmailComposer(lead.email, lead.name);
+            if (ok) await afterOpenChannel('email');
+          }}
+        />
+        <Button title="Cancel" variant="ghost" onPress={() => setReplyOpen(false)} />
+      </BottomSheet>
 
-      <Modal visible={Boolean(markOpen)} transparent animationType="fade" onRequestClose={() => setMarkOpen(null)}>
-        <Pressable style={styles.modalOverlay} onPress={() => setMarkOpen(null)}>
-          <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.handle} />
-            <Text style={styles.sheetTitle}>
-              {markOpen === 'replied' ? 'Mark as replied' : 'Mark as contacted'}
-            </Text>
-            <Text style={styles.muted}>
-              Only confirm if you actually contacted them. Opening dialer/WhatsApp/email alone is not enough.
-            </Text>
-            <Input
-              label="Optional note"
-              value={note}
-              onChangeText={setNote}
-              multiline
-              style={{ minHeight: 80, textAlignVertical: 'top' }}
-            />
-            <Button
-              title="Save"
-              loading={contactMutation.isPending || replyMutation.isPending}
-              onPress={() => {
-                if (markOpen === 'replied') replyMutation.mutate('other');
-                else contactMutation.mutate();
-              }}
-            />
-            <Button title="Cancel" variant="ghost" onPress={() => setMarkOpen(null)} />
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <BottomSheet visible={Boolean(markOpen)} onClose={() => setMarkOpen(null)}>
+        <Text style={styles.sheetTitle}>
+          {markOpen === 'replied' ? 'Mark as replied' : 'Mark as contacted'}
+        </Text>
+        <Text style={styles.muted}>
+          Only confirm if you actually contacted them. Opening dialer/WhatsApp/email alone is not enough.
+        </Text>
+        <Input
+          label="Optional note"
+          value={note}
+          onChangeText={setNote}
+          multiline
+          style={{ minHeight: 80, textAlignVertical: 'top' }}
+        />
+        <Button
+          title="Save"
+          loading={contactMutation.isPending || replyMutation.isPending}
+          onPress={() => {
+            if (markOpen === 'replied') replyMutation.mutate('other');
+            else contactMutation.mutate();
+          }}
+        />
+        <Button title="Cancel" variant="ghost" onPress={() => setMarkOpen(null)} />
+      </BottomSheet>
 
-      <Modal visible={statusOpen} transparent animationType="slide" onRequestClose={() => setStatusOpen(false)}>
-        <Pressable style={styles.modalOverlay} onPress={() => setStatusOpen(false)}>
-          <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.handle} />
-            <Text style={styles.sheetTitle}>Change status</Text>
-            {CRM_LEAD_STATUSES.map((s) => (
-              <Button
-                key={s}
-                title={LEAD_STATUS_LABELS[s]}
-                variant={lead.status === s ? 'primary' : 'ghost'}
-                onPress={() => statusMutation.mutate(s)}
-              />
-            ))}
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <BottomSheet visible={statusOpen} onClose={() => setStatusOpen(false)}>
+        <Text style={styles.sheetTitle}>Change status</Text>
+        {CRM_LEAD_STATUSES.map((s) => (
+          <Button
+            key={s}
+            title={LEAD_STATUS_LABELS[s]}
+            variant={lead.status === s ? 'secondary' : 'ghost'}
+            onPress={() => statusMutation.mutate(s)}
+          />
+        ))}
+      </BottomSheet>
 
-      <Modal visible={followUpOpen} transparent animationType="fade" onRequestClose={() => setFollowUpOpen(false)}>
-        <Pressable style={styles.modalOverlay} onPress={() => setFollowUpOpen(false)}>
-          <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.handle} />
-            <Text style={styles.sheetTitle}>Follow-up</Text>
-            <Input
-              label="Date/time (YYYY-MM-DDTHH:mm)"
-              value={followUpValue}
-              onChangeText={setFollowUpValue}
-              placeholder="2026-09-20T19:00"
-              autoCapitalize="none"
-            />
-            <Button
-              title="Save follow-up"
-              loading={followUpMutation.isPending}
-              onPress={() => followUpMutation.mutate()}
-            />
-            <Button
-              title="Clear follow-up"
-              variant="ghost"
-              onPress={() => {
-                setFollowUpValue('');
-                followUpMutation.mutate();
-              }}
-            />
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <BottomSheet visible={followUpOpen} onClose={() => setFollowUpOpen(false)}>
+        <Text style={styles.sheetTitle}>Follow-up</Text>
+        <Input
+          label="Date/time (YYYY-MM-DDTHH:mm)"
+          value={followUpValue}
+          onChangeText={setFollowUpValue}
+          placeholder="2026-09-20T19:00"
+          autoCapitalize="none"
+        />
+        <Button
+          title="Save follow-up"
+          loading={followUpMutation.isPending}
+          onPress={() => followUpMutation.mutate()}
+        />
+        <Button
+          title="Clear follow-up"
+          variant="ghost"
+          onPress={() => {
+            setFollowUpValue('');
+            followUpMutation.mutate();
+          }}
+        />
+      </BottomSheet>
     </>
   );
 }
@@ -373,52 +361,30 @@ function Row({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
-  header: { gap: spacing.sm },
-  name: { ...typography.title, color: colors.text },
+  content: { padding: spacing.screen, gap: spacing.md, paddingBottom: spacing.xxxl },
+  header: { gap: spacing.sm, paddingBottom: spacing.sm },
+  name: { ...typography.display, color: colors.text },
   business: { ...typography.body, color: colors.textSecondary },
-  actions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    paddingVertical: spacing.sm,
-    ...shadows.xs,
-  },
+  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   card: {
     backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: radius.lg,
-    padding: spacing.lg,
-    gap: spacing.md,
-    ...shadows.card,
+    paddingHorizontal: spacing.lg,
   },
-  row: { gap: 2 },
-  rowLabel: { ...typography.small, color: colors.textMuted, textTransform: 'uppercase' },
-  rowValue: { ...typography.body, color: colors.text },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.borderSubtle,
+  },
+  rowLabel: { ...typography.caption, color: colors.textSecondary, flex: 1 },
+  rowValue: { ...typography.body, color: colors.text, flex: 2, textAlign: 'right' },
   rowBtns: { flexDirection: 'row', gap: spacing.sm },
-  section: { ...typography.subtitle, color: colors.text, marginTop: spacing.sm },
-  muted: { ...typography.body, color: colors.textMuted },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: colors.overlay,
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
-    padding: spacing.xl,
-    paddingTop: spacing.md,
-    gap: spacing.md,
-    ...shadows.floating,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: radius.pill,
-    backgroundColor: colors.border,
-    alignSelf: 'center',
-    marginBottom: spacing.xs,
-  },
-  sheetTitle: { ...typography.subtitle, color: colors.text },
+  section: { ...typography.subtitle, color: colors.text, marginTop: spacing.lg },
+  muted: { ...typography.body, color: colors.textSecondary },
+  sheetTitle: { ...typography.title, color: colors.text, marginBottom: spacing.xs },
 });

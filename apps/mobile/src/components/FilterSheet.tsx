@@ -1,8 +1,9 @@
 import React from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CRM_LEAD_STATUSES, LEAD_STATUS_LABELS, type CrmLeadStatus } from '@/types/crm';
 import { Button } from './Button';
-import { colors, radius, shadows, spacing, typography } from '@/theme';
+import { BottomSheet } from './BottomSheet';
+import { colors, radius, spacing, typography } from '@/theme';
 
 export type LeadFilters = {
   status?: CrmLeadStatus | '';
@@ -41,136 +42,110 @@ function Chip({
 
 export function FilterSheet({ visible, value, onChange, onClose }: Props) {
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-          <View style={styles.handle} />
-          <Text style={styles.title}>Filters</Text>
-          <ScrollView contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xl }}>
-            <View>
-              <Text style={styles.section}>Status</Text>
-              <View style={styles.row}>
-                <Chip
-                  label="All"
-                  active={!value.status}
-                  onPress={() => onChange({ ...value, status: '' })}
-                />
-                {CRM_LEAD_STATUSES.map((s) => (
-                  <Chip
-                    key={s}
-                    label={LEAD_STATUS_LABELS[s]}
-                    active={value.status === s}
-                    onPress={() => onChange({ ...value, status: s })}
-                  />
-                ))}
-              </View>
-            </View>
+    <BottomSheet visible={visible} onClose={onClose}>
+      <Text style={styles.title}>Filters</Text>
+      <View style={{ gap: spacing.lg, paddingBottom: spacing.md }}>
+        <View>
+          <Text style={styles.section}>Status</Text>
+          <View style={styles.row}>
+            <Chip
+              label="All"
+              active={!value.status}
+              onPress={() => onChange({ ...value, status: '' })}
+            />
+            {CRM_LEAD_STATUSES.map((s) => (
+              <Chip
+                key={s}
+                label={LEAD_STATUS_LABELS[s]}
+                active={value.status === s}
+                onPress={() => onChange({ ...value, status: s })}
+              />
+            ))}
+          </View>
+        </View>
 
-            <View>
-              <Text style={styles.section}>Replied</Text>
-              <View style={styles.row}>
-                {(
-                  [
-                    ['', 'All'],
-                    ['true', 'Replied'],
-                    ['false', 'Not replied'],
-                  ] as const
-                ).map(([k, label]) => (
-                  <Chip
-                    key={label}
-                    label={label}
-                    active={(value.replied || '') === k}
-                    onPress={() => onChange({ ...value, replied: k })}
-                  />
-                ))}
-              </View>
-            </View>
+        <View>
+          <Text style={styles.section}>Replied</Text>
+          <View style={styles.row}>
+            {(
+              [
+                ['', 'All'],
+                ['true', 'Replied'],
+                ['false', 'Not replied'],
+              ] as const
+            ).map(([k, label]) => (
+              <Chip
+                key={label}
+                label={label}
+                active={(value.replied || '') === k}
+                onPress={() => onChange({ ...value, replied: k })}
+              />
+            ))}
+          </View>
+        </View>
 
-            <View>
-              <Text style={styles.section}>Follow-up</Text>
-              <View style={styles.row}>
-                {(
-                  [
-                    ['', 'Any'],
-                    ['due', 'Due'],
-                    ['upcoming', 'Upcoming'],
-                    ['set', 'Scheduled'],
-                  ] as const
-                ).map(([k, label]) => (
-                  <Chip
-                    key={label}
-                    label={label}
-                    active={(value.follow_up || '') === k}
-                    onPress={() => onChange({ ...value, follow_up: k })}
-                  />
-                ))}
-              </View>
-            </View>
+        <View>
+          <Text style={styles.section}>Follow-up</Text>
+          <View style={styles.row}>
+            {(
+              [
+                ['', 'Any'],
+                ['due', 'Due'],
+                ['upcoming', 'Upcoming'],
+                ['set', 'Scheduled'],
+              ] as const
+            ).map(([k, label]) => (
+              <Chip
+                key={label}
+                label={label}
+                active={(value.follow_up || '') === k}
+                onPress={() => onChange({ ...value, follow_up: k })}
+              />
+            ))}
+          </View>
+        </View>
 
-            <View>
-              <Text style={styles.section}>Sort</Text>
-              <View style={styles.row}>
-                {(
-                  [
-                    ['newest', 'Newest'],
-                    ['oldest', 'Oldest'],
-                    ['updated', 'Recently updated'],
-                    ['follow_up', 'Follow-up date'],
-                  ] as const
-                ).map(([k, label]) => (
-                  <Chip
-                    key={label}
-                    label={label}
-                    active={(value.sort || 'newest') === k}
-                    onPress={() => onChange({ ...value, sort: k })}
-                  />
-                ))}
-              </View>
-            </View>
-          </ScrollView>
-          <Button title="Apply" onPress={onClose} />
-        </Pressable>
-      </Pressable>
-    </Modal>
+        <View>
+          <Text style={styles.section}>Sort</Text>
+          <View style={styles.row}>
+            {(
+              [
+                ['newest', 'Newest'],
+                ['oldest', 'Oldest'],
+                ['updated', 'Recently updated'],
+                ['follow_up', 'Follow-up date'],
+              ] as const
+            ).map(([k, label]) => (
+              <Chip
+                key={label}
+                label={label}
+                active={(value.sort || 'newest') === k}
+                onPress={() => onChange({ ...value, sort: k })}
+              />
+            ))}
+          </View>
+        </View>
+      </View>
+      <Button title="Apply" onPress={onClose} />
+    </BottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: colors.overlay,
-  },
-  sheet: {
-    maxHeight: '80%',
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
-    padding: spacing.xl,
-    paddingTop: spacing.md,
-    gap: spacing.md,
-    ...shadows.floating,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: radius.pill,
-    backgroundColor: colors.border,
-    alignSelf: 'center',
-    marginBottom: spacing.sm,
-  },
   title: { ...typography.title, color: colors.text },
   section: { ...typography.caption, color: colors.textSecondary, marginBottom: spacing.sm },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chip: {
     backgroundColor: colors.surfaceMuted,
-    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    minHeight: 36,
+    minHeight: 44,
     justifyContent: 'center',
   },
-  chipActive: { backgroundColor: colors.brand },
+  chipActive: { backgroundColor: colors.brandSoft, borderColor: colors.brand },
   chipText: { ...typography.caption, color: colors.textSecondary },
-  chipTextActive: { color: colors.white, fontWeight: '700' },
+  chipTextActive: { color: colors.brand, fontWeight: '600' },
 });

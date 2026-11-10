@@ -4,19 +4,11 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  View,
   type PressableProps,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
-import { colors, gradients, motion, radius, shadows, spacing, typography } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
@@ -27,14 +19,12 @@ type Props = PressableProps & {
   style?: StyleProp<ViewStyle>;
 };
 
-const variantStyles: Record<Variant, { bg: string; text: string; border?: string }> = {
-  primary: { bg: colors.brand, text: colors.white },
-  secondary: { bg: colors.brandSoft, text: colors.brandDark },
-  ghost: { bg: 'transparent', text: colors.brand, border: colors.border },
-  danger: { bg: colors.danger, text: colors.white },
+const variantStyles: Record<Variant, { bg: string; text: string; border: string }> = {
+  primary: { bg: colors.brand, text: colors.white, border: colors.brand },
+  secondary: { bg: colors.brandSoft, text: colors.brand, border: colors.brandSoft },
+  ghost: { bg: colors.surface, text: colors.text, border: colors.border },
+  danger: { bg: colors.danger, text: colors.white, border: colors.danger },
 };
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function Button({
   title,
@@ -46,77 +36,38 @@ export function Button({
   ...rest
 }: Props) {
   const v = variantStyles[variant];
-  const scale = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const content = loading ? (
-    <ActivityIndicator color={v.text} />
-  ) : (
-    <Text style={[styles.label, { color: v.text }]}>{title}</Text>
-  );
+  const unavailable = Boolean(disabled || loading);
 
   return (
-    <AnimatedPressable
+    <Pressable
       accessibilityRole="button"
       accessibilityLabel={title}
-      disabled={disabled || loading}
-      onPressIn={() => {
-        scale.value = withSpring(0.96, motion.press);
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, motion.release);
-      }}
-      onPress={(e) => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        onPress?.(e);
-      }}
-      style={[
-        animatedStyle,
-        { opacity: disabled || loading ? 0.55 : 1 },
+      accessibilityState={{ disabled: unavailable, busy: Boolean(loading) }}
+      disabled={unavailable}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.base,
+        { backgroundColor: v.bg, borderColor: v.border, opacity: unavailable ? 0.5 : pressed ? 0.8 : 1 },
         style,
       ]}
       {...rest}
     >
-      {variant === 'primary' ? (
-        <LinearGradient
-          colors={gradients.brandButton}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.base, shadows.card]}
-        >
-          {content}
-        </LinearGradient>
-      ) : (
-        <View
-          style={[
-            styles.base,
-            {
-              backgroundColor: v.bg,
-              borderColor: v.border || 'transparent',
-              borderWidth: v.border ? 1 : 0,
-            },
-          ]}
-        >
-          {content}
-        </View>
+      {loading ? <ActivityIndicator color={v.text} /> : (
+        <Text style={[styles.label, { color: v.text }]}>{title}</Text>
       )}
-    </AnimatedPressable>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 50,
+    minHeight: 48,
+    borderWidth: 1,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  label: {
-    ...typography.subtitle,
-    fontSize: 15,
-  },
+  label: { ...typography.subtitle, fontSize: 15, textAlign: 'center' },
 });
