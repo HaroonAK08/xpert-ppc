@@ -21,7 +21,7 @@ import { MobileNavigation } from '@/components/ui/mobile-navigation';
 const NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, match: (p: string) => p === '/dashboard' },
   { href: '/dashboard/announcements', label: 'Announcements', icon: Megaphone, match: (p: string) => p.startsWith('/dashboard/announcements') },
-  { href: '/dashboard/exams', label: 'Exams', icon: ClipboardCheck, match: (p: string) => p.startsWith('/dashboard/exams') },
+  { href: '/dashboard/exams', label: 'Quizzes', icon: ClipboardCheck, match: (p: string) => p.startsWith('/dashboard/exams') },
   {
     href: '/dashboard/courses',
     label: 'My Courses',
@@ -67,7 +67,7 @@ export function DashboardSidebar() {
   return (
     <>
     <MobileNavigation items={NAV} home="/dashboard" onLogout={async () => { await logoutStudent(); router.replace('/login'); }} />
-    <aside className="relative hidden w-[260px] shrink-0 flex-col overflow-hidden bg-gradient-to-b from-[#1a6ef0] via-[#1454c9] to-[#0a2d7a] text-white lg:flex">
+    <aside className="relative hidden w-[260px] shrink-0 flex-col overflow-hidden bg-gradient-to-b from-[#1a6ef0] via-[#1454c9] to-[#0a2d7a] text-white lg:sticky lg:top-0 lg:flex lg:h-dvh">
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-56 opacity-40"
         style={{

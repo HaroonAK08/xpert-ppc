@@ -49,10 +49,46 @@ function formatWhen(value: string, timezone: string) {
   }
 }
 
+function formatCalendarDate(value: string, timezone: string) {
+  try {
+    return new Intl.DateTimeFormat('en-PK', {
+      month: 'short',
+      day: 'numeric',
+      timeZone: timezone || 'Asia/Karachi',
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
+function formatCalendarTime(value: string, timezone: string) {
+  try {
+    return new Intl.DateTimeFormat('en-PK', {
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZone: timezone || 'Asia/Karachi',
+    }).format(new Date(value));
+  } catch {
+    return '';
+  }
+}
+
+function calendarDay(value: string, timezone: string) {
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      timeZone: timezone || 'Asia/Karachi',
+    }).format(new Date(value));
+  } catch {
+    return '';
+  }
+}
+
 export default function DashboardPage() {
   const student = useStudent();
   const [courses, setCourses] = useState<PortalCourseSummary[] | null>(null);
   const [nextSession, setNextSession] = useState<HubSession | null>(null);
+  const [sessions, setSessions] = useState<HubSession[]>([]);
   const [community, setCommunity] = useState<HubCommunity | null>(null);
   const [announcements, setAnnouncements] = useState<AnnouncementMessage[] | null>(null);
   const [announcementError, setAnnouncementError] = useState(false);
@@ -75,6 +111,7 @@ export default function DashboardPage() {
         setAnnouncementError(false);
         setAnnouncements(res.data.announcements ?? []);
         setNextSession(res.data.nextSession);
+        setSessions(res.data.sessions ?? []);
         setCommunity(res.data.community);
       } finally {
         refreshing = false;
@@ -263,18 +300,36 @@ export default function DashboardPage() {
               </Link>
             </div>
             <div className="mt-5 grid grid-cols-7 gap-1 text-center">
-              {DAYS.map((day) => (
-                <div key={day} className="flex flex-col items-center gap-2">
-                  <p className="text-[11px] font-semibold text-muted">{day}</p>
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f1f5f9] text-xs text-muted/50">
-                    —
-                  </span>
-                </div>
-              ))}
+              {DAYS.map((day) => {
+                const daySessions = sessions.filter((session) => calendarDay(session.startsAt, session.timezone) === day);
+                return (
+                  <div key={day} className="flex min-h-24 min-w-0 flex-col items-center gap-2">
+                    <p className="text-[11px] font-semibold text-muted">{day}</p>
+                    {daySessions.length ? (
+                      <div className="w-full space-y-1">
+                        {daySessions.slice(0, 2).map((session) => (
+                          <Link
+                            key={session.id}
+                            href="/dashboard/schedule"
+                            title={`${session.title} — ${formatCalendarDate(session.startsAt, session.timezone)}`}
+                            className="block rounded-lg bg-brand-soft px-1 py-1.5 text-[10px] font-bold leading-tight text-brand hover:bg-brand/15"
+                          >
+                            <span className="block truncate">{formatCalendarDate(session.startsAt, session.timezone)}</span>
+                            <span className="block truncate font-medium">{formatCalendarTime(session.startsAt, session.timezone)}</span>
+                          </Link>
+                        ))}
+                        {daySessions.length > 2 ? <span className="block text-[10px] font-semibold text-muted">+{daySessions.length - 2} more</span> : null}
+                      </div>
+                    ) : (
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f1f5f9] text-xs text-muted/50">—</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <div className="mt-8 flex flex-col items-center gap-2 text-center">
               <CalendarDays className="h-12 w-12 text-border" strokeWidth={1.25} />
-              <p className="text-xs text-muted">Your next session will appear here.</p>
+              <p className="text-xs text-muted">{sessions.length ? 'Select a date to view the full class schedule.' : 'Your next session will appear here once scheduled.'}</p>
             </div>
           </div>
         </div>

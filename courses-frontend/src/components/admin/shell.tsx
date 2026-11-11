@@ -25,7 +25,7 @@ const NAV = [
   { href: '/admin/applications', label: 'Applications', icon: ClipboardList },
   { href: '/admin/students', label: 'Students', icon: Users },
   { href: '/admin/announcements', label: 'Announcements', icon: Megaphone },
-  { href: '/admin/exams', label: 'Exams', icon: ClipboardCheck },
+  { href: '/admin/exams', label: 'Quizzes', icon: ClipboardCheck },
   { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
   { href: '/admin/courses', label: 'Courses', icon: BookOpen },
   { href: '/admin/schedule', label: 'Class Schedule', icon: CalendarDays },

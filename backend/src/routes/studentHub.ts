@@ -32,6 +32,7 @@ router.get(
       }).sort({ startsAt: 1 }),
       ClassSession.find({
         published: true,
+        startsAt: { $gte: now },
       })
         .sort({ startsAt: 1 })
         .limit(30),
