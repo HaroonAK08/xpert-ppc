@@ -1,8 +1,10 @@
 import { Router } from 'express';
+import mongoose from 'mongoose';
 
 import { PortalCourse } from '../models/PortalCourse';
 import { Student } from '../models/Student';
 import { Enrollment } from '../models/Enrollment';
+import { ExamAttempt } from '../models/ExamAttempt';
 import { ClassSession } from '../models/ClassSession';
 import { ClassRecording } from '../models/ClassRecording';
 import { LearningResource } from '../models/LearningResource';
@@ -101,6 +103,23 @@ router.get(
         couponCode: student.couponCode || '',
       })),
     });
+  })
+);
+
+router.delete(
+  '/students/:id',
+  asyncHandler(async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.id)) throw new ApiError(404, 'Student not found.');
+
+    const student = await Student.findByIdAndDelete(req.params.id);
+    if (!student) throw new ApiError(404, 'Student not found.');
+
+    await Promise.all([
+      Enrollment.deleteMany({ studentId: student._id }),
+      ExamAttempt.deleteMany({ studentId: student._id }),
+    ]);
+
+    res.json({ ok: true, deletedStudentId: String(student._id) });
   })
 );
 

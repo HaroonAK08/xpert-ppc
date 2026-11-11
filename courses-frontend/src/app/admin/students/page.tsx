@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { Loader2, RefreshCw, UserCircle } from 'lucide-react';
+import { Loader2, RefreshCw, Trash2, UserCircle } from 'lucide-react';
 import { adminApi } from '@/lib/admin-api';
 import { parseApplicationInterest } from '@/lib/parse-application';
 import { DESIGN_COURSES } from '@/data/catalog';
@@ -51,6 +51,8 @@ export default function AdminStudentsPage() {
   const [login, setLogin] = useState('all');
   const [page, setPage] = useState(1);
   const [refresh, setRefresh] = useState(0);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -73,6 +75,21 @@ export default function AdminStudentsPage() {
     setPage(1);
     setSearch(searchInput.trim());
     setRefresh((value) => value + 1);
+  }
+
+  async function deleteStudent() {
+    if (!studentToDelete || deleting) return;
+    setDeleting(true);
+    setError('');
+    const result = await adminApi.delete<{ deletedStudentId: string }>(`/api/admin/portal/students/${studentToDelete.id}`);
+    if (!result.ok) {
+      setError(result.error);
+    } else {
+      if (data?.items.length === 1 && page > 1) setPage((value) => value - 1);
+      setStudentToDelete(null);
+      setRefresh((value) => value + 1);
+    }
+    setDeleting(false);
   }
 
   const pages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
@@ -143,9 +160,20 @@ export default function AdminStudentsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="shrink-0 text-sm">
-                      <p className="text-xs font-semibold text-muted">Last login</p>
-                      <p className="mt-1 font-semibold text-ink">{formatDate(student.lastLoginAt)}</p>
+                    <div className="flex shrink-0 items-start gap-4 text-sm">
+                      <div>
+                        <p className="text-xs font-semibold text-muted">Last login</p>
+                        <p className="mt-1 font-semibold text-ink">{formatDate(student.lastLoginAt)}</p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="text-red-600 hover:border-red-200 hover:text-red-700"
+                        onClick={() => setStudentToDelete(student)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
                   <details className="border-t border-border/70">
@@ -183,6 +211,30 @@ export default function AdminStudentsPage() {
           </>
         )}
       </main>
+      {studentToDelete ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-5" role="presentation">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-student-title"
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+          >
+            <h2 id="delete-student-title" className="text-xl font-extrabold text-ink">Delete student?</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              This permanently deletes <strong className="text-ink">{studentToDelete.name}</strong> ({studentToDelete.email}) and removes their enrollments and quiz attempts. This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button type="button" variant="outline" disabled={deleting} onClick={() => setStudentToDelete(null)}>
+                Cancel
+              </Button>
+              <Button type="button" className="bg-red-600 hover:bg-red-700" disabled={deleting} onClick={deleteStudent}>
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                {deleting ? 'Deleting…' : 'Delete student'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
