@@ -137,6 +137,30 @@ export const academySettingsSchema = z.object({
   weeklyClassNotice: z.string().trim().max(1000).optional(),
 });
 
+export const examQuestionSchema = z.object({
+  prompt: z.string().trim().min(1).max(500),
+  options: z.array(z.string().trim().min(1).max(300)).min(2).max(6),
+  correctIndex: z.number().int().min(0).max(5),
+}).superRefine((question, ctx) => {
+  if (question.correctIndex >= question.options.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Choose a valid correct answer.' });
+  }
+});
+
+export const examSchema = z.object({
+  title: z.string().trim().min(1).max(160),
+  description: z.string().trim().max(2000).optional().default(''),
+  questions: z.array(examQuestionSchema).min(1).max(50),
+  published: z.boolean().optional().default(false),
+});
+
+export const examUpdateSchema = examSchema.partial();
+
+export const examSubmitSchema = z.object({
+  answers: z.array(z.number().int().min(0).max(5)).min(1).max(50),
+});
+
+
 export const portalModuleSchema = z.object({
   title: z.string().trim().min(2).max(160),
   description: z.string().trim().max(1000).optional().default(''),

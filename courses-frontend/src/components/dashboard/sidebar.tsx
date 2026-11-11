@@ -12,7 +12,7 @@ import {
   UserCircle,
   LogOut,
   Megaphone,
-} from 'lucide-react';
+  ClipboardCheck,} from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { logoutStudent } from '@/lib/student-context';
 import { Logo } from '@/components/site/logo';
@@ -21,6 +21,7 @@ import { MobileNavigation } from '@/components/ui/mobile-navigation';
 const NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, match: (p: string) => p === '/dashboard' },
   { href: '/dashboard/announcements', label: 'Announcements', icon: Megaphone, match: (p: string) => p.startsWith('/dashboard/announcements') },
+  { href: '/dashboard/exams', label: 'Exams', icon: ClipboardCheck, match: (p: string) => p.startsWith('/dashboard/exams') },
   {
     href: '/dashboard/courses',
     label: 'My Courses',

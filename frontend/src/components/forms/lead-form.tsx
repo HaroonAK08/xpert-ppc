@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useId, useState, type FormEvent } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { CheckCircle2, Loader2 } from 'lucide-react';
-import { Field, Input, Label, Select, Textarea } from '@/components/ui/input';
-import { api } from '@/lib/api';
-import { siteConfig } from '@/lib/site';
-import { PLATFORMS, type LEAD_SOURCES } from '@/lib/validation';
-import { cn } from '@/lib/utils';
-import { getVisitorId } from '@/lib/visitor';
+import { useId, useState, type FormEvent } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { CheckCircle2, Loader2 } from "lucide-react";
+import { Field, Input, Label, Select, Textarea } from "@/components/ui/input";
+import { api } from "@/lib/api";
+import { siteConfig } from "@/lib/site";
+import { PLATFORMS, type LEAD_SOURCES } from "@/lib/validation";
+import { cn } from "@/lib/utils";
+import { getVisitorId } from "@/lib/visitor";
 
-type Variant = 'audit' | 'contact';
+type Variant = "audit" | "contact";
 
 type Props = {
   variant?: Variant;
@@ -22,18 +22,26 @@ type Props = {
   whatsAppSubmit?: boolean;
   /** Name, email, phone only — for ad landing pages. */
   compact?: boolean;
-  /** Show a Clinic name field (maps to company / businessName in CRM). */
+  /** Show a business name field (maps to company / businessName in CRM). */
   showClinicName?: boolean;
+  /** Customizes the business name label when shown. */
+  businessLabel?: string;
   className?: string;
 };
 
-const AUDIT_PLATFORMS = ['Google Ads', 'Meta Ads', 'TikTok Ads', 'Amazon Ads', 'Other'] as const;
+const AUDIT_PLATFORMS = [
+  "Google Ads",
+  "Meta Ads",
+  "TikTok Ads",
+  "Amazon Ads",
+  "Other",
+] as const;
 
 /** Digits only, with an optional single leading "+" — no letters, spaces, or punctuation. */
 function sanitizePhoneInput(raw: string): string {
-  const stripped = raw.replace(/[^\d+]/g, '');
-  const hasLeadingPlus = stripped.startsWith('+');
-  const digits = stripped.replace(/\+/g, '');
+  const stripped = raw.replace(/[^\d+]/g, "");
+  const hasLeadingPlus = stripped.startsWith("+");
+  const digits = stripped.replace(/\+/g, "");
   return hasLeadingPlus ? `+${digits}` : digits;
 }
 
@@ -43,101 +51,107 @@ function onPhoneInput(e: FormEvent<HTMLInputElement>) {
   if (clean !== el.value) el.value = clean;
 }
 
-
 export function LeadForm({
-  variant = 'contact',
+  variant = "contact",
   source,
   defaultPlatform,
   submitLabel,
   whatsAppSubmit = false,
   compact = false,
   showClinicName = false,
+  businessLabel = "Clinic name",
   className,
 }: Props) {
   const uid = useId();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">(
+    "idle",
+  );
+  const [error, setError] = useState("");
 
-  const isAudit = variant === 'audit';
-  const platformOptions = isAudit ? AUDIT_PLATFORMS : PLATFORMS.filter((p) => p !== 'Other');
+  const isAudit = variant === "audit";
+  const platformOptions = isAudit
+    ? AUDIT_PLATFORMS
+    : PLATFORMS.filter((p) => p !== "Other");
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus('sending');
-    setError('');
+    setStatus("sending");
+    setError("");
 
     const fd = new FormData(e.currentTarget);
     // Ignore honeypot if a password manager/autofill stuffed it — real bots usually only fill that field.
-    const honeypot = String(fd.get('companyWebsite') || '').trim();
-    const phone = sanitizePhoneInput(String(fd.get('phone') || '').trim());
-    const email = String(fd.get('email') || '').trim();
-    const name = String(fd.get('name') || '').trim();
-    const company = String(fd.get('company') || '').trim();
+    const honeypot = String(fd.get("companyWebsite") || "").trim();
+    const phone = sanitizePhoneInput(String(fd.get("phone") || "").trim());
+    const email = String(fd.get("email") || "").trim();
+    const name = String(fd.get("name") || "").trim();
+    const company = String(fd.get("company") || "").trim();
     const looksLikeAutofill =
       honeypot.length > 0 &&
       (honeypot === phone ||
         honeypot === email ||
         honeypot === name ||
         honeypot === company ||
-        honeypot.includes('@'));
+        honeypot.includes("@"));
 
     const payload = {
       name,
       email,
       phone,
       company,
-      platform: String(fd.get('platform') || 'Other'),
-      message: String(fd.get('message') || ''),
-      companyWebsite: looksLikeAutofill ? '' : honeypot,
+      platform: String(fd.get("platform") || "Other"),
+      message: String(fd.get("message") || ""),
+      companyWebsite: looksLikeAutofill ? "" : honeypot,
       visitorId: getVisitorId(),
       source,
       sourcePath: pathname,
       utm: {
-        source: searchParams.get('utm_source') ?? '',
-        medium: searchParams.get('utm_medium') ?? '',
-        campaign: searchParams.get('utm_campaign') ?? '',
-        term: searchParams.get('utm_term') ?? '',
-        content: searchParams.get('utm_content') ?? '',
+        source: searchParams.get("utm_source") ?? "",
+        medium: searchParams.get("utm_medium") ?? "",
+        campaign: searchParams.get("utm_campaign") ?? "",
+        term: searchParams.get("utm_term") ?? "",
+        content: searchParams.get("utm_content") ?? "",
       },
     };
 
     // Grab the form before awaiting — React clears currentTarget after the tick.
     const form = e.currentTarget;
-    const result = await api.post('/api/leads', payload);
+    const result = await api.post("/api/leads", payload);
 
     if (!result.ok) {
       setError(result.error);
-      setStatus('error');
+      setStatus("error");
       return;
     }
 
     form.reset();
-    setStatus('done');
+    setStatus("done");
   }
 
-  if (status === 'done') {
+  if (status === "done") {
     return (
       <div
         className={cn(
-          'rounded-2xl border border-success/40 bg-success/10 p-8 text-center',
-          className
+          "rounded-2xl border border-success/40 bg-success/10 p-8 text-center",
+          className,
         )}
         role="status"
       >
         <CheckCircle2 className="mx-auto mb-4 h-10 w-10 text-success" />
-        <h3 className="mb-2 text-lg font-bold text-foreground">Thank you — we&apos;ve got it.</h3>
+        <h3 className="mb-2 text-lg font-bold text-foreground">
+          Thank you — we&apos;ve got it.
+        </h3>
         <p className="text-sm text-muted-foreground">
-          A specialist will reach out within one business day. Need it sooner? Message us on
-          WhatsApp.
+          A specialist will reach out within one business day. Need it sooner?
+          Message us on WhatsApp.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className={cn('space-y-4', className)} noValidate>
+    <form onSubmit={onSubmit} className={cn("space-y-4", className)} noValidate>
       {/* Honeypot: hidden from users. Obscure name/attrs so browsers don't autofill phone/email into it. */}
       <div
         className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
@@ -172,13 +186,13 @@ export function LeadForm({
           </Field>
           {showClinicName ? (
             <Field>
-              <Label htmlFor={`company-${uid}`}>Clinic name *</Label>
+              <Label htmlFor={`company-${uid}`}>{businessLabel} *</Label>
               <Input
                 id={`company-${uid}`}
                 name="company"
                 required
                 autoComplete="organization"
-                placeholder="Your clinic name"
+                placeholder={`Your ${businessLabel.toLowerCase()}`}
               />
             </Field>
           ) : null}
@@ -211,7 +225,9 @@ export function LeadForm({
         <>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field>
-              <Label htmlFor={`name-${uid}`}>{isAudit ? 'Full name *' : 'Name *'}</Label>
+              <Label htmlFor={`name-${uid}`}>
+                {isAudit ? "Full name *" : "Name *"}
+              </Label>
               <Input
                 id={`name-${uid}`}
                 name="name"
@@ -222,7 +238,9 @@ export function LeadForm({
             </Field>
 
             <Field>
-              <Label htmlFor={`email-${uid}`}>{isAudit ? 'Work email *' : 'Email *'}</Label>
+              <Label htmlFor={`email-${uid}`}>
+                {isAudit ? "Work email *" : "Email *"}
+              </Label>
               <Input
                 id={`email-${uid}`}
                 name="email"
@@ -247,7 +265,9 @@ export function LeadForm({
             ) : null}
 
             <Field>
-              <Label htmlFor={`phone-${uid}`}>{isAudit ? 'WhatsApp / phone' : 'Phone *'}</Label>
+              <Label htmlFor={`phone-${uid}`}>
+                {isAudit ? "WhatsApp / phone" : "Phone *"}
+              </Label>
               <Input
                 id={`phone-${uid}`}
                 name="phone"
@@ -262,16 +282,16 @@ export function LeadForm({
 
             <Field>
               <Label htmlFor={`platform-${uid}`}>
-                {isAudit ? 'Where should we audit? *' : 'Service interest *'}
+                {isAudit ? "Where should we audit? *" : "Service interest *"}
               </Label>
               <Select
                 id={`platform-${uid}`}
                 name="platform"
                 required
-                defaultValue={defaultPlatform ?? ''}
+                defaultValue={defaultPlatform ?? ""}
               >
                 <option value="" disabled>
-                  {isAudit ? 'Select a platform' : 'Select a service'}
+                  {isAudit ? "Select a platform" : "Select a service"}
                 </option>
                 {platformOptions.map((p) => (
                   <option key={p} value={p}>
@@ -284,7 +304,7 @@ export function LeadForm({
 
           <Field>
             <Label htmlFor={`message-${uid}`}>
-              {isAudit ? 'Business / city (optional)' : 'Message *'}
+              {isAudit ? "Business / city (optional)" : "Message *"}
             </Label>
             <Textarea
               id={`message-${uid}`}
@@ -292,8 +312,8 @@ export function LeadForm({
               required={!isAudit}
               placeholder={
                 isAudit
-                  ? 'e.g. Your business & city, ~$500/month ad budget'
-                  : 'Tell us about your goals'
+                  ? "e.g. Your business & city, ~$500/month ad budget"
+                  : "Tell us about your goals"
               }
             />
           </Field>
@@ -308,23 +328,27 @@ export function LeadForm({
 
       <button
         type="submit"
-        disabled={status === 'sending'}
+        disabled={status === "sending"}
         className="btn-hover-effect inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 disabled:opacity-60"
       >
-        {status === 'sending' ? (
+        {status === "sending" ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Sending…
           </>
         ) : (
-          submitLabel ?? (isAudit ? 'Get My Free Audit' : 'Send Message')
+          (submitLabel ?? (isAudit ? "Get My Free Audit" : "Send Message"))
         )}
       </button>
       {whatsAppSubmit ? (
         <button
           type="button"
           onClick={() => {
-            window.open(siteConfig.contact.whatsapp, '_blank', 'noopener,noreferrer');
+            window.open(
+              siteConfig.contact.whatsapp,
+              "_blank",
+              "noopener,noreferrer",
+            );
           }}
           className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#25D366] px-6 text-sm font-bold text-white transition-colors hover:bg-[#20bd5a]"
         >

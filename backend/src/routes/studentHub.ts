@@ -27,12 +27,10 @@ router.get(
 
     const [nextSession, sessions, recordings, resources, settings, courses, announcements] = await Promise.all([
       ClassSession.findOne({
-        courseId: { $in: courseIds },
         published: true,
         startsAt: { $gte: now },
       }).sort({ startsAt: 1 }),
       ClassSession.find({
-        courseId: { $in: courseIds },
         published: true,
       })
         .sort({ startsAt: 1 })
@@ -55,6 +53,16 @@ router.get(
     ]);
 
     const courseMap = new Map(courses.map((c) => [String(c._id), c]));
+    const missingCourseIds = [...new Set(
+      [nextSession, ...sessions]
+        .filter((session): session is NonNullable<typeof session> => Boolean(session))
+        .map((session) => String(session.courseId))
+        .filter((id) => !courseMap.has(id)),
+    )];
+    if (missingCourseIds.length) {
+      const sessionCourses = await PortalCourse.find({ _id: { $in: missingCourseIds } }).select('title');
+      for (const course of sessionCourses) courseMap.set(String(course._id), course);
+    }
 
     res.json({
       announcements: announcements.map(serializeAnnouncement),

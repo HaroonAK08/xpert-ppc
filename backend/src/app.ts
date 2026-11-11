@@ -20,6 +20,7 @@ import studentHubRouter from './routes/studentHub';
 import adminPortalRouter from './routes/adminPortal';
 import adminAcademyRouter from './routes/adminAcademy';
 import { adminAnnouncementsRouter, studentAnnouncementsRouter } from './routes/announcements';
+import { adminExamsRouter, studentExamsRouter } from './routes/exams';
 import crmV1Router from './routes/crmV1';
 import metaWebhookRouter from './routes/metaWebhook';
 import trackRouter from './routes/track';
@@ -93,9 +94,11 @@ export function createApp() {
   app.use('/api/student/images', studentImagesRouter);
   app.use('/api/student/courses', studentPortalRouter);
   app.use('/api/student/hub', studentHubRouter);
+  app.use('/api/student/exams', studentExamsRouter);
   app.use('/api/admin/portal', adminPortalRouter);
   app.use('/api/student/announcements', studentAnnouncementsRouter);
   app.use('/api/admin/academy/announcements', adminAnnouncementsRouter);
+  app.use('/api/admin/academy/exams', adminExamsRouter);
   app.use('/api/admin/academy', adminAcademyRouter);
   app.use('/api/v1', crmV1Router);
 
