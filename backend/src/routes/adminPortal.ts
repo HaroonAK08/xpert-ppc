@@ -17,6 +17,7 @@ import {
   portalLessonSchema,
   portalModuleSchema,
   studentDecisionSchema,
+  adminStudentProfileSchema,
 } from '../validation/portal';
 import { applyStudentDecision, assignStudentCourse } from '../utils/studentApplication';
 import { isStudentProfileComplete } from '../utils/studentProfile';
@@ -120,6 +121,46 @@ router.delete(
     ]);
 
     res.json({ ok: true, deletedStudentId: String(student._id) });
+  })
+);
+
+router.patch(
+  '/students/:id/profile',
+  asyncHandler(async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.id)) throw new ApiError(404, 'Student not found.');
+
+    const parsed = adminStudentProfileSchema.safeParse(req.body);
+    if (!parsed.success) throw new ApiError(400, parsed.error.issues[0]?.message || 'Enter valid profile details.');
+
+    const student = await Student.findById(req.params.id);
+    if (!student) throw new ApiError(404, 'Student not found.');
+
+    student.set(parsed.data);
+    if (student.freelancedBefore === false) student.freelancingExperience = '';
+    await student.save();
+
+    res.json({
+      ok: true,
+      student: {
+        id: String(student._id),
+        name: student.name,
+        email: student.email,
+        country: student.country || '',
+        avatarUrl: student.avatarUrl || '',
+        courseSlug: student.courseSlug || '',
+        coursePreference: student.coursePreference || '',
+        freelancedBefore: student.freelancedBefore ?? null,
+        freelancingExperience: student.freelancingExperience || '',
+        workPreference: student.workPreference || '',
+        gender: student.gender || '',
+        active: student.active,
+        lastLoginAt: student.lastLoginAt || null,
+        createdAt: student.createdAt,
+        profileComplete: isStudentProfileComplete(student),
+        interest: student.interest || '',
+        couponCode: student.couponCode || '',
+      },
+    });
   })
 );
 

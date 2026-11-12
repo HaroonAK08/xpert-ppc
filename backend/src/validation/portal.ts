@@ -63,6 +63,27 @@ export const studentProfileSchema = z.object({
   completeProfile: z.boolean().optional(),
 });
 
+export const adminStudentProfileSchema = z.object({
+  name: z.string().trim().min(2).max(80).optional(),
+  country: z.string().trim().min(2).max(80).optional(),
+  interest: z.string().trim().max(4000).optional(),
+  avatarUrl: z
+    .string()
+    .trim()
+    .max(1000)
+    .refine((v) => v === '' || /^https?:\/\//i.test(v), 'Enter a valid image URL.')
+    .optional(),
+  coursePreference: z.union([z.enum(PROFILE_COURSES), z.literal('')]).optional(),
+  freelancedBefore: z.boolean().nullable().optional(),
+  freelancingExperience: z.string().trim().max(2000).optional(),
+  workPreference: z.union([z.enum(['full-time', 'part-time']), z.literal('')]).optional(),
+  gender: z.union([z.enum(['male', 'female']), z.literal('')]).optional(),
+}).strict().superRefine((value, ctx) => {
+  if (Object.keys(value).length === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Add at least one profile change.' });
+  }
+});
+
 export const forgotPasswordSchema = z.object({
   email: z.string().trim().email().max(160),
 });
