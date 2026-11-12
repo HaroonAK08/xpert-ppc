@@ -52,6 +52,37 @@ export const umerKhan: TeamMemberContent = {
   },
 };
 
+export const waseemNazir: TeamMemberContent = {
+  slug: 'waseem-nazir',
+  name: 'Waseem Nazir',
+  role: 'Google Ads, Microsoft Ads & Meta Ads Specialist',
+  bio: 'Waseem Nazir specializes in paid advertising across Google Ads, Microsoft Bing and Meta, supported by Google Analytics 4 and Google Tag Manager. His work brings campaign management and measurement together, helping businesses understand their advertising performance and make informed optimization decisions. Featured on the Xpert PPC Academy as Waseem Niazi, his listed Upwork experience spans 229 jobs and 25K hours of work.',
+  photo: '/team/waseem-nazir.png',
+  expertise: [
+    'Google Ads campaign management',
+    'Microsoft Advertising / Bing Ads',
+    'Meta Ads: Facebook & Instagram advertising',
+    'Google Analytics 4 (GA4)',
+    'Google Tag Manager (GTM)',
+    'Conversion tracking and campaign performance analysis',
+  ],
+  achievements: [
+    'Top Rated Plus profile featured by Xpert PPC Academy',
+    '229 jobs listed on the academy profile',
+    '25K hours of professional work listed',
+    '4.9 rating across 157 reviews listed on the academy profile',
+  ],
+  socials: {
+    linkedin: 'https://www.linkedin.com/in/waseem-nazir/',
+    upwork: 'https://www.upwork.com/freelancers/~01f8fe5f1ed7fe4143',
+  },
+  seo: {
+    title: 'Waseem Nazir | Google Ads, Bing & Meta Ads Specialist',
+    description: 'Meet Waseem Nazir, a Google Ads, Microsoft Bing and Meta Ads specialist with expertise in GA4, Google Tag Manager and conversion tracking.',
+    keywords: ['Waseem Nazir', 'Google Ads specialist', 'Microsoft Ads expert', 'Meta Ads specialist', 'GA4 and GTM'],
+  },
+};
+
 /** Content for the Upwork landing page. */
 export const upworkProfile = {
   headline: 'Hire Me on Upwork',

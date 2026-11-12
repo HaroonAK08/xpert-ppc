@@ -37,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: url('/contact'), changeFrequency: 'monthly', priority: 0.8 },
     { url: url('/faq'), changeFrequency: 'monthly', priority: 0.7 },
     { url: url('/team/umer-khan'), changeFrequency: 'monthly', priority: 0.6 },
+    { url: url('/team/waseem-nazir'), changeFrequency: 'monthly', priority: 0.6 },
     {
       url: url('/google-ads-expert-upwork-umer-khan'),
       changeFrequency: 'monthly',
