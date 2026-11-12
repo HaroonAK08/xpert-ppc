@@ -1,11 +1,18 @@
 import { createApp } from './app';
 import { connectDb, disconnectDb } from './config/db';
 import { env } from './config/env';
+import { backfillPublishedCourseEnrollments } from './utils/courseEnrollment';
 import { startSheetSyncScheduler } from './services/googleSheets/scheduler';
 import { startSequenceScheduler } from './services/sequences/scheduler';
 
 async function start() {
   await connectDb();
+
+  try {
+    await backfillPublishedCourseEnrollments();
+  } catch (err) {
+    console.error('[academy] Failed to backfill course enrollments; student requests will retry:', err);
+  }
 
   const app = createApp();
   const server = app.listen(env.port, () => {

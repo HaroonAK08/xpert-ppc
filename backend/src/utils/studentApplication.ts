@@ -5,6 +5,8 @@ import { sendApplicationDecisionEmail } from './mail';
 import { refundCoupon } from './coupon';
 import { env } from '../config/env';
 import type { ApplicationDecision } from './jwt';
+import { enrollStudentInPublishedCourses } from './courseEnrollment';
+import { ordinaryStudentFilter } from './studentInvitation';
 
 export function isStudentApproved(student: {
   status?: string;
@@ -15,56 +17,12 @@ export function isStudentApproved(student: {
   return Boolean(student.emailVerified);
 }
 
-async function resolveAppliedCourse(student: {
-  courseSlug?: string | null;
-  interest?: string | null;
-}) {
-  const slug = (student.courseSlug || '').trim().toLowerCase();
-  if (slug) {
-    const bySlug = await PortalCourse.findOne({ slug, published: true });
-    if (bySlug) return bySlug;
-  }
-
-  const interest = student.interest || '';
-  const titleMatch = interest.match(/Course:\s*(.+?)\s*(?:\.|$)/i);
-  const title = titleMatch?.[1]?.trim();
-  if (!title) return null;
-
-  const normalized = title.replace(/\s*[—–-]\s*Live Course$/i, '').trim();
-  const byTitle =
-    (await PortalCourse.findOne({ title: new RegExp(`^${escapeRegex(normalized)}$`, 'i'), published: true })) ||
-    (await PortalCourse.findOne({ title: new RegExp(escapeRegex(normalized), 'i'), published: true }));
-  return byTitle;
-}
-
-function escapeRegex(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-export async function enrollStudentInAppliedCourse(
-  studentId: string
-): Promise<{ enrolled: boolean; courseTitle?: string }> {
-  const student = await Student.findById(studentId);
-  if (!student) return { enrolled: false };
-
-  const course = await resolveAppliedCourse(student);
-  if (!course) return { enrolled: false };
-
-  await Enrollment.findOneAndUpdate(
-    { studentId: student._id, courseId: course._id },
-    { $setOnInsert: { studentId: student._id, courseId: course._id, completedLessonIds: [] } },
-    { upsert: true, new: true }
-  );
-
-  return { enrolled: true, courseTitle: course.title };
-}
-
-/** Admin picks a course by hand when auto-enroll couldn't match one on approval. */
+/** Admin can still assign a published course explicitly. */
 export async function assignStudentCourse(
   studentId: string,
   courseId: string
 ): Promise<{ ok: true; courseTitle: string; emailed: boolean } | { ok: false; error: string }> {
-  const student = await Student.findById(studentId);
+  const student = await Student.findOne({ _id: studentId, ...ordinaryStudentFilter });
   if (!student) return { ok: false, error: 'Student not found.' };
 
   const course = await PortalCourse.findOne({ _id: courseId, published: true });
@@ -105,7 +63,7 @@ export async function applyStudentDecision(
   | { ok: true; already: boolean; name: string; email: string; enrolled: boolean }
   | { ok: false; error: string }
 > {
-  const student = await Student.findById(studentId);
+  const student = await Student.findOne({ _id: studentId, ...ordinaryStudentFilter });
   if (!student) return { ok: false, error: 'Application not found.' };
 
   const already =
@@ -115,19 +73,17 @@ export async function applyStudentDecision(
   let enrolled = false;
 
   if (!already) {
-    student.status = decision;
-    student.emailVerified = decision === 'approved';
-    await student.save();
-
-    if (decision === 'approved') {
+    const changed = await Student.findOneAndUpdate({ _id: student._id, ...ordinaryStudentFilter, status: { $ne: decision } },
+      { $set: { status: decision, emailVerified: decision === 'approved' } }, { new: true });
+    if (!changed && student.status !== decision) return { ok: false, error: 'Application not found.' };
+    if (changed && decision === 'approved') {
       try {
-        enrolled = (await enrollStudentInAppliedCourse(String(student._id))).enrolled;
+        enrolled = await enrollStudentInPublishedCourses(String(student._id));
       } catch (err) {
         console.error('[academy] Failed to enroll approved student:', err);
       }
 
-      // Don't tell the student they're in if nothing matched — the admin still needs
-      // to assign a course by hand on /admin/students, which sends this email itself.
+      // Send the approval email once the student has published courses to access.
       if (enrolled) {
         try {
           await sendApplicationDecisionEmail({
@@ -140,7 +96,7 @@ export async function applyStudentDecision(
           console.error('[mail] Failed to email student about application:', err);
         }
       }
-    } else {
+    } else if (changed && decision === 'rejected') {
       if (student.couponCode) {
         try {
           await refundCoupon(student.couponCode);
@@ -162,7 +118,7 @@ export async function applyStudentDecision(
     }
   } else if (decision === 'approved') {
     try {
-      enrolled = (await enrollStudentInAppliedCourse(String(student._id))).enrolled;
+      enrolled = await enrollStudentInPublishedCourses(String(student._id));
     } catch (err) {
       console.error('[academy] Failed to enroll approved student:', err);
     }

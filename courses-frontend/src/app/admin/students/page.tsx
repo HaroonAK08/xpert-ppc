@@ -2,18 +2,22 @@
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { Camera, Loader2, Pencil, RefreshCw, Trash2, UserCircle, X } from 'lucide-react';
+import { Camera, Loader2, Pencil, RefreshCw, UserCircle } from 'lucide-react';
 import { adminApi } from '@/lib/admin-api';
 import { parseApplicationInterest } from '@/lib/parse-application';
 import { DESIGN_COURSES } from '@/data/catalog';
 import { AdminPageHeader } from '@/components/admin/page-header';
 import { Button } from '@/components/ui/button';
+import { StudentDialog } from '@/components/admin/student-dialog';
+import { StudentInvitations } from '@/components/admin/student-invitations';
+import { StudentProgress } from '@/components/admin/student-progress';
 import { Input, Label, Select, Textarea } from '@/components/ui/input';
 
 type Student = {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   country: string;
   avatarUrl: string;
   courseSlug: string;
@@ -30,7 +34,7 @@ type Student = {
   couponCode: string;
 };
 type StudentList = { items: Student[]; total: number; page: number; pageSize: number };
-type EditValues = Pick<Student, 'name' | 'country' | 'interest' | 'avatarUrl' | 'coursePreference' | 'freelancedBefore' | 'freelancingExperience' | 'workPreference' | 'gender'>;
+type EditValues = Pick<Student, 'name' | 'phone' | 'country' | 'interest' | 'avatarUrl' | 'coursePreference' | 'freelancedBefore' | 'freelancingExperience' | 'workPreference' | 'gender'>;
 
 function formatDate(value: string | null) {
   if (!value) return 'Never signed in';
@@ -60,6 +64,23 @@ export default function AdminStudentsPage() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const [progressStudent, setProgressStudent] = useState<Student | null>(null);
+  const [activeStudent, setActiveStudent] = useState<Student | null>(null);
+  const [changingActive, setChangingActive] = useState(false);
+  const [activeError, setActiveError] = useState('');
+  const mutationLock = useRef(false);
+
+  async function changeActive() {
+    if (!activeStudent || mutationLock.current) return;
+    mutationLock.current = true;
+    setChangingActive(true); setActiveError('');
+    const result = await adminApi.patch<{ ok: true; active: boolean }>(`/api/admin/portal/students/${encodeURIComponent(activeStudent.id)}/active`, { active: !activeStudent.active });
+    mutationLock.current = false;
+    setChangingActive(false);
+    if (!result.ok) { setActiveError(result.error); return; }
+    setData((current) => current ? { ...current, items: current.items.map((item) => item.id === activeStudent.id ? { ...item, active: result.data.active } : item) } : current);
+    setActiveStudent(null);
+  }
 
   useEffect(() => {
     let active = true;
@@ -103,6 +124,7 @@ export default function AdminStudentsPage() {
     setStudentToEdit(student);
     setEditValues({
       name: student.name,
+      phone: student.phone || '',
       country: student.country,
       interest: student.interest,
       avatarUrl: student.avatarUrl,
@@ -148,6 +170,7 @@ export default function AdminStudentsPage() {
     setEditError('');
     const payload = {
       ...editValues,
+      country: editValues.country.trim(),
       freelancingExperience: editValues.freelancedBefore === false ? '' : editValues.freelancingExperience,
     };
     const result = await adminApi.patch<{ student: Student }>(`/api/admin/portal/students/${studentToEdit.id}/profile`, payload);
@@ -223,6 +246,7 @@ export default function AdminStudentsPage() {
                       <div className="min-w-0">
                         <h3 className="text-lg font-extrabold text-ink">{student.name}</h3>
                         <p className="break-all text-sm text-muted">{student.email}</p>
+                        <p className="mt-1 break-words text-sm text-muted">Phone: {student.phone || 'Not provided'}</p>
                         <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
                           <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">Approved</span>
                           <span className={`rounded-full px-2.5 py-1 ${student.profileComplete ? 'bg-brand-soft text-brand' : 'bg-amber-50 text-amber-700'}`}>{student.profileComplete ? 'Profile complete' : 'Profile incomplete'}</span>
@@ -230,22 +254,23 @@ export default function AdminStudentsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-start gap-2 text-sm">
-                      <div className="mr-2">
+                    <div className="flex min-w-0 flex-wrap items-start gap-2 text-sm sm:max-w-md">
+                      <div className="mb-1 w-full">
                         <p className="text-xs font-semibold text-muted">Last login</p>
                         <p className="mt-1 font-semibold text-ink">{formatDate(student.lastLoginAt)}</p>
                       </div>
-                      <Button type="button" variant="outline" onClick={() => openEditor(student)}>
+                      <Button type="button" variant="outline" className="min-h-11" onClick={() => setProgressStudent(student)}>Progress</Button>
+                      <Button type="button" variant="outline" className="min-h-11" onClick={() => { setActiveError(''); setActiveStudent(student); }}>{student.active ? 'Deactivate' : 'Reactivate'}</Button>
+                      <Button type="button" variant="outline" className="min-h-11" onClick={() => openEditor(student)}>
                         <Pencil className="h-4 w-4" />
                         Edit
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
-                        className="text-red-600 hover:border-red-200 hover:text-red-700"
+                        className="min-h-11 text-red-600 hover:border-red-200 hover:text-red-700"
                         onClick={() => setStudentToDelete(student)}
                       >
-                        <Trash2 className="h-4 w-4" />
                         Delete
                       </Button>
                     </div>
@@ -284,17 +309,17 @@ export default function AdminStudentsPage() {
             )}
           </>
         )}
+        <StudentInvitations />
       </main>
+      {progressStudent && <StudentProgress student={progressStudent} onClose={() => setProgressStudent(null)} />}
+      {activeStudent && <StudentDialog title={activeStudent.active ? 'Deactivate student?' : 'Reactivate student?'} busy={changingActive} onClose={() => setActiveStudent(null)}>
+        <p className="break-words text-sm text-muted">{activeStudent.active ? `Deactivate ${activeStudent.name}? They will lose access immediately. Their account, enrollments and progress will be kept. This is not permanent deletion.` : `Reactivate ${activeStudent.name}? They will be able to sign in again with their existing password and progress.`}</p>
+        {activeError && <p role="alert" className="mt-4 text-sm text-red-700">{activeError}</p>}
+        <div className="mt-6 flex flex-wrap justify-end gap-3"><Button type="button" variant="outline" className="min-h-11" disabled={changingActive} onClick={() => setActiveStudent(null)}>Cancel</Button><Button type="button" className="min-h-11" disabled={changingActive} onClick={() => void changeActive()}>{changingActive ? 'Saving…' : activeStudent.active ? 'Deactivate student' : 'Reactivate student'}</Button></div>
+      </StudentDialog>}
       {studentToEdit && editValues ? (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/50 p-5" role="presentation">
-          <div role="dialog" aria-modal="true" aria-labelledby="edit-student-title" className="mx-auto my-8 w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 id="edit-student-title" className="text-xl font-extrabold text-ink">Edit student profile</h2>
-                <p className="mt-1 text-sm text-muted">Changes save directly to the student account without sending a notification.</p>
-              </div>
-              <button type="button" aria-label="Close editor" onClick={closeEditor} disabled={savingEdit || uploadingPhoto} className="rounded-lg p-2 text-muted hover:bg-slate-100 disabled:opacity-50"><X className="h-5 w-5" /></button>
-            </div>
+        <StudentDialog title="Edit student profile" wide busy={savingEdit || uploadingPhoto} onClose={closeEditor}>
+            <p className="text-sm text-muted">Changes save directly to the student account without sending a notification. Additional profile questions are optional.</p>
             {editError && <p role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{editError}</p>}
             <form onSubmit={saveEdit} className="mt-6 space-y-5">
               <div className="flex items-center gap-4">
@@ -313,7 +338,8 @@ export default function AdminStudentsPage() {
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-2"><Label htmlFor="edit-name">Name</Label><Input id="edit-name" required minLength={2} maxLength={80} value={editValues.name} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, name: event.target.value } : current)} /></div>
-                <div className="space-y-2"><Label htmlFor="edit-country">Country</Label><Input id="edit-country" minLength={2} maxLength={80} value={editValues.country} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, country: event.target.value } : current)} /></div>
+                <div className="space-y-2"><Label htmlFor="edit-phone">Phone number</Label><Input id="edit-phone" type="tel" autoComplete="tel" maxLength={40} value={editValues.phone || ''} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, phone: event.target.value } : current)} /></div>
+                <div className="space-y-2"><Label htmlFor="edit-country">Country <span className="font-normal text-muted">(optional)</span></Label><Input id="edit-country" maxLength={80} value={editValues.country} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, country: event.target.value } : current)} /></div>
                 <div className="space-y-2"><Label htmlFor="edit-course">Course preference</Label><Select id="edit-course" value={editValues.coursePreference} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, coursePreference: event.target.value } : current)}><option value="">Not answered</option>{DESIGN_COURSES.map((course) => <option key={course.slug} value={course.slug}>{course.shortName}</option>)}</Select></div>
                 <div className="space-y-2"><Label htmlFor="edit-freelanced">Freelanced online before</Label><Select id="edit-freelanced" value={editValues.freelancedBefore == null ? '' : editValues.freelancedBefore ? 'yes' : 'no'} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, freelancedBefore: event.target.value === '' ? null : event.target.value === 'yes', freelancingExperience: event.target.value === 'no' ? '' : current.freelancingExperience } : current)}><option value="">Not answered</option><option value="yes">Yes</option><option value="no">No</option></Select></div>
                 <div className="space-y-2"><Label htmlFor="edit-work">Work preference</Label><Select id="edit-work" value={editValues.workPreference} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, workPreference: event.target.value } : current)}><option value="">Not answered</option><option value="full-time">Full-time</option><option value="part-time">Part-time</option></Select></div>
@@ -321,35 +347,16 @@ export default function AdminStudentsPage() {
               </div>
               <div className="space-y-2"><Label htmlFor="edit-interest">Application interest</Label><Textarea id="edit-interest" maxLength={4000} value={editValues.interest} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, interest: event.target.value } : current)} /></div>
               {editValues.freelancedBefore !== false && <div className="space-y-2"><Label htmlFor="edit-experience">Freelancing experience</Label><Textarea id="edit-experience" maxLength={2000} value={editValues.freelancingExperience} disabled={savingEdit || uploadingPhoto} onChange={(event) => setEditValues((current) => current ? { ...current, freelancingExperience: event.target.value } : current)} /></div>}
-              <div className="flex justify-end gap-3 border-t border-border/70 pt-5"><Button type="button" variant="outline" disabled={savingEdit || uploadingPhoto} onClick={closeEditor}>Cancel</Button><Button type="submit" disabled={savingEdit || uploadingPhoto}>{savingEdit && <Loader2 className="h-4 w-4 animate-spin" />}{savingEdit ? 'Saving…' : 'Save changes'}</Button></div>
+              <div className="flex flex-wrap justify-end gap-3 border-t border-border/70 pt-5"><Button type="button" variant="outline" className="min-h-11" disabled={savingEdit || uploadingPhoto} onClick={closeEditor}>Cancel</Button><Button type="submit" className="min-h-11" disabled={savingEdit || uploadingPhoto}>{savingEdit && <Loader2 className="h-4 w-4 animate-spin" />}{savingEdit ? 'Saving…' : 'Save changes'}</Button></div>
             </form>
-          </div>
-        </div>
+        </StudentDialog>
       ) : null}
-      {studentToDelete ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-5" role="presentation">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-student-title"
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
-          >
-            <h2 id="delete-student-title" className="text-xl font-extrabold text-ink">Delete student?</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              This permanently deletes <strong className="text-ink">{studentToDelete.name}</strong> ({studentToDelete.email}) and removes their enrollments and quiz attempts. This action cannot be undone.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <Button type="button" variant="outline" disabled={deleting} onClick={() => setStudentToDelete(null)}>
-                Cancel
-              </Button>
-              <Button type="button" className="bg-red-600 hover:bg-red-700" disabled={deleting} onClick={deleteStudent}>
-                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                {deleting ? 'Deleting…' : 'Delete student'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {studentToDelete && (
+        <StudentDialog title="Permanently delete student?" busy={deleting} onClose={() => setStudentToDelete(null)}>
+          <p className="break-words text-sm text-muted">This permanently deletes {studentToDelete.name} ({studentToDelete.email}) and removes their enrollments and quiz attempts. This cannot be undone. Deactivate the account instead if you only want to remove access and keep progress.</p>
+          <div className="mt-6 flex flex-wrap justify-end gap-3"><Button type="button" variant="outline" className="min-h-11" disabled={deleting} onClick={() => setStudentToDelete(null)}>Cancel</Button><Button type="button" className="min-h-11 bg-red-600 hover:bg-red-700" disabled={deleting} onClick={deleteStudent}>{deleting ? 'Deleting…' : 'Permanently delete'}</Button></div>
+        </StudentDialog>
+      )}
     </>
   );
 }

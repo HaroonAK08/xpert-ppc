@@ -26,6 +26,8 @@ type Props = {
   showClinicName?: boolean;
   /** Customizes the business name label when shown. */
   businessLabel?: string;
+  /** Placeholder for phone/WhatsApp input, customized by region-specific landing pages. */
+  phonePlaceholder?: string;
   className?: string;
 };
 
@@ -60,6 +62,7 @@ export function LeadForm({
   compact = false,
   showClinicName = false,
   businessLabel = "Clinic name",
+  phonePlaceholder = "+92 300 1234567",
   className,
 }: Props) {
   const uid = useId();
@@ -216,7 +219,7 @@ export function LeadForm({
               required
               autoComplete="tel"
               inputMode="tel"
-              placeholder="+92 300 1234567"
+              placeholder={phonePlaceholder}
               onInput={onPhoneInput}
             />
           </Field>
@@ -275,7 +278,7 @@ export function LeadForm({
                 required={!isAudit}
                 autoComplete="tel"
                 inputMode="tel"
-                placeholder="+92 300 1234567"
+                placeholder={phonePlaceholder}
                 onInput={onPhoneInput}
               />
             </Field>

@@ -13,9 +13,11 @@ import {
   PlayCircle,
   Ticket,
   Users,
+  UserPlus,
 } from 'lucide-react';
 import { adminApi } from '@/lib/admin-api';
 import { AdminPageHeader } from '@/components/admin/page-header';
+import { AdminInstall } from '@/components/admin/install';
 
 type Overview = {
   pendingStudents: number;
@@ -24,6 +26,15 @@ type Overview = {
   recordings: number;
   resources: number;
 };
+
+const QUICK_ACTIONS = [
+  { href: '/admin/students?invite=1', label: 'Invite student', icon: UserPlus },
+  { href: '/admin/applications', label: 'Review applications', icon: ClipboardList },
+  { href: '/admin/announcements', label: 'Post announcement', icon: Megaphone },
+  { href: '/admin/schedule', label: 'Manage classes', icon: CalendarDays },
+  { href: '/admin/recordings', label: 'Upload recording', icon: PlayCircle },
+  { href: '/admin/resources', label: 'Upload resource', icon: FileText },
+];
 
 const LINKS = [
   { href: '/admin/coupons', label: 'Coupons', description: 'Manage registration fee waiver codes.', icon: Ticket, key: null, suffix: '' },
@@ -113,7 +124,18 @@ export default function AdminOverviewPage() {
         title="Academy overview"
         subtitle="Manage applications, courses, live classes, and student content."
       />
-      <main className="px-5 py-8 sm:px-8">
+      <main className="space-y-6 px-4 py-6 sm:px-8">
+        <section aria-labelledby="quick-actions-heading">
+          <h2 id="quick-actions-heading" className="mb-3 text-sm font-bold text-ink">Quick actions</h2>
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {QUICK_ACTIONS.map(({ href, label, icon: Icon }) => (
+              <Link key={href} href={href} className="flex min-h-12 items-center gap-3 rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-ink hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                <Icon className="h-5 w-5 shrink-0 text-muted" aria-hidden="true" />{label}
+              </Link>
+            ))}
+          </div>
+        </section>
+        <AdminInstall />
         {error ? (
           <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
             {error}

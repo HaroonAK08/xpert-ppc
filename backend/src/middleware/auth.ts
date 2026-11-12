@@ -2,6 +2,8 @@ import type { NextFunction, Request, Response } from 'express';
 import { SESSION_COOKIE, verifySession, type SessionPayload } from '../utils/jwt';
 import { Student } from '../models/Student';
 import { isStudentApproved } from '../utils/studentApplication';
+import { ordinaryStudentFilter } from '../utils/studentInvitation';
+import { enrollStudentInPublishedCourses } from '../utils/courseEnrollment';
 import {
   STUDENT_COOKIE,
   verifyStudentSession,
@@ -68,11 +70,12 @@ export function requireStudent(req: Request, res: Response, next: NextFunction) 
 
 export function requireApprovedStudent(req: Request, res: Response, next: NextFunction) {
   requireStudent(req, res, () => {
-    void Student.findById(req.student!.sub).then((student) => {
+    void Student.findOne({ _id: req.student!.sub, ...ordinaryStudentFilter }).then(async (student) => {
       if (!student || !student.active || !isStudentApproved(student)) {
         res.status(401).json({ error: 'Session invalid. Please sign in again.' });
         return;
       }
+      await enrollStudentInPublishedCourses(String(student._id));
       next();
     }).catch(next);
   });

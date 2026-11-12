@@ -6,7 +6,7 @@ import { SOCIAL_LINKS } from '@/lib/socials';
 
 export function WhatsAppFab() {
   const pathname = usePathname() || '';
-  if (pathname.startsWith('/admin') || pathname.startsWith('/dashboard')) return null;
+  if (pathname.startsWith('/admin') || pathname.startsWith('/dashboard') || pathname === '/join') return null;
 
   return (
     <a

@@ -1,20 +1,13 @@
-'use client';
+import type { Metadata } from 'next';
+import { AdminLayoutContent } from '@/components/admin/layout-content';
 
-import { usePathname } from 'next/navigation';
-import { AdminGuard } from '@/lib/admin-context';
-import { AdminShell } from '@/components/admin/shell';
+export const metadata: Metadata = {
+  title: 'Academy Admin',
+  manifest: '/academy-admin.webmanifest',
+  appleWebApp: { capable: true, title: 'Academy Admin', statusBarStyle: 'default' },
+  robots: { index: false, follow: false },
+};
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isLogin = pathname === '/admin/login';
-
-  if (isLogin) {
-    return children;
-  }
-
-  return (
-    <AdminGuard>
-      <AdminShell>{children}</AdminShell>
-    </AdminGuard>
-  );
+  return <AdminLayoutContent>{children}</AdminLayoutContent>;
 }

@@ -21,6 +21,10 @@ export type CaseStudyContent = {
   approach: string[];
   servicesDeployed: string[];
   featured?: boolean;
+  /** Dashboard screenshots. Leave unset until exact asset files exist. */
+  proof?: { src: string; alt: string; caption: string }[];
+  /** Scope note when a headline metric is estimated or a rate is segment-specific. */
+  measurementNote?: string;
   seo: { title: string; description: string; keywords: string[] };
 };
 
@@ -1096,6 +1100,108 @@ export const dentalPhysio: CaseStudyContent = {
   },
 };
 
+export const newportBeachRestaurant: CaseStudyContent = {
+  slug: 'newport-beach-restaurant',
+  client: 'Newport Beach Restaurant',
+  title: 'Newport Beach Restaurant Case Study',
+  subtitle: 'Estimated +45% order growth from tracked Google Ads demand',
+  excerpt:
+    'An anonymous Newport Beach restaurant: 2,399 tracked conversions at $28.06 each, from $67.3K in Google Ads spend and a 5.96% segment CTR.',
+  industry: 'Food & Beverage — Restaurant',
+  duration: 'Reported campaign period',
+  channels: ['Google Ads', 'Local SEO'],
+  heroImage: '/lp/restaurant/lp-restaurant-hero.png',
+  metrics: [
+    { value: '+45%', label: 'Estimated Order Growth', icon: 'TrendingUp' },
+    { value: '2,399', label: 'Tracked Conversions', icon: 'BarChart3' },
+    { value: '$28.06', label: 'Cost per Conversion', icon: 'Target' },
+    { value: '5.96%', label: 'Segment CTR', icon: 'MousePointerClick' },
+  ],
+  intro:
+    'A Newport Beach restaurant needed more online orders without treating every click as a sale. Xpert PPC ran Google Ads against tracked conversions — calls, directions, and order actions — and reports the period honestly: 2,399 conversions, $67.3K spent, 37,912 clicks, and 635,655 impressions.',
+  pillarsHeading: 'What the Account Was Built Around',
+  pillarsIntro: 'Local intent, conversion tracking, and a CTR scoped to the segment in the source report.',
+  pillars: [
+    {
+      title: 'Order-Intent Search',
+      description: 'Campaigns aimed at people ready to order, call, or visit — not broad food browsing.',
+      icon: 'Search',
+    },
+    {
+      title: 'Tracked Conversions',
+      description: '2,399 conversions measured in-account, not inferred from impressions.',
+      icon: 'Target',
+    },
+    {
+      title: 'Spend Discipline',
+      description: '$67.3K in spend held cost per conversion at $28.06.',
+      icon: 'BarChart3',
+    },
+    {
+      title: 'Segment CTR',
+      description: '5.96% click-through rate on the segment reported in the source PDF — not an account-wide rate.',
+      icon: 'MousePointerClick',
+    },
+  ],
+  takeawaysHeading: 'Reported Results',
+  takeawaysIntro: 'Figures below match the source report. Order growth is labeled as an estimate.',
+  takeaways: [
+    {
+      title: 'Estimated Order Growth',
+      description:
+        'Orders are estimated up about 45% for the period. That figure is an estimate, not a closed POS reconciliation.',
+    },
+    {
+      title: '2,399 Tracked Conversions',
+      description: 'Conversions recorded in the ads account at a $28.06 cost per conversion.',
+    },
+    {
+      title: 'Volume Behind the Cost',
+      description: '$67.3K spend produced 37,912 clicks from 635,655 impressions.',
+    },
+    {
+      title: 'CTR Stays Segment-Scoped',
+      description:
+        'The published click-through rate is 5.96%, the rate on the segment in the source PDF. It is not blended with any other account rate.',
+    },
+  ],
+  approach: [
+    'We kept the restaurant anonymous and published only numbers that can be tied to the source report.',
+    'Headline growth stays labeled as an estimate. Efficiency claims use tracked conversions, spend, clicks, and impressions.',
+  ],
+  servicesDeployed: [
+    'Google Search Ads',
+    'Local Intent Campaigns',
+    'Conversion Tracking',
+    'Performance Reporting',
+  ],
+  measurementNote:
+    'Order growth of +45% is an estimate. Cost per conversion ($28.06), conversions (2,399), spend ($67.3K), clicks (37,912), and impressions (635,655) are tracked account totals. The 5.96% CTR is the segment rate from the source PDF, not a different account-wide rate.',
+  proof: [
+    {
+      src: '/case-studies/newport-beach-restaurant/account-overview.jpg',
+      alt: 'Redacted Google Ads reporting overview for the Newport Beach Restaurant case study',
+      caption: 'Reporting overview from the supplied account view. The +45% order-growth figure is a separate estimated business comparison, not a tracked Ads conversion total.',
+    },
+    {
+      src: '/case-studies/newport-beach-restaurant/campaign-table.jpg',
+      alt: 'Redacted Google Ads campaign performance table for the Newport Beach Restaurant case study',
+      caption: 'Redacted campaign table from the supplied reporting screenshots. CTR figures are kept scoped to the view shown rather than blended into one account-wide claim.',
+    },
+  ],
+  seo: {
+    title: 'Newport Beach Restaurant Google Ads Case Study | Xpert PPC',
+    description:
+      'Anonymous Newport Beach restaurant case study: estimated +45% order growth, 2,399 tracked conversions at $28.06, and a 5.96% segment CTR.',
+    keywords: [
+      'restaurant Google Ads case study',
+      'Newport Beach restaurant marketing',
+      'restaurant PPC',
+      'local food ads',
+    ],
+  },
+};
+
 export const caseStudies: CaseStudyContent[] = [
   desertFarms,
   ecommerceGrowth,
@@ -1110,6 +1216,7 @@ export const caseStudies: CaseStudyContent[] = [
   metaArdnamurchan,
   rafplay,
   dentalPhysio,
+  newportBeachRestaurant,
 ];
 
 export function getCaseStudy(slug: string) {

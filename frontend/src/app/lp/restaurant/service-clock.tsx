@@ -33,7 +33,7 @@ const windows: Window[] = [
     query: "coffee and dessert near me",
     caption:
       "Turn the quiet window into an offer people can discover and share.",
-    image: familyImage,
+    image: burgerImage,
   },
   {
     slot: "7–10 PM",

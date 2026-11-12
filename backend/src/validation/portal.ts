@@ -1,6 +1,17 @@
 import { z } from 'zod';
 import { PROFILE_COURSES } from '../utils/studentProfile';
 
+const phoneSchema = z.string().trim().min(7).max(40).regex(/^\+?[0-9 ()-]+$/, 'Enter a valid phone number.');
+export const invitationCreateSchema = z.object({ email: z.string().trim().email().max(254).transform((v) => v.toLowerCase()) }).strict();
+export const invitationTokenSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) });
+export const invitationAcceptSchema = invitationTokenSchema.extend({
+  name: z.string().trim().min(2).max(80), phone: phoneSchema, password: z.string().min(6).max(100),
+}).strict();
+export const studentActiveSchema = z.object({ active: z.boolean() }).strict();
+const timezoneSchema = z.string().trim().min(1).max(80).refine((value) => {
+  try { new Intl.DateTimeFormat('en', { timeZone: value }); return true; } catch { return false; }
+}, 'Enter a valid IANA timezone.');
+
 export const studentSignupSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(160),
@@ -64,8 +75,9 @@ export const studentProfileSchema = z.object({
 });
 
 export const adminStudentProfileSchema = z.object({
+  phone: z.union([phoneSchema, z.literal('')]).optional(),
   name: z.string().trim().min(2).max(80).optional(),
-  country: z.string().trim().min(2).max(80).optional(),
+  country: z.union([z.string().trim().min(2).max(80), z.literal('')]).optional(),
   interest: z.string().trim().max(4000).optional(),
   avatarUrl: z
     .string()
@@ -112,7 +124,7 @@ export const portalCourseSchema = z.object({
   level: z.string().trim().max(60).optional().default('Beginner'),
   published: z.boolean().optional().default(false),
   meetLink: z.string().trim().max(1000).optional().default(''),
-  timezone: z.string().trim().max(80).optional().default('Asia/Karachi'),
+  timezone: timezoneSchema.optional().default('Asia/Karachi'),
   nextClassAt: z.union([z.string(), z.null()]).optional().nullable(),
 });
 
@@ -125,7 +137,7 @@ export const classSessionSchema = z.object({
     if (!value) return true;
     try { return ['http:', 'https:'].includes(new URL(value).protocol); } catch { return false; }
   }, 'Enter a valid HTTP or HTTPS meeting link.').optional().default(''),
-  timezone: z.string().trim().max(80).optional().default('Asia/Karachi'),
+  timezone: timezoneSchema.optional().default('Asia/Karachi'),
   notes: z.string().trim().max(2000).optional().default(''),
   published: z.boolean().optional().default(true),
 });
@@ -179,7 +191,7 @@ export const examUpdateSchema = examSchema.partial();
 
 export const examSubmitSchema = z.object({
   answers: z.array(z.number().int().min(0).max(5)).min(1).max(50),
-});
+}).strict();
 
 
 export const portalModuleSchema = z.object({

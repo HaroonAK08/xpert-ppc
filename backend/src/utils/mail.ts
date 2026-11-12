@@ -68,7 +68,10 @@ export async function sendLeadNotification(lead: LeadMailPayload): Promise<void>
 
   const transporter = createTransport();
 
-  const subject = `New lead: ${lead.name} (${lead.platform || 'Other'})`;
+  const sourceLabel = lead.source === 'lp-restaurant' || lead.sourcePath === '/lp/restaurant'
+    ? 'Restaurant landing page'
+    : lead.sourcePath || lead.source || 'Website';
+  const subject = `New lead from ${sourceLabel}: ${lead.name} (${lead.platform || 'Other'})`;
   const text = [
     'New website lead',
     '',
@@ -243,6 +246,18 @@ export async function sendPasswordResetEmail(opts: {
     html,
   });
   return { sent: true };
+}
+
+export async function sendStudentInvitationEmail(to: string, joinUrl: string): Promise<{ sent: boolean }> {
+  if (!isAcademyMailConfigured()) return { sent: false };
+  const info = await createAcademyTransport().sendMail({
+    from: env.academySmtp.otpFrom,
+    to,
+    subject: 'You are invited to Xpert PPC Digital Academy',
+    text: `You are invited to join Xpert PPC Digital Academy. Set up your account:\n${joinUrl}\n\nThis link expires in seven days. If you did not expect this invitation, ignore this email.`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:24px"><h2>You are invited</h2><p>Join Xpert PPC Digital Academy with your name, phone number and password.</p>${btn(joinUrl, 'Set up your account', '#0066cc')}<p>This link expires in seven days. If you did not expect this invitation, ignore this email.</p></div>`,
+  });
+  return { sent: Array.isArray(info.accepted) && info.accepted.length > 0 };
 }
 
 function btn(href: string, label: string, color: string): string {

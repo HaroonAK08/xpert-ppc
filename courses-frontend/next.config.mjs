@@ -18,6 +18,17 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
+      {
+        source: '/join',
+        headers: [
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          { key: 'Cache-Control', value: 'private, no-store' },
+        ],
+      },
+      {
+        source: '/admin/:path*',
+        headers: [{ key: 'Cache-Control', value: 'private, no-store' }],
+      },
     ];
   },
 };

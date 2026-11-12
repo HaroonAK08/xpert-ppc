@@ -120,19 +120,20 @@ router.post(
   '/:courseId/lessons/:lessonId/complete',
   requireApprovedStudent,
   asyncHandler(async (req, res) => {
+    const course = await PortalCourse.findOne({ _id: req.params.courseId, published: true });
+    const valid = course?.modules.flatMap((m) => m.lessons.filter((l) => l.published).map((l) => String(l._id))) || [];
     const enrollment = await Enrollment.findOne({
       studentId: req.student!.sub,
       courseId: req.params.courseId,
     });
-    if (!enrollment) throw new ApiError(403, 'Not enrolled in this course.');
-
-    const lessonId = req.params.lessonId;
-    if (!enrollment.completedLessonIds.includes(lessonId)) {
-      enrollment.completedLessonIds.push(lessonId);
-      await enrollment.save();
-    }
-
-    res.json({ ok: true, completedLessonIds: enrollment.completedLessonIds });
+    if (!course || !enrollment) throw new ApiError(403, 'Not enrolled in this course.');
+    if (!valid.includes(req.params.lessonId)) throw new ApiError(404, 'Lesson not found.');
+    const updated = await Enrollment.findOneAndUpdate(
+      { _id: enrollment._id },
+      { $addToSet: { completedLessonIds: req.params.lessonId } },
+      { new: true }
+    );
+    res.json({ ok: true, completedLessonIds: updated?.completedLessonIds || [] });
   })
 );
 

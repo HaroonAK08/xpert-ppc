@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { ClipboardCheck, Loader2, Plus, Trash2 } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
@@ -348,7 +349,13 @@ export default function AdminExamsPage() {
                     submissions · {exam.published ? "Published" : "Hidden"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href={`/admin/exams/${exam.id}`}
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-white px-5 text-sm font-semibold text-ink hover:border-brand/40 hover:text-brand"
+                  >
+                    Results
+                  </Link>
                   <Button
                     type="button"
                     variant="outline"

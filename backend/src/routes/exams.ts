@@ -42,9 +42,23 @@ function serializeAttempt(attempt: InstanceType<typeof ExamAttempt>) {
     score: attempt.score,
     total: attempt.total,
     percent: attempt.percent,
-    answers: attempt.answers,
     submittedAt: attempt.submittedAt,
   };
+}
+
+function serializeReview(exam: InstanceType<typeof Exam>, answers: number[]) {
+  return exam.questions.map((question, index) => {
+    const selectedIndex = answers[index];
+    const selected = Number.isInteger(selectedIndex) && selectedIndex >= 0 && selectedIndex < question.options.length;
+    return {
+      id: String(question._id),
+      prompt: question.prompt,
+      options: question.options,
+      selectedIndex: selected ? selectedIndex : null,
+      correctIndex: question.correctIndex,
+      correct: selected && selectedIndex === question.correctIndex,
+    };
+  });
 }
 
 adminExamsRouter.get('/', asyncHandler(async (req, res) => {
@@ -108,14 +122,32 @@ adminExamsRouter.delete('/:id', asyncHandler(async (req, res) => {
 
 adminExamsRouter.get('/:id/attempts', asyncHandler(async (req, res) => {
   validId(req.params.id);
-  if (!await Exam.exists({ _id: req.params.id })) throw new ApiError(404, 'Exam not found.');
+  const exam = await Exam.findById(req.params.id);
+  if (!exam) throw new ApiError(404, 'Exam not found.');
   const page = Math.max(1, Number(req.query.page) || 1);
   const pageSize = 20;
+  const search = typeof req.query.search === 'string' ? req.query.search.trim().slice(0, 160) : '';
+  const filter: Record<string, unknown> = { examId: exam._id };
+  if (search) {
+    const pattern = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    filter.$or = [
+      { studentName: new RegExp(pattern, 'i') },
+      { studentEmail: new RegExp(pattern, 'i') },
+    ];
+  }
   const [attempts, total] = await Promise.all([
-    ExamAttempt.find({ examId: req.params.id }).sort({ submittedAt: -1, _id: -1 }).skip((page - 1) * pageSize).limit(pageSize),
-    ExamAttempt.countDocuments({ examId: req.params.id }),
+    ExamAttempt.find(filter).sort({ submittedAt: -1, _id: -1 }).skip((page - 1) * pageSize).limit(pageSize),
+    ExamAttempt.countDocuments(filter),
   ]);
-  res.json({ items: attempts.map(serializeAttempt), total, page, pageSize });
+  res.json({
+    items: attempts.map((attempt) => ({
+      ...serializeAttempt(attempt),
+      questions: serializeReview(exam, attempt.answers),
+    })),
+    total,
+    page,
+    pageSize,
+  });
 }));
 
 studentExamsRouter.get('/', asyncHandler(async (req, res) => {
@@ -144,8 +176,8 @@ studentExamsRouter.get('/:id', asyncHandler(async (req, res) => {
   res.json({
     exam: serializeExam(exam, false),
     attempt: attempt ? {
-      score: attempt.score, total: attempt.total, percent: attempt.percent,
-      answers: attempt.answers, submittedAt: attempt.submittedAt,
+      score: attempt.score, total: attempt.total, percent: attempt.percent, submittedAt: attempt.submittedAt,
+      questions: serializeReview(exam, attempt.answers),
     } : null,
   });
 }));
@@ -156,7 +188,7 @@ studentExamsRouter.post('/:id/submit', asyncHandler(async (req, res) => {
   if (!parsed.success) throw new ApiError(400, 'Submit one answer for every question.');
   const exam = await Exam.findOne({ _id: req.params.id, published: true });
   if (!exam) throw new ApiError(404, 'Exam not found.');
-  if (parsed.data.answers.length !== exam.questions.length) {
+  if (parsed.data.answers.length !== exam.questions.length || parsed.data.answers.some((answer, index) => answer >= exam.questions[index].options.length)) {
     throw new ApiError(400, 'Submit one answer for every question.');
   }
   const student = await Student.findById(req.student!.sub);
@@ -175,9 +207,12 @@ studentExamsRouter.post('/:id/submit', asyncHandler(async (req, res) => {
       percent: Math.round((score / exam.questions.length) * 100),
       submittedAt: new Date(),
     });
-    res.status(201).json({ attempt: {
-      score: attempt.score, total: attempt.total, percent: attempt.percent, submittedAt: attempt.submittedAt,
-    } });
+    res.status(201).json({
+      attempt: {
+        score: attempt.score, total: attempt.total, percent: attempt.percent, submittedAt: attempt.submittedAt,
+        questions: serializeReview(exam, attempt.answers),
+      },
+    });
   } catch (error) {
     if (error && typeof error === 'object' && 'code' in error && error.code === 11000) {
       throw new ApiError(409, 'You have already submitted this exam.');

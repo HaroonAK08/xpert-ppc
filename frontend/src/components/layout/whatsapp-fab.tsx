@@ -8,9 +8,13 @@ export function WhatsAppFab() {
   const pathname = usePathname() || '';
   if (pathname.startsWith('/ads')) return null;
 
+  const whatsappUrl = pathname.startsWith('/lp/restaurant')
+    ? 'https://wa.me/15878935511'
+    : siteConfig.contact.whatsapp;
+
   return (
     <a
-      href={siteConfig.contact.whatsapp}
+      href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"

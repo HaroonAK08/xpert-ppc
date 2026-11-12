@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import { invitationAcceptSchema, invitationTokenSchema } from '../validation/portal';
+import { ordinaryStudentFilter, validInvitation } from '../utils/studentInvitation';
+import { enrollStudentInPublishedCourses } from '../utils/courseEnrollment';
 import rateLimit from 'express-rate-limit';
 
 import { env } from '../config/env';
@@ -29,7 +32,7 @@ import {
   verifyPasswordResetToken,
 } from '../utils/jwt';
 import { applyStudentDecision, isStudentApproved } from '../utils/studentApplication';
-import { consumeCoupon, findValidCoupon, normalizeCouponCode } from '../utils/coupon';
+import { consumeCoupon, findValidCoupon, normalizeCouponCode, refundCoupon } from '../utils/coupon';
 
 const router = Router();
 
@@ -41,13 +44,14 @@ const authLimiter = rateLimit({
   message: { error: 'Too many requests. Try again later.' },
 });
 
-type PublicStudentSource = StudentProfile & { _id: unknown; email: string; name: string; courseSlug?: string | null };
+type PublicStudentSource = StudentProfile & { _id: unknown; email: string; name: string; phone?: string; courseSlug?: string | null };
 
 function publicStudent(student: PublicStudentSource) {
   return {
     id: String(student._id),
     email: student.email,
     name: student.name,
+    phone: student.phone || '',
     avatarUrl: student.avatarUrl || '',
     coursePreference: student.coursePreference || student.courseSlug || '',
     freelancedBefore: student.freelancedBefore ?? null,
@@ -101,14 +105,15 @@ router.post(
     const courseSlug = (parsed.data.courseSlug || '').trim().toLowerCase();
     const country = parsed.data.country.trim();
     const couponRaw = parsed.data.couponCode || '';
-    const passwordHash = await hashPassword(parsed.data.password);
 
-    let student = await Student.findOne({ email }).select('+passwordHash');
-    if (student && isStudentApproved(student)) {
+    const existing = await Student.findOne({ email }).select('+invitationOnly');
+    if (existing?.invitationOnly || (existing && isStudentApproved(existing))) {
       throw new ApiError(409, 'An account with this email already exists. Please sign in.');
     }
 
-    const previousCoupon = student?.couponCode || '';
+    const passwordHash = await hashPassword(parsed.data.password);
+    const previousCoupon = existing?.couponCode || '';
+    let consumedFreshCoupon = false;
 
     // A resubmitted pending application reusing its own coupon shouldn't consume a second use.
     let couponCode = '';
@@ -120,31 +125,43 @@ router.post(
         const coupon = await consumeCoupon(normalized);
         if (!coupon) throw new ApiError(400, 'This coupon code is not valid or has expired.');
         couponCode = coupon.code;
+        consumedFreshCoupon = true;
       }
     }
 
-    if (!student) {
-      student = await Student.create({
-        email,
-        name,
-        passwordHash,
-        interest,
-        courseSlug,
-        couponCode,
-        country,
-        status: 'pending',
-        emailVerified: false,
-      });
-    } else {
-      student.name = name;
-      student.passwordHash = passwordHash;
-      student.interest = interest;
-      student.courseSlug = courseSlug;
-      student.couponCode = couponCode;
-      student.country = country;
-      student.status = 'pending';
-      student.emailVerified = false;
-      await student.save();
+    let student;
+    try {
+      if (!existing) {
+        student = await Student.create({
+          email,
+          name,
+          passwordHash,
+          interest,
+          courseSlug,
+          couponCode,
+          country,
+          status: 'pending',
+          emailVerified: false,
+        });
+      } else {
+        const updated = await Student.findOneAndUpdate({
+          _id: existing._id,
+          ...ordinaryStudentFilter,
+          status: { $in: ['pending', 'rejected'] },
+          emailVerified: { $ne: true },
+        }, { $set: {
+          name, passwordHash, interest, courseSlug, couponCode, country, status: 'pending', emailVerified: false,
+        } }, { new: true }).select('+passwordHash');
+        if (!updated) throw new ApiError(409, 'An account with this email already exists. Please sign in.');
+        student = updated;
+      }
+    } catch (error) {
+      if (consumedFreshCoupon) await refundCoupon(couponCode);
+      if ((error as { code?: number }).code === 11000 || error instanceof ApiError) {
+        if (error instanceof ApiError) throw error;
+        throw new ApiError(409, 'An account with this email already exists. Please sign in.');
+      }
+      throw error;
     }
 
     const reviewUrl = `${env.coursesSiteUrl}/courses/application?token=${signApplicationReviewToken(String(student._id))}`;
@@ -180,7 +197,7 @@ router.post(
     if (!parsed.success) throw new ApiError(400, 'Enter a valid email and password.');
 
     const email = parsed.data.email.toLowerCase();
-    const found = await Student.findOne({ email, active: true }).select('+passwordHash');
+    const found = await Student.findOne({ email, active: true, ...ordinaryStudentFilter }).select('+passwordHash');
     const studentOk = found && (await verifyPassword(parsed.data.password, found.passwordHash));
 
     // The portal and the admin/owner account share one login form. A failed
@@ -243,7 +260,7 @@ router.post(
     if (!parsed.success) throw new ApiError(400, 'Enter a valid email address.');
 
     const email = parsed.data.email.toLowerCase();
-    const student = await Student.findOne({ email, active: true }).select('+passwordHash');
+    const student = await Student.findOne({ email, active: true, ...ordinaryStudentFilter }).select('+passwordHash');
 
     if (student) {
       const resetUrl = `${env.coursesSiteUrl}/courses/reset-password?token=${signPasswordResetToken(
@@ -289,7 +306,7 @@ router.post(
     const sid = typeof unsafePayload?.sid === 'string' ? unsafePayload.sid : '';
     if (!sid) throw new ApiError(400, 'This reset link is invalid or expired.');
 
-    const student = await Student.findOne({ _id: sid, active: true }).select('+passwordHash');
+    const student = await Student.findOne({ _id: sid, active: true, ...ordinaryStudentFilter }).select('+passwordHash');
     if (!student) throw new ApiError(400, 'This reset link is invalid or expired.');
 
     const verified = verifyPasswordResetToken(token, student.passwordHash);
@@ -297,8 +314,8 @@ router.post(
       throw new ApiError(400, 'This reset link is invalid or expired.');
     }
 
-    student.passwordHash = await hashPassword(password);
-    await student.save();
+    const updated = await Student.findOneAndUpdate({ _id: student._id, ...ordinaryStudentFilter }, { $set: { passwordHash: await hashPassword(password) } });
+    if (!updated) throw new ApiError(400, 'This reset link is invalid or expired.');
 
     res.json({ ok: true, message: 'Password updated. You can now sign in.' });
   })
@@ -314,7 +331,7 @@ router.get(
     const parsed = verifyApplicationReviewToken(token);
     if (!parsed) throw new ApiError(400, 'This review link is invalid or expired.');
 
-    const student = await Student.findById(parsed.sid);
+    const student = await Student.findOne({ _id: parsed.sid, ...ordinaryStudentFilter });
     if (!student) throw new ApiError(404, 'Application not found.');
 
     res.json({
@@ -350,6 +367,33 @@ router.post(
   })
 );
 
+router.post('/invitation/inspect', authLimiter, asyncHandler(async (req, res) => {
+  const parsed = invitationTokenSchema.safeParse(req.body);
+  if (!parsed.success) throw new ApiError(400, 'This invitation link is invalid.');
+  const student = await Student.findOne(validInvitation(parsed.data.token)).select('email invitationExpiresAt');
+  if (!student) throw new ApiError(400, 'This invitation is invalid, expired, cancelled, or already used.');
+  res.set('Cache-Control', 'no-store');
+  res.json({ email: student.email, expiresAt: student.invitationExpiresAt });
+}));
+router.post('/invitation/accept', authLimiter, asyncHandler(async (req, res) => {
+  const parsed = invitationAcceptSchema.safeParse(req.body);
+  if (!parsed.success) throw new ApiError(400, 'Enter your name, phone number, and password (min 6 characters).');
+  const student = await Student.findOneAndUpdate(validInvitation(parsed.data.token), { $set: {
+    name: parsed.data.name, phone: parsed.data.phone, passwordHash: await hashPassword(parsed.data.password),
+    active: true, status: 'approved', emailVerified: true, invitationOnly: false, invitationAcceptedAt: new Date(),
+  }, $unset: { invitationTokenHash: 1 } }, { new: true });
+  if (!student) throw new ApiError(400, 'This invitation is invalid, expired, cancelled, or already used.');
+  try {
+    await enrollStudentInPublishedCourses(String(student._id));
+  } catch (err) {
+    console.error('[academy] Failed to enroll accepted invitation:', err);
+  }
+  const token = signStudentSession({ sub: String(student._id), email: student.email, name: student.name });
+  res.cookie(STUDENT_COOKIE, token, cookieOptions());
+  res.set('Cache-Control', 'no-store');
+  res.json(sessionPayload(student, token));
+}));
+
 router.post('/logout', (_req, res) => {
   res.clearCookie(STUDENT_COOKIE, { ...cookieOptions(), maxAge: undefined });
   res.json({ ok: true });
@@ -359,7 +403,7 @@ router.get(
   '/me',
   requireStudent,
   asyncHandler(async (req, res) => {
-    const student = await Student.findById(req.student!.sub);
+    const student = await Student.findOne({ _id: req.student!.sub, ...ordinaryStudentFilter });
     if (!student || !student.active || !isStudentApproved(student)) {
       throw new ApiError(401, 'Session invalid. Please sign in again.');
     }
@@ -374,21 +418,27 @@ router.patch(
     const parsed = studentProfileSchema.safeParse(req.body);
     if (!parsed.success) throw new ApiError(400, parsed.error.issues[0]?.message || 'Enter valid profile details.');
 
-    const student = await Student.findById(req.student!.sub);
+    const student = await Student.findOne({ _id: req.student!.sub, ...ordinaryStudentFilter });
     if (!student || !student.active || !isStudentApproved(student)) {
       throw new ApiError(401, 'Session invalid. Please sign in again.');
     }
 
     const wasComplete = isStudentProfileComplete(student);
     const { completeProfile, ...updates } = parsed.data;
-    student.set(updates);
-    if (student.freelancedBefore === false) student.freelancingExperience = '';
-    if ((completeProfile || wasComplete) && !isStudentProfileComplete(student)) {
+    const proposed = {
+      ...student.toObject(),
+      ...updates,
+      freelancingExperience: updates.freelancedBefore === false ? '' : updates.freelancingExperience ?? student.freelancingExperience,
+    };
+    if ((completeProfile || wasComplete) && !isStudentProfileComplete(proposed)) {
       throw new ApiError(400, 'Please answer every required question, describe your experience if you have freelanced before (at least 10 characters), and add a profile photo if you are a man.');
     }
-    await student.save();
-
-    res.json({ ok: true, user: publicStudent(student) });
+    const saved = await Student.findOneAndUpdate({ _id: student._id, ...ordinaryStudentFilter, active: true }, { $set: {
+      ...updates,
+      freelancingExperience: proposed.freelancingExperience,
+    } }, { new: true });
+    if (!saved) throw new ApiError(409, 'This account cannot be updated.');
+    res.json({ ok: true, user: publicStudent(saved) });
   })
 );
 

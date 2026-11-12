@@ -219,6 +219,30 @@ export default async function CaseStudyDetailPage({ params }: Props) {
         </section>
       ) : null}
 
+      {cs.proof?.length ? (
+        <section className="border-y border-border/50 bg-background py-16 sm:py-20">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto mb-10 max-w-2xl text-center">
+              <p className="mb-3 text-sm font-bold uppercase tracking-wider text-primary">Account evidence</p>
+              <h2 className="text-3xl font-bold text-foreground md:text-4xl">What the reporting showed</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {cs.measurementNote || 'Supplied reporting views from the engagement. Metrics are shown with their original scope and measurement limits.'}
+              </p>
+            </div>
+            <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
+              {cs.proof.map((item) => (
+                <figure key={item.src} className="overflow-hidden rounded-2xl border border-border bg-card">
+                  <div className="relative aspect-[16/10] bg-muted">
+                    <Image src={item.src} alt={item.alt} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                  </div>
+                  <figcaption className="p-4 text-sm leading-relaxed text-muted-foreground">{item.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="bg-secondary py-16 text-secondary-foreground sm:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14">

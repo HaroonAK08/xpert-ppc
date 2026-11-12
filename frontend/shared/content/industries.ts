@@ -965,7 +965,7 @@ export const foodBeverage: IndustryContent = {
         'Clearer acquisition efficiency short term, and compounding organic + paid growth when the partnership runs long enough.',
     },
   ],
-  relatedCaseStudies: ['desert-farms', 'meta-ads-ardnamurchan'],
+  relatedCaseStudies: ['desert-farms', 'meta-ads-ardnamurchan', 'newport-beach-restaurant'],
   seo: {
     title: 'Food & Beverage Marketing Agency | Xpert PPC',
     description:

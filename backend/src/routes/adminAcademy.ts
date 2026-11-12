@@ -20,8 +20,22 @@ import {
 import { normalizeCouponCode } from '../utils/coupon';
 
 const router = Router();
-
 router.use(requireAuth, requireRole('admin'));
+
+async function refreshCourseNextClass(courseIds: unknown[]) {
+  const ids = [...new Set(courseIds.filter(Boolean).map(String))];
+  const now = new Date();
+  for (const courseId of ids) {
+    const next = await ClassSession.findOne({ courseId, published: true, startsAt: { $gte: now } }).sort({ startsAt: 1 });
+    await PortalCourse.updateOne({ _id: courseId }, { $set: next ? { nextClassAt: next.startsAt, meetLink: next.meetLink || '', timezone: next.timezone || 'Asia/Karachi' } : { nextClassAt: null } });
+  }
+}
+function sessionTimes(startsRaw: string, endsRaw: string | null | undefined) {
+  const startsAt = new Date(startsRaw);
+  const endsAt = endsRaw ? new Date(endsRaw) : null;
+  if (Number.isNaN(startsAt.getTime()) || (endsAt && Number.isNaN(endsAt.getTime())) || (endsAt && endsAt <= startsAt)) throw new ApiError(400, 'Enter a valid end time after the start.');
+  return { startsAt, endsAt };
+}
 
 async function courseTitleMap(ids: string[]) {
   const courses = await PortalCourse.find({ _id: { $in: ids } }).select('title slug');
@@ -32,7 +46,7 @@ router.get(
   '/overview',
   asyncHandler(async (_req, res) => {
     const [pendingStudents, courses, sessions, recordings, resources] = await Promise.all([
-      import('../models/Student').then(({ Student }) => Student.countDocuments({ status: 'pending' })),
+      Student.countDocuments({ status: 'pending', invitationOnly: { $ne: true } }),
       PortalCourse.countDocuments(),
       ClassSession.countDocuments({ published: true }),
       ClassRecording.countDocuments({ published: true }),
@@ -80,27 +94,12 @@ router.post(
     const course = await PortalCourse.findById(parsed.data.courseId);
     if (!course) throw new ApiError(404, 'Course not found.');
 
-    const startsAt = new Date(parsed.data.startsAt);
-    if (Number.isNaN(startsAt.getTime())) throw new ApiError(400, 'Invalid start time.');
-
-    const endsAt = parsed.data.endsAt ? new Date(parsed.data.endsAt) : null;
+    const { startsAt, endsAt } = sessionTimes(parsed.data.startsAt, parsed.data.endsAt);
     const session = await ClassSession.create({
-      courseId: course._id,
-      title: parsed.data.title,
-      startsAt,
-      endsAt: endsAt && !Number.isNaN(endsAt.getTime()) ? endsAt : null,
-      meetLink: parsed.data.meetLink,
-      timezone: parsed.data.timezone,
-      notes: parsed.data.notes,
-      published: parsed.data.published,
+      courseId: course._id, title: parsed.data.title, startsAt, endsAt, meetLink: parsed.data.meetLink,
+      timezone: parsed.data.timezone, notes: parsed.data.notes, published: parsed.data.published,
     });
-
-    if (!course.nextClassAt || startsAt < course.nextClassAt || course.nextClassAt < new Date()) {
-      course.nextClassAt = startsAt;
-      if (parsed.data.meetLink) course.meetLink = parsed.data.meetLink;
-      if (parsed.data.timezone) course.timezone = parsed.data.timezone;
-      await course.save();
-    }
+    await refreshCourseNextClass([course._id]);
 
     res.status(201).json({
       item: {
@@ -126,20 +125,19 @@ router.patch(
 
     const session = await ClassSession.findById(req.params.id);
     if (!session) throw new ApiError(404, 'Session not found.');
-
+    const previousCourseId = session.courseId;
     if (parsed.data.courseId) {
       const course = await PortalCourse.findById(parsed.data.courseId);
       if (!course) throw new ApiError(404, 'Course not found.');
       session.courseId = course._id;
     }
     if (parsed.data.title !== undefined) session.title = parsed.data.title;
-    if (parsed.data.startsAt) {
-      const startsAt = new Date(parsed.data.startsAt);
-      if (Number.isNaN(startsAt.getTime())) throw new ApiError(400, 'Invalid start time.');
-      session.startsAt = startsAt;
-    }
-    if (parsed.data.endsAt !== undefined) {
-      session.endsAt = parsed.data.endsAt ? new Date(parsed.data.endsAt) : null;
+    const startsRaw = parsed.data.startsAt || session.startsAt.toISOString();
+    const endsRaw = parsed.data.endsAt !== undefined ? parsed.data.endsAt : session.endsAt?.toISOString() || null;
+    if (parsed.data.startsAt || parsed.data.endsAt !== undefined) {
+      const times = sessionTimes(startsRaw, endsRaw);
+      session.startsAt = times.startsAt;
+      session.endsAt = times.endsAt;
     }
     if (parsed.data.meetLink !== undefined) session.meetLink = parsed.data.meetLink;
     if (parsed.data.timezone !== undefined) session.timezone = parsed.data.timezone;
@@ -147,6 +145,7 @@ router.patch(
     if (parsed.data.published !== undefined) session.published = parsed.data.published;
 
     await session.save();
+    await refreshCourseNextClass([previousCourseId, session.courseId]);
     res.json({
       item: {
         id: String(session._id),
@@ -168,6 +167,7 @@ router.delete(
   asyncHandler(async (req, res) => {
     const session = await ClassSession.findByIdAndDelete(req.params.id);
     if (!session) throw new ApiError(404, 'Session not found.');
+    await refreshCourseNextClass([session.courseId]);
     res.json({ ok: true });
   })
 );
@@ -373,7 +373,7 @@ router.get(
   asyncHandler(async (_req, res) => {
     const coupons = await Coupon.find().sort({ createdAt: -1 }).limit(200);
     const codes = coupons.map((c) => c.code);
-    const students = await Student.find({ couponCode: { $in: codes } })
+    const students = await Student.find({ couponCode: { $in: codes }, invitationOnly: { $ne: true } })
       .select('name email status couponCode createdAt')
       .sort({ createdAt: -1 })
       .limit(500);

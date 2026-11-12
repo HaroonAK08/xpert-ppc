@@ -188,4 +188,20 @@ export const caseStudyNarratives: Record<string, CaseStudyNarrative> = {
       'Service segmentation and local intent kept lead quality high while spend scaled responsibly.',
     ],
   },
+  'newport-beach-restaurant': {
+    challenge: [
+      'A Newport Beach restaurant needed more orders from people already searching locally, without publishing the business name.',
+      'Previous reporting mixed estimated sales lift with in-account totals, which made the real efficiency hard to see.',
+    ],
+    strategy: [
+      'Google Ads focused on order, call, and visit intent rather than broad awareness.',
+      'Conversions were tracked in-account so cost per conversion could be stated from spend and conversion count, not from estimated orders.',
+      'Click-through rate is reported only for the segment in the source PDF, so it is not blended with a different account view.',
+    ],
+    results: [
+      'Estimated order growth of about +45% for the reported period. The estimate is labeled as such and is not a point-of-sale reconciliation.',
+      'Tracked account totals: 2,399 conversions, $28.06 cost per conversion, $67.3K spend, 37,912 clicks, and 635,655 impressions.',
+      'Segment CTR from the source PDF is 5.96%. No other CTR is published for this case study.',
+    ],
+  },
 };

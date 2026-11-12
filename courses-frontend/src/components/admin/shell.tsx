@@ -6,7 +6,8 @@ import {
   BookOpen,
   CalendarDays,
   ClipboardList,
-  ClipboardCheck,  FileText,
+  ClipboardCheck,
+  FileText,
   LayoutDashboard,
   LogOut,
   Megaphone,
@@ -41,7 +42,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-dvh flex-col bg-canvas lg:flex-row">
-      <MobileNavigation items={NAV} home="/admin" onLogout={async () => { await logoutAdmin(); router.replace('/admin/login'); }} />
+      <div className="sticky top-0 z-30 lg:hidden">
+        <MobileNavigation items={NAV} home="/admin" onLogout={async () => { await logoutAdmin(); router.replace('/admin/login'); }} />
+      </div>
       <aside className="relative hidden w-[260px] shrink-0 flex-col overflow-hidden bg-gradient-to-b from-[#0f2347] via-[#12305f] to-[#0a1b3f] text-white lg:flex">
         <div className="relative px-5 py-6">
           <Logo dark href="/admin" />
@@ -50,15 +53,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </p>
         </div>
 
-        <nav className="relative flex-1 space-y-1 px-3">
+        <nav aria-label="Admin navigation" className="relative flex-1 space-y-1 px-3">
           {NAV.map(({ href, label, icon: Icon, exact }) => {
             const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
                 key={href}
                 href={href}
+                aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white',
+                  'flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white',
                   active && 'bg-white/15 text-white'
                 )}
               >

@@ -83,6 +83,55 @@ export function mediaUrl(pathOrUrl: string) {
   return `${API_URL}${pathOrUrl.startsWith('/') ? '' : '/'}${pathOrUrl}`;
 }
 
+export type AdminUploadOptions = {
+  onProgress?: (percent: number | null) => void;
+  signal?: AbortSignal;
+};
+
+function upload<T>(path: string, file: File, options: AdminUploadOptions = {}): Promise<AdminApiResult<T>> {
+  return new Promise((resolve) => {
+    if (options.signal?.aborted) {
+      resolve({ ok: false, error: 'Upload cancelled. A file already received by the server may remain there.' });
+      return;
+    }
+    const xhr = new XMLHttpRequest();
+    const abort = () => xhr.abort();
+    const finish = (result: AdminApiResult<T>) => {
+      options.signal?.removeEventListener('abort', abort);
+      resolve(result);
+    };
+    xhr.open('POST', `${API_URL}${path}`);
+    xhr.withCredentials = true;
+    xhr.timeout = 30 * 60 * 1000;
+    const token = getAdminToken();
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.upload.onprogress = (event) => options.onProgress?.(event.lengthComputable ? Math.min(100, Math.round(event.loaded / event.total * 100)) : null);
+    xhr.onload = () => {
+      let body: any = null;
+      try { body = JSON.parse(xhr.responseText); } catch { /* handled below */ }
+      if (xhr.status < 200 || xhr.status >= 300) {
+        if (xhr.status === 401 && !path.endsWith('/login')) {
+          setAdminToken(null);
+          window.dispatchEvent(new Event('academy:admin-expired'));
+        }
+        const message = typeof body?.error === 'string' ? body.error : body?.error?.message;
+        finish({ ok: false, error: message || (xhr.status === 413 ? 'File exceeds the server upload limit (200 MiB).' : `Upload failed (${xhr.status}).`), status: xhr.status });
+      } else if (!body) {
+        finish({ ok: false, error: 'The server returned an invalid upload response. Check the file before retrying.' });
+      } else {
+        finish({ ok: true, data: body as T });
+      }
+    };
+    xhr.onerror = () => finish({ ok: false, error: 'Upload connection lost. Check your connection before retrying; the server may have received the file.' });
+    xhr.ontimeout = () => finish({ ok: false, error: 'Upload timed out after 30 minutes. The server may have received the file; retry only when ready.' });
+    xhr.onabort = () => finish({ ok: false, error: 'Upload cancelled. A file already received by the server may remain there.' });
+    options.signal?.addEventListener('abort', abort, { once: true });
+    const fd = new FormData();
+    fd.append('file', file);
+    xhr.send(fd);
+  });
+}
+
 export const adminApi = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body?: unknown) =>
@@ -90,11 +139,7 @@ export const adminApi = {
   patch: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'PATCH', body: JSON.stringify(body ?? {}) }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
-  upload: async <T>(path: string, file: File) => {
-    const fd = new FormData();
-    fd.append('file', file);
-    return request<T>(path, { method: 'POST', body: fd }, { json: false });
-  },
+  upload,
 };
 
 export async function logoutAdmin() {

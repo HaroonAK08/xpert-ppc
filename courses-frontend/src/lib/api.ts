@@ -80,6 +80,7 @@ export type CurrentStudent = {
   id: string;
   email: string;
   name: string;
+  phone?: string;
   avatarUrl?: string;
   coursePreference?: string;
   freelancedBefore?: boolean | null;

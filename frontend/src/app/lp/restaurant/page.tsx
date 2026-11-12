@@ -67,7 +67,7 @@ export const metadata: Metadata = buildMetadata({
   ],
 });
 
-const WHATSAPP = siteConfig.contact.whatsapp;
+const WHATSAPP = "https://wa.me/15878935511";
 const CHAR = "#0E0E0E";
 const SAFFRON = "#F5A524";
 const SMOKE = "#161616";
@@ -199,6 +199,7 @@ function FormCard({ id = "audit-form" }: { id?: string }) {
           compact
           showClinicName
           businessLabel="Restaurant / brand name"
+          phonePlaceholder="+1 587 893 5511"
           submitLabel="Get My Free Audit"
           className="[&_button]:rounded-full [&_button]:bg-[#0E0E0E] [&_button]:hover:bg-[#2a2a2a]"
         />
@@ -239,7 +240,7 @@ export default function RestaurantLpPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent" />
 
           <div className="relative mx-auto grid min-h-[85vh] max-w-6xl items-center gap-10 px-4 pb-12 pt-28 sm:px-6 sm:pb-16 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
-            <LoadGroup className="max-w-2xl">
+            <LoadGroup className="max-w-2xl" stagger={0} delayChildren={0}>
               <LoadItem>
                 <p
                   className={`${display.className} mb-3 text-5xl tracking-wide text-white sm:text-6xl`}
@@ -822,6 +823,44 @@ export default function RestaurantLpPage() {
           </div>
         </section>
 
+        {/* Restaurant proof */}
+        <section className="bg-[#0E0E0E] py-16 text-white sm:py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <Reveal className="max-w-3xl">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: SAFFRON }}>
+                Restaurant case study
+              </p>
+              <h2 className={`${display.className} text-4xl tracking-wide sm:text-5xl`}>
+                A Newport Beach restaurant built a stronger demand engine
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/75">
+                Over a three-year partnership, Xpert PPC brought local discovery, Google Ads, landing pages, and conversion tracking together around online orders, reservations, dine-in visits, and private events.
+              </p>
+            </Reveal>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ['+45%', 'Estimated order growth'],
+                ['2,399', 'Tracked conversions'],
+                ['$28.06', 'Cost per conversion'],
+                ['$67.3K', 'Google Ads spend'],
+              ].map(([value, label]) => (
+                <div key={label} className="rounded-2xl border border-white/15 bg-white/[0.06] p-5">
+                  <p className="text-3xl font-extrabold tracking-tight" style={{ color: SAFFRON }}>{value}</p>
+                  <p className="mt-2 text-xs font-bold uppercase tracking-wider text-white/65">{label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+              <p className="max-w-3xl text-xs leading-relaxed text-white/55">
+                Measurement note: the +45% order figure is an estimated business comparison, not a direct Google Ads attribution. Tracked conversions are account actions and are not equivalent to completed orders or confirmed bookings.
+              </p>
+              <a href="/case-study/newport-beach-restaurant" className="inline-flex min-h-11 items-center justify-center rounded-full px-6 text-sm font-bold text-[#0E0E0E]" style={{ backgroundColor: SAFFRON }}>
+                Read the full case study →
+              </a>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ */}
         <section className="bg-[#F7F4EE] py-16 text-neutral-900 sm:py-20">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
@@ -893,6 +932,12 @@ export default function RestaurantLpPage() {
                   className="inline-flex h-12 items-center justify-center rounded-full border-2 border-white/80 bg-white/10 px-6 text-sm font-bold text-white transition-colors hover:bg-white/20"
                 >
                   Or message us on WhatsApp
+                </a>
+                <a
+                  href="/case-study/newport-beach-restaurant"
+                  className="mt-4 inline-flex min-h-11 items-center text-sm font-bold text-white underline decoration-white/60 underline-offset-4 hover:decoration-white"
+                >
+                  Read the Newport Beach restaurant case study →
                 </a>
               </div>
             </Reveal>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { FileUpload } from '@/components/admin/file-upload';
 import { adminApi, mediaUrl } from '@/lib/admin-api';
 import { useAdminCourses } from '@/hooks/use-admin-courses';
 import { AdminPageHeader } from '@/components/admin/page-header';
@@ -26,6 +27,10 @@ export default function AdminResourcesPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [sourceMode, setSourceMode] = useState<'link' | 'upload'>('link');
+  const [fileUrl, setFileUrl] = useState('');
+  const [uploadedUrl, setUploadedUrl] = useState('');
 
   async function load() {
     setLoading(true);
@@ -45,7 +50,9 @@ export default function AdminResourcesPage() {
 
   async function onCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (busy) return;
+    if (busy || uploading) return;
+    const finalUrl = (sourceMode === 'upload' ? uploadedUrl : fileUrl).trim();
+    if (!finalUrl) { setError('Enter a file URL or complete a file upload before saving.'); return; }
     const formElement = e.currentTarget;
     setBusy(true);
     setError('');
@@ -55,7 +62,7 @@ export default function AdminResourcesPage() {
       title: String(fd.get('title') || ''),
       kind: String(fd.get('kind') || 'notes'),
       description: String(fd.get('description') || ''),
-      fileUrl: String(fd.get('fileUrl') || ''),
+      fileUrl: finalUrl,
       published: true,
     });
     setBusy(false);
@@ -64,6 +71,9 @@ export default function AdminResourcesPage() {
       return;
     }
     formElement.reset();
+    setFileUrl('');
+    setUploadedUrl('');
+    setSourceMode('link');
     setShowForm(false);
     await load();
   }
@@ -84,7 +94,7 @@ export default function AdminResourcesPage() {
         title="Resources"
         subtitle="Notes, assignments, and downloadable assets for students."
         actions={
-          <Button type="button" className="h-10" onClick={() => setShowForm((v) => !v)}>
+          <Button type="button" className="min-h-11" disabled={busy || uploading} onClick={() => setShowForm((v) => !v)}>
             <Plus className="h-4 w-4" />
             Add resource
           </Button>
@@ -125,16 +135,22 @@ export default function AdminResourcesPage() {
               <Label htmlFor="title">Title</Label>
               <Input id="title" name="title" required placeholder="Campaign brief template" />
             </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="fileUrl">File / link URL</Label>
-              <Input id="fileUrl" name="fileUrl" placeholder="https://..." />
+            <div className="min-w-0 space-y-3 sm:col-span-2">
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" variant="outline" className="min-h-11" aria-pressed={sourceMode === 'link'} disabled={busy || uploading} onClick={() => setSourceMode('link')}>Use URL</Button>
+                <Button type="button" variant="outline" className="min-h-11" aria-pressed={sourceMode === 'upload'} disabled={busy || uploading} onClick={() => setSourceMode('upload')}>Upload file</Button>
+              </div>
+              {sourceMode === 'link' ? <div className="space-y-1.5">
+                <Label htmlFor="fileUrl">File / link URL</Label>
+                <Input id="fileUrl" name="fileUrl" type="url" value={fileUrl} onChange={(event) => setFileUrl(event.target.value)} placeholder="https://..." />
+              </div> : <FileUpload disabled={busy} onUploaded={setUploadedUrl} onUploadingChange={setUploading} onSelectionChange={() => setUploadedUrl('')} />}
             </div>
             <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="description">Description</Label>
               <Textarea id="description" name="description" rows={2} />
             </div>
             <div className="sm:col-span-2">
-              <Button type="submit" disabled={busy} className="h-10">
+              <Button type="submit" disabled={busy || uploading} className="min-h-11">
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save resource'}
               </Button>
             </div>
@@ -173,7 +189,7 @@ export default function AdminResourcesPage() {
                 <button
                   type="button"
                   onClick={() => void remove(item.id)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted hover:text-red-600"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border text-muted hover:text-red-600"
                   aria-label="Delete resource"
                 >
                   <Trash2 className="h-4 w-4" />
