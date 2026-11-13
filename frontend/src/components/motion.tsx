@@ -79,7 +79,7 @@ export function Reveal({
   return (
     <Cmp
       className={className}
-      initial={initial}
+      initial={false}
       whileInView={visible}
       viewport={{ once: true, amount, ...(margin ? { margin } : {}) }}
       transition={{ duration, ease: EASE, ...(delay ? { delay } : {}) }}
@@ -111,7 +111,7 @@ export function RevealGroup({
   return (
     <Cmp
       className={className}
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, amount }}
       variants={{ hidden: {}, visible: { transition: { staggerChildren: stagger } } }}
