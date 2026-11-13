@@ -190,18 +190,21 @@ export const caseStudyNarratives: Record<string, CaseStudyNarrative> = {
   },
   'newport-beach-restaurant': {
     challenge: [
-      'A Newport Beach restaurant needed more orders from people already searching locally, without publishing the business name.',
-      'Previous reporting mixed estimated sales lift with in-account totals, which made the real efficiency hard to see.',
+      'The restaurant had a weak local presence. Its Google Business Profile, website, and local listings needed attention so nearby customers could find it.',
+      'No ad campaigns were running. Website content needed to match cuisine and Newport Beach searches, and there was no website tagging, conversion tracking, or Google Analytics 4 setup.',
+      'Marketing needed to connect with ordering, OpenTable, reservations, private dining, family gatherings, and graduation events. The owner also needed a simple reporting view.',
     ],
     strategy: [
-      'Google Ads focused on order, call, and visit intent rather than broad awareness.',
-      'Conversions were tracked in-account so cost per conversion could be stated from spend and conversion count, not from estimated orders.',
-      'Click-through rate is reported only for the segment in the source PDF, so it is not blended with a different account view.',
+      'Checked local SEO, Google Business Profile, and citations, improving name, address, and phone consistency.',
+      'Researched local cuisine and Newport Beach searches and improved website content, page titles, headings, and descriptions.',
+      'Launched Google and Bing ads, ran Facebook and Instagram campaigns, and included YouTube in the wider marketing work.',
+      'Added Google Analytics 4, website tags, conversion tracking, and a Looker Studio owner report.',
+      'Supported landing-page recommendations, order management, OpenTable integration, and reservation forms.',
     ],
     results: [
-      'Estimated order growth of about +45% for the reported period. The estimate is labeled as such and is not a point-of-sale reconciliation.',
-      'Tracked account totals: 2,399 conversions, $28.06 cost per conversion, $67.3K spend, 37,912 clicks, and 635,655 impressions.',
-      'Segment CTR from the source PDF is 5.96%. No other CTR is published for this case study.',
+      'Over one month, management reported estimated +45% overall order growth and +55% website traffic growth. Exact comparison dates and the traffic breakdown were not provided.',
+      'A separate Google Ads reporting period, June 1, 2025–October 31, 2026, recorded 2,398.56 actions, $28.06 per action, $67,303 spend, 37,912 clicks, and 635,655 impressions. The supplied reporting view shows a 5.96% click-through rate.',
+      'Recorded Google Ads actions are not equivalent to completed orders or confirmed bookings. Business growth reflects the wider marketing work and is not attributed to Google Ads alone.',
     ],
   },
 };

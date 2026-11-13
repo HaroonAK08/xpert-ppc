@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { LeadForm } from "@/components/forms/lead-form";
+import { NewportCaseStudy } from "./newport-case-study";
 import JsonLd from "@/components/seo/json-ld";
 import {
   LoadFade,
@@ -26,7 +27,6 @@ import {
 import { ServiceClock } from "./service-clock";
 import { RestaurantStickyCta } from "./sticky-cta";
 import { buildMetadata, faqSchema, serviceSchema } from "@/lib/seo";
-import { siteConfig } from "@/lib/site";
 
 // Statically imported so Next.js can generate a real blurDataURL — a plain
 // string src="/lp/..." gets no placeholder and shows an empty box until the
@@ -55,7 +55,7 @@ const body = DM_Sans({
 export const metadata: Metadata = buildMetadata({
   title: "Marketing for Restaurants & Fast Food Brands | Xpert PPC",
   description:
-    "Get more table bookings, walk-ins, and online orders for your restaurant or fast food business with Google Ads, Meta Ads, local search, and conversion tracking.",
+    "See how Xpert PPC helped an anonymous Newport Beach restaurant report estimated +45% order growth and +55% website traffic, with tracked Google Ads, local SEO, and booking support.",
   path: "/lp/restaurant",
   image: "/lp/restaurant/lp-restaurant-hero.png",
   keywords: [
@@ -823,43 +823,7 @@ export default function RestaurantLpPage() {
           </div>
         </section>
 
-        {/* Restaurant proof */}
-        <section className="bg-[#0E0E0E] py-16 text-white sm:py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <Reveal className="max-w-3xl">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: SAFFRON }}>
-                Restaurant case study
-              </p>
-              <h2 className={`${display.className} text-4xl tracking-wide sm:text-5xl`}>
-                A Newport Beach restaurant built a stronger demand engine
-              </h2>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/75">
-                Over a three-year partnership, Xpert PPC brought local discovery, Google Ads, landing pages, and conversion tracking together around online orders, reservations, dine-in visits, and private events.
-              </p>
-            </Reveal>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                ['+45%', 'Estimated order growth'],
-                ['2,399', 'Tracked conversions'],
-                ['$28.06', 'Cost per conversion'],
-                ['$67.3K', 'Google Ads spend'],
-              ].map(([value, label]) => (
-                <div key={label} className="rounded-2xl border border-white/15 bg-white/[0.06] p-5">
-                  <p className="text-3xl font-extrabold tracking-tight" style={{ color: SAFFRON }}>{value}</p>
-                  <p className="mt-2 text-xs font-bold uppercase tracking-wider text-white/65">{label}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
-              <p className="max-w-3xl text-xs leading-relaxed text-white/55">
-                Measurement note: the +45% order figure is an estimated business comparison, not a direct Google Ads attribution. Tracked conversions are account actions and are not equivalent to completed orders or confirmed bookings.
-              </p>
-              <a href="/case-study/newport-beach-restaurant" className="inline-flex min-h-11 items-center justify-center rounded-full px-6 text-sm font-bold text-[#0E0E0E]" style={{ backgroundColor: SAFFRON }}>
-                Read the full case study →
-              </a>
-            </div>
-          </div>
-        </section>
+        <NewportCaseStudy />
 
         {/* FAQ */}
         <section className="bg-[#F7F4EE] py-16 text-neutral-900 sm:py-20">
@@ -934,10 +898,10 @@ export default function RestaurantLpPage() {
                   Or message us on WhatsApp
                 </a>
                 <a
-                  href="/case-study/newport-beach-restaurant"
+                  href="#case-study"
                   className="mt-4 inline-flex min-h-11 items-center text-sm font-bold text-white underline decoration-white/60 underline-offset-4 hover:decoration-white"
                 >
-                  Read the Newport Beach restaurant case study →
+                  See the Newport Beach restaurant case study →
                 </a>
               </div>
             </Reveal>
