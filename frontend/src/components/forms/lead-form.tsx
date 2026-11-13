@@ -146,7 +146,7 @@ export function LeadForm({
           Thank you — we&apos;ve got it.
         </h3>
         <p className="text-sm text-muted-foreground">
-          A specialist will reach out within one business day. Need it sooner?
+          A specialist will review your details and follow up with next steps. Need it sooner?
           Message us on WhatsApp.
         </p>
       </div>

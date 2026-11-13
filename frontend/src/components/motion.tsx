@@ -166,16 +166,18 @@ export function LoadGroup({
   className,
   stagger = 0.09,
   delayChildren = 0.05,
+  showImmediately = false,
 }: {
   children: ReactNode;
   className?: string;
   stagger?: number;
   delayChildren?: number;
+  showImmediately?: boolean;
 }) {
   return (
     <motion.div
       className={className}
-      initial="hidden"
+      initial={showImmediately ? false : "hidden"}
       animate="visible"
       variants={{
         hidden: {},
@@ -193,19 +195,21 @@ export function LoadItem({
   y = 12,
   duration = 0.6,
   as = 'div',
+  showImmediately = false,
 }: {
   children: ReactNode;
   className?: string;
   y?: number;
   duration?: number;
   as?: 'div' | 'h1' | 'p' | 'ul';
+  showImmediately?: boolean;
 }) {
   const Cmp = motion[as];
 
   return (
     <Cmp
       className={className}
-      variants={{ hidden: { opacity: 0, y }, visible: { opacity: 1, y: 0 } }}
+      variants={{ hidden: { opacity: showImmediately ? 1 : 0, y }, visible: { opacity: 1, y: 0 } }}
       transition={{ duration, ease: EASE }}
     >
       {children}
@@ -221,6 +225,7 @@ export function LoadFade({
   scale,
   duration = 0.7,
   delay = 0,
+  showImmediately = false,
 }: {
   children: ReactNode;
   className?: string;
@@ -228,11 +233,12 @@ export function LoadFade({
   scale?: number;
   duration?: number;
   delay?: number;
+  showImmediately?: boolean;
 }) {
   return (
     <motion.div
       className={className}
-      initial={scale ? { opacity: 0, scale } : { opacity: 0, y }}
+      initial={showImmediately ? false : scale ? { opacity: 0, scale } : { opacity: 0, y }}
       animate={scale ? { opacity: 1, scale: 1 } : { opacity: 1, y: 0 }}
       transition={{ duration, ease: EASE, delay }}
     >

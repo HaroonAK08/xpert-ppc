@@ -69,7 +69,15 @@ export function createApp() {
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret'],
     })(req, res, next);
   });
-  app.use('/api/track', cors({ origin: true }));
+  app.use(
+    '/api/track',
+    cors({
+      origin: true,
+      credentials: true,
+      methods: ['POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type'],
+    })
+  );
 
   app.use('/uploads', express.static(path.resolve(UPLOAD_DIR)));
 
