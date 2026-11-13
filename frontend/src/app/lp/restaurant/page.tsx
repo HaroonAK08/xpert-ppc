@@ -328,281 +328,16 @@ export default function RestaurantLpPage() {
           </div>
         </section>
 
-        {/* Service clock */}
-        <section className="py-16 sm:py-20" style={{ backgroundColor: CHAR }}>
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <Reveal>
-              <ServiceClock />
-            </Reveal>
-          </div>
-        </section>
-
-        {/* Margin story — bold comparison bars */}
-        <section className="bg-white py-16 text-neutral-900 sm:py-20">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <Reveal className="mb-10 text-center">
-              <h2
-                className={`${display.className} text-4xl tracking-wide sm:text-5xl`}
-                style={{ color: CHAR }}
-              >
-                Stop tipping the delivery apps
-              </h2>
-              <p className="mx-auto mt-3 max-w-xl text-base text-neutral-600">
-                Every aggregator order costs commission and hands them your
-                customer. Direct ads flip that.
-              </p>
-            </Reveal>
-
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Reveal x={-14}>
-                <div className="h-full rounded-3xl bg-neutral-100 p-6 sm:p-8">
-                  <div className="mb-6 flex items-baseline justify-between">
-                    <p className="text-sm font-bold uppercase tracking-wide text-neutral-500">
-                      Via apps
-                    </p>
-                    <p
-                      className={`${display.className} text-5xl text-neutral-400`}
-                    >
-                      −28%
-                    </p>
-                  </div>
-                  <div className="mb-6 h-3 overflow-hidden rounded-full bg-neutral-200">
-                    <div className="h-full w-[72%] rounded-full bg-neutral-400" />
-                  </div>
-                  <ul className="space-y-3">
-                    {[
-                      "20–30% commission every order",
-                      "They own the customer data",
-                      "No path to repeat business",
-                      "Race to the bottom on price",
-                    ].map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-2 text-sm text-neutral-600"
-                      >
-                        <X className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Reveal>
-              <Reveal x={14} delay={0.08}>
-                <div
-                  className="h-full rounded-3xl p-6 sm:p-8"
-                  style={{
-                    backgroundColor: CHAR,
-                    boxShadow: `0 0 0 2px ${SAFFRON}`,
-                  }}
-                >
-                  <div className="mb-6 flex items-baseline justify-between">
-                    <p
-                      className="text-sm font-bold uppercase tracking-wide"
-                      style={{ color: SAFFRON }}
-                    >
-                      Direct ads
-                    </p>
-                    <p
-                      className={`${display.className} text-5xl`}
-                      style={{ color: SAFFRON }}
-                    >
-                      100%
-                    </p>
-                  </div>
-                  <div className="mb-6 h-3 overflow-hidden rounded-full bg-white/10">
-                    <div
-                      className="h-full w-full rounded-full"
-                      style={{ backgroundColor: SAFFRON }}
-                    />
-                  </div>
-                  <ul className="space-y-3">
-                    {[
-                      "Keep the full order value",
-                      "Phone & WhatsApp stay yours",
-                      "Retarget for the next offer",
-                      "Win on experience, not discounts",
-                    ].map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-2 text-sm font-medium text-white/85"
-                      >
-                        <CheckCircle2
-                          className="mt-0.5 h-4 w-4 shrink-0"
-                          style={{ color: SAFFRON }}
-                        />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Reveal>
-            </div>
-          </div>
-        </section>
-
-        {/* Dish features — large photo panels */}
-        <section className="py-16 sm:py-20" style={{ backgroundColor: CHAR }}>
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <Reveal className="mb-12 max-w-lg">
-              <h2
-                className={`${display.className} text-4xl tracking-wide text-white sm:text-5xl`}
-              >
-                Built around what you serve
-              </h2>
-              <p className="mt-3 text-base text-white/55">
-                Different kitchens convert differently. Campaigns and pages
-                should match how diners decide.
-              </p>
-            </Reveal>
-            <RevealGroup className="grid gap-4 sm:grid-cols-2" stagger={0.1}>
-              {dishes.map((d, i) => (
-                <RevealItem
-                  key={d.title}
-                  y={24}
-                  className={i === 0 ? "sm:col-span-2" : ""}
-                >
-                  <article
-                    className={`group relative overflow-hidden rounded-3xl ${i === 0 ? "min-h-[320px] sm:min-h-[380px]" : "min-h-[280px]"}`}
-                  >
-                    <Image
-                      src={d.image}
-                      alt={d.title}
-                      fill
-                      placeholder="blur"
-                      sizes="(min-width: 640px) 50vw, 100vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                      <h3
-                        className={`${display.className} text-3xl tracking-wide text-white`}
-                      >
-                        {d.title}
-                      </h3>
-                      <p className="mt-2 max-w-md text-sm leading-relaxed text-white/70">
-                        {d.body}
-                      </p>
-                    </div>
-                  </article>
-                </RevealItem>
-              ))}
-            </RevealGroup>
-          </div>
-        </section>
-
-        {/* Peak hours — unique restaurant angle */}
-        <section className="bg-white py-16 text-neutral-900 sm:py-20">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <Reveal className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p
-                  className="mb-2 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em]"
-                  style={{ color: SAFFRON }}
-                >
-                  <Clock className="h-3.5 w-3.5" /> Peak hunger windows
-                </p>
-                <h2
-                  className={`${display.className} text-4xl tracking-wide sm:text-5xl`}
-                  style={{ color: CHAR }}
-                >
-                  Ads that fire when stomachs do
-                </h2>
-              </div>
-              <p className="max-w-xs text-sm text-neutral-500">
-                We schedule spend around lunch, dinner, and late-night delivery
-                — not a flat daily drip.
-              </p>
-            </Reveal>
-            <RevealGroup className="space-y-4" stagger={0.08}>
-              {peakHours.map((h) => (
-                <RevealItem key={h.slot} y={14}>
-                  <div className="grid items-center gap-3 sm:grid-cols-[120px_1fr_100px]">
-                    <p
-                      className={`${display.className} text-2xl tracking-wide`}
-                      style={{ color: CHAR }}
-                    >
-                      {h.slot}
-                    </p>
-                    <div className="h-10 overflow-hidden rounded-full bg-neutral-100">
-                      <div
-                        className="flex h-full items-center rounded-full px-4 text-xs font-bold text-[#0E0E0E]"
-                        style={{ width: h.fill, backgroundColor: SAFFRON }}
-                      >
-                        {h.label}
-                      </div>
-                    </div>
-                    <p className="text-right text-sm font-bold text-neutral-400">
-                      {h.fill} intent
-                    </p>
-                  </div>
-                </RevealItem>
-              ))}
-            </RevealGroup>
-          </div>
-        </section>
-
-        {/* How it works — ticket stubs */}
-        <section className="py-16 sm:py-20" style={{ backgroundColor: SMOKE }}>
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <Reveal
-              as="h2"
-              className={`${display.className} mb-10 text-center text-4xl tracking-wide text-white sm:text-5xl`}
-            >
-              Order of operations
-            </Reveal>
-            <RevealGroup className="grid gap-4 md:grid-cols-3" stagger={0.1}>
-              {[
-                {
-                  icon: Megaphone,
-                  n: "01",
-                  title: "We run the ads",
-                  body: "Google, Meta, and Maps aimed at your menu, radius, and peak hours.",
-                },
-                {
-                  icon: MessageCircle,
-                  n: "02",
-                  title: "They call or order",
-                  body: "Every inquiry hits a page built to convert — no dead ends.",
-                },
-                {
-                  icon: Phone,
-                  n: "03",
-                  title: "You get the customer",
-                  body: "Tracked from click to cover or order so you know what paid off.",
-                },
-              ].map((s) => (
-                <RevealItem key={s.n} y={20}>
-                  <div className="relative overflow-hidden rounded-2xl border border-dashed border-white/20 bg-[#1a1a1a] p-6">
-                    <span
-                      className={`${display.className} absolute -right-1 -top-2 text-7xl text-white/5`}
-                    >
-                      {s.n}
-                    </span>
-                    <span
-                      className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full"
-                      style={{ backgroundColor: SAFFRON, color: CHAR }}
-                    >
-                      <s.icon className="h-5 w-5" />
-                    </span>
-                    <h3
-                      className={`${display.className} mb-2 text-2xl tracking-wide text-white`}
-                    >
-                      {s.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-white/55">
-                      {s.body}
-                    </p>
-                  </div>
-                </RevealItem>
-              ))}
-            </RevealGroup>
-          </div>
-        </section>
-
         {/* Services — receipt / ticket strip */}
         <section className="bg-white py-16 text-neutral-900 sm:py-20">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <Reveal className="mb-8 text-center">
+              <p
+                className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]"
+                style={{ color: SAFFRON }}
+              >
+                Services we provide
+              </p>
               <h2
                 className={`${display.className} text-4xl tracking-wide sm:text-5xl`}
                 style={{ color: CHAR }}
@@ -823,7 +558,279 @@ export default function RestaurantLpPage() {
           </div>
         </section>
 
+        {/* Case study — Newport Beach proof, after the ads explanation */}
         <NewportCaseStudy />
+
+        {/* Margin story — bold comparison bars */}
+        <section className="bg-white py-16 text-neutral-900 sm:py-20">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <Reveal className="mb-10 text-center">
+              <h2
+                className={`${display.className} text-4xl tracking-wide sm:text-5xl`}
+                style={{ color: CHAR }}
+              >
+                Stop tipping the delivery apps
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl text-base text-neutral-600">
+                Every aggregator order costs commission and hands them your
+                customer. Direct ads flip that.
+              </p>
+            </Reveal>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Reveal x={-14}>
+                <div className="h-full rounded-3xl bg-neutral-100 p-6 sm:p-8">
+                  <div className="mb-6 flex items-baseline justify-between">
+                    <p className="text-sm font-bold uppercase tracking-wide text-neutral-500">
+                      Via apps
+                    </p>
+                    <p
+                      className={`${display.className} text-5xl text-neutral-400`}
+                    >
+                      −28%
+                    </p>
+                  </div>
+                  <div className="mb-6 h-3 overflow-hidden rounded-full bg-neutral-200">
+                    <div className="h-full w-[72%] rounded-full bg-neutral-400" />
+                  </div>
+                  <ul className="space-y-3">
+                    {[
+                      "20–30% commission every order",
+                      "They own the customer data",
+                      "No path to repeat business",
+                      "Race to the bottom on price",
+                    ].map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-2 text-sm text-neutral-600"
+                      >
+                        <X className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
+              <Reveal x={14} delay={0.08}>
+                <div
+                  className="h-full rounded-3xl p-6 sm:p-8"
+                  style={{
+                    backgroundColor: CHAR,
+                    boxShadow: `0 0 0 2px ${SAFFRON}`,
+                  }}
+                >
+                  <div className="mb-6 flex items-baseline justify-between">
+                    <p
+                      className="text-sm font-bold uppercase tracking-wide"
+                      style={{ color: SAFFRON }}
+                    >
+                      Direct ads
+                    </p>
+                    <p
+                      className={`${display.className} text-5xl`}
+                      style={{ color: SAFFRON }}
+                    >
+                      100%
+                    </p>
+                  </div>
+                  <div className="mb-6 h-3 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full w-full rounded-full"
+                      style={{ backgroundColor: SAFFRON }}
+                    />
+                  </div>
+                  <ul className="space-y-3">
+                    {[
+                      "Keep the full order value",
+                      "Phone & WhatsApp stay yours",
+                      "Retarget for the next offer",
+                      "Win on experience, not discounts",
+                    ].map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-2 text-sm font-medium text-white/85"
+                      >
+                        <CheckCircle2
+                          className="mt-0.5 h-4 w-4 shrink-0"
+                          style={{ color: SAFFRON }}
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* Service clock */}
+        <section className="py-16 sm:py-20" style={{ backgroundColor: CHAR }}>
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <Reveal>
+              <ServiceClock />
+            </Reveal>
+          </div>
+        </section>
+
+        {/* Peak hours — unique restaurant angle */}
+        <section className="bg-white py-16 text-neutral-900 sm:py-20">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <Reveal className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p
+                  className="mb-2 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em]"
+                  style={{ color: SAFFRON }}
+                >
+                  <Clock className="h-3.5 w-3.5" /> Peak hunger windows
+                </p>
+                <h2
+                  className={`${display.className} text-4xl tracking-wide sm:text-5xl`}
+                  style={{ color: CHAR }}
+                >
+                  Ads that fire when stomachs do
+                </h2>
+              </div>
+              <p className="max-w-xs text-sm text-neutral-500">
+                We schedule spend around lunch, dinner, and late-night delivery
+                — not a flat daily drip.
+              </p>
+            </Reveal>
+            <RevealGroup className="space-y-4" stagger={0.08}>
+              {peakHours.map((h) => (
+                <RevealItem key={h.slot} y={14}>
+                  <div className="grid items-center gap-3 sm:grid-cols-[120px_1fr_100px]">
+                    <p
+                      className={`${display.className} text-2xl tracking-wide`}
+                      style={{ color: CHAR }}
+                    >
+                      {h.slot}
+                    </p>
+                    <div className="h-10 overflow-hidden rounded-full bg-neutral-100">
+                      <div
+                        className="flex h-full items-center rounded-full px-4 text-xs font-bold text-[#0E0E0E]"
+                        style={{ width: h.fill, backgroundColor: SAFFRON }}
+                      >
+                        {h.label}
+                      </div>
+                    </div>
+                    <p className="text-right text-sm font-bold text-neutral-400">
+                      {h.fill} intent
+                    </p>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          </div>
+        </section>
+
+        {/* Dish features — large photo panels */}
+        <section className="py-16 sm:py-20" style={{ backgroundColor: CHAR }}>
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <Reveal className="mb-12 max-w-lg">
+              <h2
+                className={`${display.className} text-4xl tracking-wide text-white sm:text-5xl`}
+              >
+                Built around what you serve
+              </h2>
+              <p className="mt-3 text-base text-white/55">
+                Different kitchens convert differently. Campaigns and pages
+                should match how diners decide.
+              </p>
+            </Reveal>
+            <RevealGroup className="grid gap-4 sm:grid-cols-2" stagger={0.1}>
+              {dishes.map((d, i) => (
+                <RevealItem
+                  key={d.title}
+                  y={24}
+                  className={i === 0 ? "sm:col-span-2" : ""}
+                >
+                  <article
+                    className={`group relative overflow-hidden rounded-3xl ${i === 0 ? "min-h-[320px] sm:min-h-[380px]" : "min-h-[280px]"}`}
+                  >
+                    <Image
+                      src={d.image}
+                      alt={d.title}
+                      fill
+                      placeholder="blur"
+                      sizes="(min-width: 640px) 50vw, 100vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                      <h3
+                        className={`${display.className} text-3xl tracking-wide text-white`}
+                      >
+                        {d.title}
+                      </h3>
+                      <p className="mt-2 max-w-md text-sm leading-relaxed text-white/70">
+                        {d.body}
+                      </p>
+                    </div>
+                  </article>
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          </div>
+        </section>
+
+        {/* How it works — ticket stubs */}
+        <section className="py-16 sm:py-20" style={{ backgroundColor: SMOKE }}>
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <Reveal
+              as="h2"
+              className={`${display.className} mb-10 text-center text-4xl tracking-wide text-white sm:text-5xl`}
+            >
+              Order of operations
+            </Reveal>
+            <RevealGroup className="grid gap-4 md:grid-cols-3" stagger={0.1}>
+              {[
+                {
+                  icon: Megaphone,
+                  n: "01",
+                  title: "We run the ads",
+                  body: "Google, Meta, and Maps aimed at your menu, radius, and peak hours.",
+                },
+                {
+                  icon: MessageCircle,
+                  n: "02",
+                  title: "They call or order",
+                  body: "Every inquiry hits a page built to convert — no dead ends.",
+                },
+                {
+                  icon: Phone,
+                  n: "03",
+                  title: "You get the customer",
+                  body: "Tracked from click to cover or order so you know what paid off.",
+                },
+              ].map((s) => (
+                <RevealItem key={s.n} y={20}>
+                  <div className="relative overflow-hidden rounded-2xl border border-dashed border-white/20 bg-[#1a1a1a] p-6">
+                    <span
+                      className={`${display.className} absolute -right-1 -top-2 text-7xl text-white/5`}
+                    >
+                      {s.n}
+                    </span>
+                    <span
+                      className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full"
+                      style={{ backgroundColor: SAFFRON, color: CHAR }}
+                    >
+                      <s.icon className="h-5 w-5" />
+                    </span>
+                    <h3
+                      className={`${display.className} mb-2 text-2xl tracking-wide text-white`}
+                    >
+                      {s.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-white/55">
+                      {s.body}
+                    </p>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          </div>
+        </section>
 
         {/* FAQ */}
         <section className="bg-[#F7F4EE] py-16 text-neutral-900 sm:py-20">
