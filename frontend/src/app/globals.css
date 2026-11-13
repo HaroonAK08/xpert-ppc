@@ -104,6 +104,55 @@
     }
   }
 
+  .restaurant-display {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Narrow', sans-serif;
+    font-weight: 400;
+  }
+
+  .restaurant-body {
+    color: #f8fafc;
+    font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Keep inherited site tokens readable over the LP's charcoal sections. */
+  .restaurant-body .text-foreground {
+    color: #f8fafc;
+  }
+
+  .restaurant-body .text-primary,
+  .restaurant-body .text-blue-500,
+  .restaurant-body .text-blue-600,
+  .restaurant-body .text-blue-700 {
+    color: #f5a524;
+  }
+
+  .restaurant-body .text-muted-foreground {
+    color: rgb(226 232 240 / 0.72);
+  }
+
+  /* Form cards are white surfaces, so their labels and controls need the
+     light-surface token rather than the dark-section token above. */
+  .restaurant-body .bg-white .text-foreground {
+    color: #111827;
+  }
+
+  .restaurant-body .bg-white .text-muted-foreground,
+  .restaurant-body .bg-white label {
+    color: #64748b;
+  }
+
+  .restaurant-body .bg-white input,
+  .restaurant-body .bg-white textarea,
+  .restaurant-body .bg-white select {
+    color: #111827;
+  }
+
+  .restaurant-body .bg-white input::placeholder,
+  .restaurant-body .bg-white textarea::placeholder {
+    color: #64748b;
+    opacity: 1;
+  }
+
   .glow-primary {
     box-shadow: 0 0 18px hsla(var(--primary), 0.45);
   }

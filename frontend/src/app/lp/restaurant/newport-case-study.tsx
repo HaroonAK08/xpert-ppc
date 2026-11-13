@@ -59,7 +59,7 @@ export function NewportCaseStudy() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <Reveal className="max-w-3xl">
           <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>Restaurant case study</p>
-          <h2 className="font-[family-name:var(--font-resto-display)] text-4xl tracking-wide sm:text-6xl">Newport Beach restaurant growth, reported clearly</h2>
+          <h2 className="restaurant-display text-4xl tracking-wide sm:text-6xl">Newport Beach restaurant growth, reported clearly</h2>
           <p className="mt-4 text-base leading-relaxed text-white/75">A local restaurant wanted more people to find it online, order food, book tables, and enquire about private dining and events. Xpert PPC supported the restaurant for about four years.</p>
           <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-white/50">Restaurant name kept private · Newport Beach, California · One-month growth comparison</p>
         </Reveal>
@@ -82,7 +82,7 @@ export function NewportCaseStudy() {
         <div className="mt-16 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <Reveal>
             <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>About the project</p>
-            <h3 className="font-[family-name:var(--font-resto-display)] text-4xl tracking-wide">A local restaurant with room to grow</h3>
+            <h3 className="restaurant-display text-4xl tracking-wide">A local restaurant with room to grow</h3>
           </Reveal>
           <Reveal delay={0.08}>
             <p className="text-base leading-relaxed text-white/75">The restaurant wanted more orders and bookings, including private dining, family gatherings, graduation parties, and groups. The work covered search engines, paid ads, social media, the website, booking tools, tracking, and reporting.</p>
@@ -93,21 +93,21 @@ export function NewportCaseStudy() {
         </div>
 
         <div className="mt-20">
-          <Reveal className="mb-8"><h3 className="font-[family-name:var(--font-resto-display)] text-4xl tracking-wide sm:text-5xl">The challenges</h3><p className="mt-3 max-w-2xl text-white/60">The main areas that needed attention before the marketing could connect with orders and bookings.</p></Reveal>
+          <Reveal className="mb-8"><h3 className="restaurant-display text-4xl tracking-wide sm:text-5xl">The challenges</h3><p className="mt-3 max-w-2xl text-white/60">The main areas that needed attention before the marketing could connect with orders and bookings.</p></Reveal>
           <RevealGroup className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
             {challenges.map(([number, title, body]) => <RevealItem key={number} y={14} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5"><p className="text-sm font-bold" style={{ color: saffron }}>{number}</p><h4 className="mt-3 text-base font-bold">{title}</h4><p className="mt-2 text-sm leading-relaxed text-white/60">{body}</p></RevealItem>)}
           </RevealGroup>
         </div>
 
         <div className="mt-20">
-          <Reveal className="mb-8"><h3 className="font-[family-name:var(--font-resto-display)] text-4xl tracking-wide sm:text-5xl">What we did</h3><p className="mt-3 max-w-2xl text-white/60">A connected plan across search, ads, social media, tracking, reporting, ordering, and reservations.</p></Reveal>
+          <Reveal className="mb-8"><h3 className="restaurant-display text-4xl tracking-wide sm:text-5xl">What we did</h3><p className="mt-3 max-w-2xl text-white/60">A connected plan across search, ads, social media, tracking, reporting, ordering, and reservations.</p></Reveal>
           <RevealGroup className="grid gap-3 md:grid-cols-2" stagger={0.05}>
             {actions.map(([title, body], i) => <RevealItem key={title} y={14} className="flex gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5"><span className="shrink-0 text-2xl font-bold" style={{ color: saffron }}>{String(i + 1).padStart(2, '0')}</span><div><h4 className="font-bold">{title}</h4><p className="mt-2 text-sm leading-relaxed text-white/60">{body}</p></div></RevealItem>)}
           </RevealGroup>
         </div>
 
         <div className="mt-20">
-          <Reveal><p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>The results</p><h3 className="font-[family-name:var(--font-resto-display)] text-4xl tracking-wide sm:text-5xl">45% more orders and 55% more website traffic</h3><p className="mt-4 max-w-3xl text-base leading-relaxed text-white/70">The restaurant reported this growth over one month. Order growth is an estimate based on management-reported performance and reflects wider marketing work across several channels.</p></Reveal>
+          <Reveal><p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>The results</p><h3 className="restaurant-display text-4xl tracking-wide sm:text-5xl">Estimated 45% more orders and 55% more website traffic</h3><p className="mt-4 max-w-3xl text-base leading-relaxed text-white/70">The restaurant reported this growth over one month. Order growth is an estimate based on management-reported performance and reflects wider marketing work across several channels.</p></Reveal>
           <Reveal className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
             <div className="border-b border-white/10 px-5 py-4"><p className="font-bold">Google Ads results over the longer reporting period</p><p className="mt-1 text-xs text-white/50">June 1, 2025–October 31, 2026</p></div>
             <div className="divide-y divide-white/10">{performance.map(([label, value]) => <div key={label} className="flex items-center justify-between gap-4 px-5 py-4 text-sm"><span className="text-white/65">{label}</span><strong className="text-right" style={{ color: saffron }}>{value}</strong></div>)}</div>
@@ -124,7 +124,7 @@ export function NewportCaseStudy() {
         <div className="mt-20 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <Reveal>
             <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>Beyond advertising</p>
-            <h3 className="font-[family-name:var(--font-resto-display)] text-4xl tracking-wide">Support from the first search to the booking</h3>
+            <h3 className="restaurant-display text-4xl tracking-wide">Support from the first search to the booking</h3>
             <p className="mt-4 text-sm leading-relaxed text-white/60">The website, order process, and booking tools also need attention. The work covered everyday orders and table reservations, plus private dining and special occasions.</p>
           </Reveal>
           <RevealGroup className="grid gap-3 sm:grid-cols-2" stagger={0.05}>
@@ -133,7 +133,7 @@ export function NewportCaseStudy() {
         </div>
 
         <div className="mt-20">
-          <Reveal className="mb-8"><p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>Services delivered</p><h3 className="font-[family-name:var(--font-resto-display)] text-4xl tracking-wide sm:text-5xl">The full scope of our work</h3></Reveal>
+          <Reveal className="mb-8"><p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>Services delivered</p><h3 className="restaurant-display text-4xl tracking-wide sm:text-5xl">The full scope of our work</h3></Reveal>
           <RevealGroup className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" stagger={0.03}>
             {services.map((service) => <RevealItem key={service} y={10} className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-sm text-white/70"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: saffron }} />{service}</RevealItem>)}
           </RevealGroup>
