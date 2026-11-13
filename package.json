@@ -25,7 +25,11 @@
     "seed": "npm --workspace backend run seed",
     "test:backend": "npm --workspace backend run test",
     "typecheck": "npm --workspace backend run typecheck && npm --workspace frontend run typecheck && npm --workspace apps/mobile run typecheck && npm --prefix crm-frontend run typecheck",
-    "lint": "npm --workspace frontend run lint"
+    "lint": "npm --workspace frontend run lint",
+    "zip:website": "bash scripts/build-hostinger.sh website",
+    "zip:backend": "bash scripts/build-hostinger.sh backend",
+    "zip:courses": "bash scripts/build-hostinger.sh courses",
+    "zip:all": "bash scripts/build-hostinger.sh all"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
