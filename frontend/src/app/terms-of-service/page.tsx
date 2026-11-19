@@ -66,7 +66,7 @@ export default function TermsOfServicePage() {
         {
           heading: 'Confidentiality',
           body: [
-            'Each party agrees to keep the other party&rsquo;s non-public business information confidential and to use it only to perform the engagement.',
+            'Each party agrees to keep the other party’s non-public business information confidential and to use it only to perform the engagement.',
           ],
         },
         {

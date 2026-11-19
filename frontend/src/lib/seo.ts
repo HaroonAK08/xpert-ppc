@@ -28,8 +28,13 @@ export function buildMetadata({
   const url = new URL(path, siteConfig.url).toString();
   const imageUrl = new URL(image, siteConfig.url).toString();
 
+  // The root layout appends "| Xpert PPC" via its title template, but much of
+  // the content in shared/ already ends with the brand. Strip it here so the
+  // template adds it exactly once instead of producing "… | Xpert PPC | Xpert PPC".
+  const pageTitle = title.replace(/\s*[|\-–]\s*Xpert ?PPC\s*$/i, '').trim() || title;
+
   return {
-    title,
+    title: pageTitle,
     description,
     keywords,
     alternates: { canonical: url },

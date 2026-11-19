@@ -56,10 +56,10 @@ export default function TeamMemberPage() {
                 </h2>
                 <div className="space-y-3">
                   <a
-                    href={`mailto:${'waseem@xpertppc.com'}`}
+                    href={`mailto:${siteConfig.contact.email}`}
                     className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
-                    <Mail className="h-4 w-4 shrink-0" /> {'waseem@xpertppc.com'}
+                    <Mail className="h-4 w-4 shrink-0" /> {siteConfig.contact.email}
                   </a>
                   <a href={`tel:${siteConfig.contact.phoneCanadaRaw}`} className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-primary">
                     <Phone className="h-4 w-4 shrink-0" /> {siteConfig.contact.phoneCanada}

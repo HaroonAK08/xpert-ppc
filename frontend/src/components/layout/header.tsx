@@ -298,10 +298,21 @@ export function Header() {
                   className="relative"
                   onMouseEnter={() => setOpenDropdown(item.label)}
                   onMouseLeave={() => setOpenDropdown(null)}
+                  onFocus={() => setOpenDropdown(item.label)}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) setOpenDropdown(null);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                      setOpenDropdown(null);
+                      event.currentTarget.querySelector('button')?.focus();
+                    }
+                  }}
                 >
                   <button
                     type="button"
                     aria-expanded={openDropdown === item.label}
+                    aria-haspopup="menu"
                     onClick={() =>
                       setOpenDropdown((cur) => (cur === item.label ? null : item.label))
                     }
@@ -323,11 +334,12 @@ export function Header() {
 
                   {openDropdown === item.label ? (
                     <div className="absolute left-1/2 top-full z-50 w-80 -translate-x-1/2 pt-4">
-                      <div className="max-h-[70vh] overflow-y-auto overflow-hidden rounded-2xl border border-primary/20 bg-card shadow-2xl">
+                      <div role="menu" className="max-h-[70vh] overflow-y-auto overflow-hidden rounded-2xl border border-primary/20 bg-card shadow-2xl">
                         {item.children.map((child) => (
                           <Link
                             key={child.href}
                             href={to(child.href)}
+                            role="menuitem"
                             className="block px-5 py-4 transition-colors hover:bg-primary/10"
                           >
                             <span className="block text-sm font-semibold text-foreground">
@@ -368,7 +380,7 @@ export function Header() {
               href={to('/contact')}
               className="btn-hover-effect inline-flex h-10 items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90"
             >
-              Book a Call
+              Book a Strategy Call
             </Link>
           </div>
 
@@ -425,7 +437,7 @@ export function Header() {
               href={to('/contact')}
               className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground"
             >
-              Book a Call
+              Book a Strategy Call
             </Link>
           </nav>
         </div>

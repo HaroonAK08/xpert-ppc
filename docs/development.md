@@ -24,9 +24,11 @@ npm run dev:backend
 # Mobile (new terminal)
 npm run dev:mobile
 
-# Optional: website frontend
+# Optional: website frontend (one frontend dev process)
 npm run dev:frontend
 ```
+
+The frontend uses `.next-dev` for `next dev` and `.next` for production builds. This keeps `npm run build` from replacing development vendor chunks. Run only one frontend dev process on port 3000; source edits should update through Next HMR without restarting the server.
 
 ### Mobile API URL
 

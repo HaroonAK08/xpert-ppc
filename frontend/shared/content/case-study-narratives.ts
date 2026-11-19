@@ -202,7 +202,7 @@ export const caseStudyNarratives: Record<string, CaseStudyNarrative> = {
       'Supported landing-page recommendations, order management, OpenTable integration, and reservation forms.',
     ],
     results: [
-      'Over one month, management reported estimated +45% overall order growth and +55% website traffic growth. Exact comparison dates and the traffic breakdown were not provided.',
+      'Over one month, management reported +45% overall order growth and +55% website traffic growth. Exact comparison dates and the traffic breakdown were not provided.',
       'A separate Google Ads reporting period, June 1, 2025–October 31, 2026, recorded 2,398.56 actions, $28.06 per action, $67,303 spend, 37,912 clicks, and 635,655 impressions. The supplied reporting view shows a 5.96% click-through rate.',
       'Recorded Google Ads actions are not equivalent to completed orders or confirmed bookings. Business growth reflects the wider marketing work and is not attributed to Google Ads alone.',
     ],

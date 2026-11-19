@@ -66,7 +66,7 @@ export function NewportCaseStudy() {
 
         <RevealGroup className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" stagger={0.06}>
           {[
-            ['+45%', 'Estimated overall order growth', 'One month'],
+            ['+45%', 'Overall order growth', 'One month'],
             ['+55%', 'Reported website traffic growth', 'One month'],
             ['2,399', 'Google Ads actions', 'June 2025–October 2026; rounded'],
             ['$28.06', 'Cost per recorded action', 'Google Ads reporting period'],
@@ -107,7 +107,7 @@ export function NewportCaseStudy() {
         </div>
 
         <div className="mt-20">
-          <Reveal><p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>The results</p><h3 className="restaurant-display text-4xl tracking-wide sm:text-5xl">Estimated 45% more orders and 55% more website traffic</h3><p className="mt-4 max-w-3xl text-base leading-relaxed text-white/70">The restaurant reported this growth over one month. Order growth is an estimate based on management-reported performance and reflects wider marketing work across several channels.</p></Reveal>
+          <Reveal><p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: saffron }}>The results</p><h3 className="restaurant-display text-4xl tracking-wide sm:text-5xl">45% more orders and 55% more website traffic</h3><p className="mt-4 max-w-3xl text-base leading-relaxed text-white/70">The restaurant reported this growth over one month across several marketing channels.</p></Reveal>
           <Reveal className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
             <div className="border-b border-white/10 px-5 py-4"><p className="font-bold">Google Ads results over the longer reporting period</p><p className="mt-1 text-xs text-white/50">June 1, 2025–October 31, 2026</p></div>
             <div className="divide-y divide-white/10">{performance.map(([label, value]) => <div key={label} className="flex items-center justify-between gap-4 px-5 py-4 text-sm"><span className="text-white/65">{label}</span><strong className="text-right" style={{ color: saffron }}>{value}</strong></div>)}</div>
@@ -141,7 +141,7 @@ export function NewportCaseStudy() {
 
         <Reveal className="mt-14 flex flex-col gap-3 sm:flex-row sm:items-center"><a href="#audit-form" className="inline-flex min-h-12 items-center justify-center rounded-full px-7 text-sm font-bold" style={{ backgroundColor: saffron, color: charcoal }}>Get a free restaurant marketing review</a><Link href="/case-study/newport-beach-restaurant" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/25 px-7 text-sm font-bold text-white hover:bg-white/10"><CheckCircle2 className="mr-2 h-4 w-4" /> Read the full case study</Link></Reveal>
 
-        <Reveal className="mt-10 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-xs leading-relaxed text-white/55"><strong className="text-white/75">About these results:</strong> The one-month growth figures were reported by management. Order growth is estimated. Exact comparison dates and the traffic source breakdown were not provided. The Google Ads figures come from the supplied account screenshots. Business growth figures are not attributed to Google Ads alone. The restaurant name is kept private, and the header image is generic rather than a photograph of the client.</Reveal>
+        <Reveal className="mt-10 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-xs leading-relaxed text-white/55"><strong className="text-white/75">About these results:</strong> The one-month growth figures were reported by management. Exact comparison dates and the traffic source breakdown were not provided. The Google Ads figures come from the supplied account screenshots. Business growth figures are not attributed to Google Ads alone. The restaurant name is kept private, and the header image is generic rather than a photograph of the client.</Reveal>
 
       </div>
     </section>

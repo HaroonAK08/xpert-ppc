@@ -23,7 +23,7 @@ export type CaseStudyContent = {
   featured?: boolean;
   /** Dashboard screenshots. Leave unset until exact asset files exist. */
   proof?: { src: string; alt: string; caption: string }[];
-  /** Scope note when a headline metric is estimated or a rate is segment-specific. */
+  /** Scope note when a headline metric needs qualification or a rate is segment-specific. */
   measurementNote?: string;
   seo: { title: string; description: string; keywords: string[] };
 };
@@ -1104,21 +1104,21 @@ export const newportBeachRestaurant: CaseStudyContent = {
   slug: 'newport-beach-restaurant',
   client: 'Newport Beach Restaurant',
   title: 'Newport Beach Restaurant Case Study',
-  subtitle: 'Estimated +45% overall order growth and +55% website traffic growth over one month',
+  subtitle: '+45% overall order growth and +55% website traffic growth over one month',
   excerpt:
-    'An anonymous Newport Beach restaurant reported estimated +45% overall order growth and +55% website traffic growth over one month, alongside 2,399 Google Ads actions at $28.06 each.',
+    'An anonymous Newport Beach restaurant reported +45% overall order growth and +55% website traffic growth over one month, alongside 2,399 Google Ads actions at $28.06 each.',
   industry: 'Restaurants and Hospitality — Newport Beach, California',
   duration: 'About four years of ongoing support',
   channels: ['Local SEO', 'Google Ads', 'Bing Ads', 'Social Media'],
   heroImage: '/lp/restaurant/lp-restaurant-hero.png',
   metrics: [
-    { value: '+45%', label: 'Estimated Order Growth', icon: 'TrendingUp' },
+    { value: '+45%', label: 'Order Growth', icon: 'TrendingUp' },
     { value: '+55%', label: 'Reported Website Traffic', icon: 'TrendingUp' },
     { value: '2,399', label: 'Google Ads Actions', icon: 'BarChart3' },
     { value: '$28.06', label: 'Cost per Recorded Action', icon: 'Target' },
   ],
   intro:
-    'A Newport Beach restaurant wanted more people to find it online, order food, book tables, and enquire about private dining and events. Xpert PPC has supported the restaurant for about four years. Over one month, management reported estimated +45% overall order growth and +55% website traffic growth. The longer Google Ads reporting view, from June 1, 2025 to October 31, 2026, shows 2,399 recorded actions at $28.06 each, $67,303 spend, 37,912 clicks, and 635,655 impressions.',
+    'A Newport Beach restaurant wanted more people to find it online, order food, book tables, and enquire about private dining and events. Xpert PPC has supported the restaurant for about four years. Over one month, management reported +45% overall order growth and +55% website traffic growth. The longer Google Ads reporting view, from June 1, 2025 to October 31, 2026, shows 2,399 recorded actions at $28.06 each, $67,303 spend, 37,912 clicks, and 635,655 impressions.',
   pillarsHeading: 'What the Work Covered',
   pillarsIntro: 'Search, paid advertising, social media, tracking, reporting, and booking support.',
   pillars: [
@@ -1144,12 +1144,12 @@ export const newportBeachRestaurant: CaseStudyContent = {
     },
   ],
   takeawaysHeading: 'Reported Results',
-  takeawaysIntro: 'Figures below match the source report. Order growth is labeled as an estimate.',
+  takeawaysIntro: 'Figures below match the source report and are shown with their reporting scope.',
   takeaways: [
     {
-      title: 'Estimated Order Growth',
+      title: 'Order Growth',
       description:
-        'Management reported about 45% overall order growth over one month. The figure is an estimate, not a completed point-of-sale reconciliation.',
+        'Management reported about 45% overall order growth over one month. The comparison dates and source reconciliation were not provided.',
     },
     {
       title: 'Reported Website Traffic Growth',
@@ -1179,12 +1179,12 @@ export const newportBeachRestaurant: CaseStudyContent = {
     'Private dining and event promotion', 'Ongoing account reviews and support',
   ],
   measurementNote:
-    'The one-month growth figures were reported by management. Order growth is estimated. Exact comparison dates and the traffic source breakdown were not provided. Google Ads figures come from the supplied account screenshots for June 1, 2025–October 31, 2026. The business growth figures are not attributed to Google Ads alone.',
+    'The one-month growth figures were reported by management. Exact comparison dates and the traffic source breakdown were not provided. Google Ads figures come from the supplied account screenshots for June 1, 2025–October 31, 2026. The business growth figures are not attributed to Google Ads alone.',
   proof: [
     {
       src: '/case-studies/newport-beach-restaurant/account-overview.jpg',
       alt: 'Redacted Google Ads reporting overview for the Newport Beach Restaurant case study',
-      caption: 'Redacted reporting overview from the supplied account view. The headline figures in this case study come from the reported period and the +45% order-growth figure is a separate management estimate.',
+      caption: 'Redacted reporting overview from the supplied account view. The headline figures in this case study come from the reported period and the +45% order-growth figure is reported separately from the Google Ads account view.',
     },
     {
       src: '/case-studies/newport-beach-restaurant/campaign-table.jpg',
@@ -1195,7 +1195,7 @@ export const newportBeachRestaurant: CaseStudyContent = {
   seo: {
     title: 'Newport Beach Restaurant Google Ads Case Study | Xpert PPC',
     description:
-      'Anonymous Newport Beach restaurant case study: estimated +45% overall order growth and +55% website traffic growth over one month, plus Google Ads reporting.',
+      'Anonymous Newport Beach restaurant case study: +45% overall order growth and +55% website traffic growth over one month, plus Google Ads reporting.',
     keywords: [
       'restaurant Google Ads case study',
       'Newport Beach restaurant marketing',

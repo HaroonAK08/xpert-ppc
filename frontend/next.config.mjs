@@ -73,11 +73,15 @@ const nextConfig = {
 };
 
 export default function nextConfigExport(phase) {
-  if (phase !== PRODUCTION_BUILD) return nextConfig;
+  const resolvedConfig = phase === 'phase-development-server'
+    ? { ...nextConfig, distDir: '.next-dev' }
+    : nextConfig;
+
+  if (phase !== PRODUCTION_BUILD) return resolvedConfig;
 
   // frontend/.env.local is for `next dev`. A production build on that machine
   // must not publish localhost URLs: the tracker then calls the visitor's computer.
-  const env = { ...nextConfig.env };
+  const env = { ...resolvedConfig.env };
   if (isDeviceLocalUrl(process.env.NEXT_PUBLIC_SITE_URL)) {
     env.NEXT_PUBLIC_SITE_URL = PRODUCTION_ORIGIN;
   }

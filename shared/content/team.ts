@@ -39,7 +39,7 @@ export const umerKhan: TeamMemberContent = {
     upwork: siteConfig.socials.upwork,
   },
   seo: {
-    title: 'Meet Our Team | Xpert PPC - PPC Specialists',
+    title: 'Umer Khan - Senior PPC Specialist',
     description:
       'Meet Umer Khan and our team of certified PPC specialists with 20+ years of experience managing high-performing ad campaigns.',
     keywords: [

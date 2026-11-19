@@ -26,7 +26,7 @@ verify() {
   # Read the listing once: piping unzip into `grep -q` trips pipefail (SIGPIPE).
   local listing; listing="$(unzip -Z1 "$zip")"
   # .env.example is expected; any other .env*, node_modules or .next is not.
-  if grep -E '(^|/)node_modules/|(^|/)\.next/|(^|/)\.env' <<<"$listing" | grep -qv '\.env\.example$'; then
+  if grep -E '(^|/)node_modules/|(^|/)\.next(-dev)?/|(^|/)\.env' <<<"$listing" | grep -qv '\.env\.example$'; then
     die "$zip contains node_modules, .next or a real .env file"
   fi
   local f
