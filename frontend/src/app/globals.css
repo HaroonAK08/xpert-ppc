@@ -153,6 +153,79 @@
     opacity: 1;
   }
 
+  .autoshop-body {
+    color: #111416;
+    font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Never leave page copy transparent when scroll-reveal hydration is delayed. */
+  .autoshop-body [style*='opacity'] {
+    opacity: 1 !important;
+  }
+
+  /* Faint dashboard-style dot grid behind the hero and closing CTA — a
+     reporting/analytics cue, not shop-signage texture. Static by design. */
+  .autoshop-grid {
+    background-image: linear-gradient(rgba(242, 241, 238, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(242, 241, 238, 0.08) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(to bottom, black, transparent 82%);
+  }
+
+  .autoshop-title {
+    font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.045em;
+  }
+
+  .autoshop-label {
+    letter-spacing: 0.18em;
+  }
+
+  .autoshop-form input,
+  .autoshop-form textarea,
+  .autoshop-form select {
+    border-color: #d8dee5;
+    background-color: #fff;
+  }
+
+  /* Keep inherited site tokens readable over the LP's graphite sections. */
+  .autoshop-body .text-foreground {
+    color: #f2f1ee;
+  }
+
+  .autoshop-body .text-primary,
+  .autoshop-body .text-blue-500,
+  .autoshop-body .text-blue-600,
+  .autoshop-body .text-blue-700 {
+    color: #e2793a;
+  }
+
+  .autoshop-body .text-muted-foreground {
+    color: rgb(226 232 240 / 0.72);
+  }
+
+  /* Form cards are white surfaces, so their labels and controls need the
+     light-surface token rather than the dark-section token above. */
+  .autoshop-body .bg-white .text-foreground {
+    color: #111827;
+  }
+
+  .autoshop-body .bg-white .text-muted-foreground,
+  .autoshop-body .bg-white label {
+    color: #64748b;
+  }
+
+  .autoshop-body .bg-white input,
+  .autoshop-body .bg-white textarea,
+  .autoshop-body .bg-white select {
+    color: #111827;
+  }
+
+  .autoshop-body .bg-white input::placeholder,
+  .autoshop-body .bg-white textarea::placeholder {
+    color: #64748b;
+    opacity: 1;
+  }
+
   .glow-primary {
     box-shadow: 0 0 18px hsla(var(--primary), 0.45);
   }

@@ -46,6 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: url('/lp/dermatologist'), changeFrequency: 'weekly', priority: 0.85 },
     { url: url('/lp/restaurant'), changeFrequency: 'weekly', priority: 0.85 },
     { url: url('/lp/property-dealer'), changeFrequency: 'weekly', priority: 0.85 },
+    { url: url('/lp/auto-repair'), changeFrequency: 'weekly', priority: 0.85 },
     { url: url('/ads/dermatologists'), changeFrequency: 'weekly', priority: 0.85 },
     { url: url('/privacy-policy'), changeFrequency: 'yearly', priority: 0.3 },
     { url: url('/terms-of-service'), changeFrequency: 'yearly', priority: 0.3 },

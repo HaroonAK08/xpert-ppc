@@ -70,7 +70,9 @@ export async function sendLeadNotification(lead: LeadMailPayload): Promise<void>
 
   const sourceLabel = lead.source === 'lp-restaurant' || lead.sourcePath === '/lp/restaurant'
     ? 'Restaurant landing page'
-    : lead.sourcePath || lead.source || 'Website';
+    : lead.source === 'lp-auto-repair' || lead.sourcePath === '/lp/auto-repair'
+      ? 'Auto repair landing page'
+      : lead.sourcePath || lead.source || 'Website';
   const subject = `New lead from ${sourceLabel}: ${lead.name} (${lead.platform || 'Other'})`;
   const text = [
     'New website lead',

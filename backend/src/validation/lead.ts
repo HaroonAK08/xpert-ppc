@@ -21,6 +21,7 @@ export const LEAD_SOURCES = [
   'footer',
   'lp-restaurant',
   'lp-property',
+  'lp-auto-repair',
   'embed',
   'quick-form',
   'other',

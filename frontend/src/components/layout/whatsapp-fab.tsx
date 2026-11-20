@@ -6,7 +6,7 @@ import { siteConfig } from '@/lib/site';
 
 export function WhatsAppFab() {
   const pathname = usePathname() || '';
-  if (pathname.startsWith('/ads')) return null;
+  if (pathname.startsWith('/ads') || pathname.startsWith('/lp/auto-repair')) return null;
 
   const whatsappUrl = pathname.startsWith('/lp/restaurant')
     ? 'https://wa.me/15878935511'
